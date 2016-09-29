@@ -1,0 +1,13 @@
+ChilliUnityDemo/Library
+ChilliUnityDemo/Temp
+ChilliUnityDemo/obj
+ChilliUnityDemo/Assets/Plugins/UnityPurchasing
+*.csproj
+*.sln
+*.userprefs
+ChilliUnityDemo/XCodeProj
+UnitySamples/ChilliUnityDemo/Library
+UnitySamples/ChilliUnityDemo/XCodeProj
+UnitySamples/ChilliUnityDemo/obj
+UnitySamples/ChilliUnityDemo/Assets/Plugins/UnityPurchasing
+UnitySamples/ChilliUnityDemo/Temp
