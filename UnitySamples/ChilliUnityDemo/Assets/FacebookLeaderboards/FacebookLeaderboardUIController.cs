@@ -55,10 +55,9 @@ public class FacebookLeaderboardUIController : MonoBehaviour
 	private void Start()
 	{
 		LeaderboardUIController leaderboardUIController = GameObject.FindObjectOfType<LeaderboardUIController>();
-		leaderboardUIController.Refresh(null);
 
-		FacebookSystem.Get().OnInitialised += () => SetState(State.FB_NOT_LOGGED_IN);
-		FacebookSystem.Get().OnLocalPlayerChanged += () => SetState(State.FB_LOGGED_IN);
+		AccountSystem.Get().OnInitialised += () => SetState(State.FB_NOT_LOGGED_IN);
+		AccountSystem.Get().OnLocalPlayerChanged += () => SetState(State.FB_LOGGED_IN);
 		LeaderboardSystem.Get().OnLeaderboardRefreshed += (scores) => leaderboardUIController.Refresh(scores);
 	}
 
@@ -74,7 +73,7 @@ public class FacebookLeaderboardUIController : MonoBehaviour
 			m_postScoreButton.SetActive(true);
 			m_refreshButton.SetActive(true);
 
-			m_localPlayerName.text = FacebookSystem.Get().GetLocalPlayerName();
+			m_localPlayerName.text = AccountSystem.Get().GetLocalPlayerName();
 //			m_localPlayerProfile = FacebookSystem.Get().GetLocalPlayerProfilePic();
 			break;
 		case State.FB_NOT_LOGGED_IN:
@@ -84,7 +83,7 @@ public class FacebookLeaderboardUIController : MonoBehaviour
 			m_refreshButton.SetActive(false);
 			break;
 		case State.INIT:
-			m_fbLoginButton.SetActive(false);
+			m_fbLoginButton.SetActive(true);
 			m_fbPlayerInfoPanel.SetActive(false);
 			m_postScoreButton.SetActive(false);
 			m_refreshButton.SetActive(false);
@@ -96,7 +95,7 @@ public class FacebookLeaderboardUIController : MonoBehaviour
 	///
 	private void OnLoginSelected()
 	{
-		FacebookSystem.Get().Login();
+		AccountSystem.Get().Login();
 	}
 
 	/// Called when the user presses the post score button.
