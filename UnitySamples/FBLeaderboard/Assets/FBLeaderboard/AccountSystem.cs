@@ -6,9 +6,15 @@ using ChilliConnect;
 /// Wrapper around the Facebook API and ChilliConnect calls for managing login and local user account
 ///
 public class AccountSystem 
-{
-	public event System.Action OnInitialised = delegate {};
-	public event System.Action OnLocalPlayerChanged = delegate {};
+{	
+	public enum AccountStatus
+	{
+		NONE,
+		LOGIN_ANONYMOUS,
+		LOGIN_FB
+	}
+
+	public event System.Action<AccountStatus> OnAccountStatusChanged = delegate {};
 
 	private static AccountSystem s_singletonInstance = null;
 
@@ -16,8 +22,6 @@ public class AccountSystem
 
 	private string m_fbAccessToken;
 	private string m_localPlayerName = "Unknown";
-
-	//TODO: Auto login
 
 	/// @return Singleton instance if system has been created (not lazily created)
 	/// 
@@ -33,6 +37,9 @@ public class AccountSystem
 	}
 
 	/// Must be called before any other FB API calls.
+	/// 
+	/// @param chilliConnect
+	/// 	SDK instance
 	///
 	public void Initialise(ChilliConnectSdk chilliConnect)
 	{
@@ -44,20 +51,48 @@ public class AccountSystem
 		}
 		else
 		{
-			FB.ActivateApp();
-			OnInitialised();
+			OnFBInitComplete();
 		}
 	}
 
 	/// Called when the FBInit call has completed
-	/// either successfully or not
+	/// either successfully or not.
 	///
 	private void OnFBInitComplete()
 	{
 		if(FB.IsInitialized == true)
 		{
+			Debug.Log("FB initialised");
+
 			FB.ActivateApp();
-			OnInitialised();
+
+			//Check if we have an existing FB session and if so attempt to login to Chilli using it
+			if(FB.IsLoggedIn == true)
+			{
+				Debug.Log("FB session already exists");
+
+				//This is the access token required to login to ChilliConnect via FB.
+				m_fbAccessToken = Facebook.Unity.AccessToken.CurrentAccessToken.TokenString;
+				ChilliConnectLogin(m_fbAccessToken);
+			}
+			else
+			{
+				Debug.Log("No FB session already exists");
+
+				//Check if we have a stored anonymous ChilliConnect token to login with
+				if(PlayerPrefs.HasKey("CCId") == true && PlayerPrefs.HasKey("CCSecret") == true)
+				{
+					Debug.Log("ChilliConnect account already exists. Logging in");
+					m_chilliConnect.PlayerAccounts.LogInUsingChilliConnect(PlayerPrefs.GetString("CCId"), PlayerPrefs.GetString("CCSecret"), (loginRequest) => OnChilliConnectAnonLoggedIn(), (loginRequest, error) => Debug.LogError(error.ErrorDescription));
+				}
+				else
+				{
+					Debug.Log("No ChilliConnect account exists. Creating one");
+					//Create a new ChilliConnect account
+					var requestDesc = new CreatePlayerRequestDesc();
+					m_chilliConnect.PlayerAccounts.CreatePlayer(requestDesc, (request, response) => OnChilliConnectAccountCreated(response), (request, createError) => Debug.LogError(createError.ErrorDescription));
+				}
+			}
 		}
 		else
 		{
@@ -68,13 +103,27 @@ public class AccountSystem
 	/// Will attempt to log the user into FB with the required permissions. 
 	/// If there is no cached session this will show the FB login dialogue.
 	///
-	public void Login()
+	public void FBLogin()
 	{
 		FB.LogInWithReadPermissions(new string[] {"public_profile", "user_friends"}, OnFBLoginComplete);
 	}
 
+	/// Attempts to login to ChilliConnect with the given FB access token
+	/// If no account exists then will pair with the current anonymous chilli account
+	/// 
+	/// @param fbAccessToken
+	/// 	The string version of the FB access token for the current FB user.
+	/// 
+	public void ChilliConnectLogin(string fbAccessToken)
+	{
+		m_chilliConnect.PlayerAccounts.LogInUsingFacebook(fbAccessToken, (request, response) => OnChilliConnectFBLoggedIn(response), (request, error) => OnChilliConnectLoginFailed(error));
+	}
+
 	/// Called when the FB login call has completed. May or may not have been
 	/// successful
+	/// 
+	/// @param result
+	/// 	Result of the FB login request
 	/// 
 	private void OnFBLoginComplete(ILoginResult result)
 	{
@@ -86,12 +135,23 @@ public class AccountSystem
 			m_fbAccessToken = Facebook.Unity.AccessToken.CurrentAccessToken.TokenString;
 
 			//First attempt to login to ChilliConnect with this FB token as an account may exist 
-			m_chilliConnect.PlayerAccounts.LogInUsingFacebook(m_fbAccessToken, (request, response) => OnChilliConnectLoggedIn(response), (request, error) => OnChilliConnectLoginFailed(error));
+			ChilliConnectLogin(m_fbAccessToken);
 		}
 		else
 		{
 			Debug.LogError("FB login failed. Reason: " + result.Error);
 		}
+	}
+
+	/// Called when the ChilliConnect login call has completed using the stored
+	/// id and secret.
+	/// 
+	private void OnChilliConnectAnonLoggedIn()
+	{
+		Debug.Log("ChilliConnect logged in anonymously");
+
+		//We consider logging in finished at this point.
+		OnAccountStatusChanged(AccountStatus.LOGIN_ANONYMOUS);
 	}
 
 	/// Called when the ChilliConnect login call has completed. This means
@@ -100,7 +160,7 @@ public class AccountSystem
 	/// @param response
 	/// 		Holds the response data including FB name
 	/// 
-	private void OnChilliConnectLoggedIn(LogInUsingFacebookResponse response)
+	private void OnChilliConnectFBLoggedIn(LogInUsingFacebookResponse response)
 	{
 		//TODO: Download local player avatar.
 
@@ -108,13 +168,13 @@ public class AccountSystem
 
 		m_localPlayerName = response.FacebookName;
 
-		//We consider logging into FB finished at this point.
-		OnLocalPlayerChanged();
+		//We consider logging in finished at this point.
+		OnAccountStatusChanged(AccountStatus.LOGIN_FB);
 	}
 
 	/// Called when the ChilliConnect login call has failed. This could mean either
 	/// a general error or that the FB player has no ChilliConnect account. In the latter
-	/// case we create a CC account and link it to the FB player.
+	/// case we link the current anonymous account to the current FB account.
 	/// 
 	/// @param error
 	/// 		Error type and description
@@ -125,21 +185,25 @@ public class AccountSystem
 
 		if(error.ErrorCode == LogInUsingFacebookError.Error.LoginNotFound)
 		{
-			//Create a new ChilliConnect account and link it with the FB token
-			var requestDesc = new CreatePlayerRequestDesc();
-			m_chilliConnect.PlayerAccounts.CreatePlayer(requestDesc, (request, response) => OnChilliConnectAccountCreated(response), (request, createError) => Debug.LogError(createError.ErrorDescription));
+			LinkFacebookAccountRequestDesc requestDesc = new LinkFacebookAccountRequestDesc(m_fbAccessToken);
+			m_chilliConnect.PlayerAccounts.LinkFacebookAccount(requestDesc, (request, linkResponse) => OnChilliConnectLinked(linkResponse), (request, linkError) => Debug.LogError(linkError.ErrorDescription));
 		}
 	}
 
-	/// Called when player creation has completed allowing us to link the newly created
-	/// account with FB
+	/// Called when a new ChilliConnect account is created
 	/// 
 	/// @param response
-	/// 
+	/// 	Holds the Id and Secret required for future anonymouse logins
+	///
 	private void OnChilliConnectAccountCreated(CreatePlayerResponse response)
 	{
-		LinkFacebookAccountRequestDesc requestDesc = new LinkFacebookAccountRequestDesc(m_fbAccessToken);
-		m_chilliConnect.PlayerAccounts.LinkFacebookAccount(requestDesc, (request, linkResponse) => OnChilliConnectLinked(linkResponse), (request, error) => Debug.LogError(error.ErrorDescription));
+		Debug.Log("Created new CC account");
+
+		PlayerPrefs.SetString("CCId", response.ChilliConnectId);
+		PlayerPrefs.SetString("CCSecret", response.ChilliConnectSecret);
+
+		//We consider logging in finished at this point.
+		OnAccountStatusChanged(AccountStatus.LOGIN_ANONYMOUS);
 	}
 
 	/// Called when the request to link FB and Chilli accounts has completed successfully
@@ -155,8 +219,8 @@ public class AccountSystem
 
 		m_localPlayerName = response.FacebookName;
 
-		//We consider logging into FB finished at this point.
-		OnLocalPlayerChanged();
+		//We consider logging in finished at this point.
+		OnAccountStatusChanged(AccountStatus.LOGIN_FB);
 	}
 
 	///

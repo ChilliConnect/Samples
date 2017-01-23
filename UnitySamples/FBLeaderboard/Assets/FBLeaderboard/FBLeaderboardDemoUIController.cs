@@ -7,17 +7,11 @@ using System.Collections;
 ///
 public class FBLeaderboardDemoUIController : MonoBehaviour 
 {
-	private enum State
-	{
-		INIT,
-		FB_LOGGED_IN,
-		FB_NOT_LOGGED_IN
-	}
-
 	private GameObject m_fbLoginButton;
-	private GameObject m_fbPlayerInfoPanel;
+	private GameObject m_playerInfoPanel;
 	private GameObject m_postScoreButton;
 	private GameObject m_refreshButton;
+	private GameObject m_leaderboardPanel;
 
 	private Text m_localPlayerName;
 	private Image m_localPlayerProfile;
@@ -31,12 +25,14 @@ public class FBLeaderboardDemoUIController : MonoBehaviour
 	private void Awake()
 	{
 		var fbLoginButton = transform.FindChild("FBLoginButton").GetComponent<Button>();
-		fbLoginButton.onClick.AddListener(OnLoginSelected);
+		fbLoginButton.onClick.AddListener(OnFBLoginSelected);
 		m_fbLoginButton = fbLoginButton.gameObject;
 
-		m_fbPlayerInfoPanel = transform.FindChild("FBPlayerInfo").gameObject;
-		m_localPlayerName = m_fbPlayerInfoPanel.transform.FindChild("Name").GetComponent<Text>();
-		m_localPlayerProfile = m_fbPlayerInfoPanel.transform.FindChild("ProfileImage").GetComponent<Image>();
+		m_leaderboardPanel = transform.FindChild("Leaderboard").gameObject;
+
+		m_playerInfoPanel = transform.FindChild("PlayerInfo").gameObject;
+		m_localPlayerName = m_playerInfoPanel.transform.FindChild("Name").GetComponent<Text>();
+		m_localPlayerProfile = m_playerInfoPanel.transform.FindChild("ProfileImage").GetComponent<Image>();
 
 		var postScoreButton = transform.FindChild("PostScoreButton").GetComponent<Button>();
 		postScoreButton.onClick.AddListener(OnPostScoreSelected);
@@ -45,9 +41,9 @@ public class FBLeaderboardDemoUIController : MonoBehaviour
 
 		var refreshButton = transform.FindChild("LeaderboardRefreshButton").GetComponent<Button>();
 		refreshButton.onClick.AddListener(OnRefreshLeaderboardSelected);
-		m_refreshButton = fbLoginButton.gameObject;
+		m_refreshButton = refreshButton.gameObject;
 
-		SetState(State.INIT);
+		SetState(AccountSystem.AccountStatus.NONE);
 	}
 
 	/// Listen to events that will change the UI
@@ -56,46 +52,50 @@ public class FBLeaderboardDemoUIController : MonoBehaviour
 	{
 		LeaderboardUIController leaderboardUIController = GameObject.FindObjectOfType<LeaderboardUIController>();
 
-		AccountSystem.Get().OnInitialised += () => SetState(State.FB_NOT_LOGGED_IN);
-		AccountSystem.Get().OnLocalPlayerChanged += () => SetState(State.FB_LOGGED_IN);
+		AccountSystem.Get().OnAccountStatusChanged += SetState;
 		LeaderboardSystem.Get().OnLeaderboardRefreshed += (scores) => leaderboardUIController.Refresh(scores);
 	}
 
 	/// Set the state of the UI (which governs what is displayed)
 	///
-	private void SetState(State state)
+	private void SetState(AccountSystem.AccountStatus status)
 	{
-		switch(state)
+		switch(status)
 		{
-		case State.FB_LOGGED_IN:
+		case AccountSystem.AccountStatus.NONE:
 			m_fbLoginButton.SetActive(false);
-			m_fbPlayerInfoPanel.SetActive(true);
+			m_playerInfoPanel.SetActive(false);
+			m_postScoreButton.SetActive(false);
+			m_refreshButton.SetActive(false);
+			m_leaderboardPanel.SetActive(false);
+			break;
+		case AccountSystem.AccountStatus.LOGIN_ANONYMOUS:
+			m_fbLoginButton.SetActive(true);
+			m_playerInfoPanel.SetActive(true);
+			m_postScoreButton.SetActive(true);
+			m_refreshButton.SetActive(false);
+			m_leaderboardPanel.SetActive(false);
+
+			m_localPlayerName.text = "Anonymous";
+			break;
+		case AccountSystem.AccountStatus.LOGIN_FB:
+			m_fbLoginButton.SetActive(false);
+			m_playerInfoPanel.SetActive(true);
 			m_postScoreButton.SetActive(true);
 			m_refreshButton.SetActive(true);
+			m_leaderboardPanel.SetActive(true);
 
 			m_localPlayerName.text = AccountSystem.Get().GetLocalPlayerName();
 //			m_localPlayerProfile = FacebookSystem.Get().GetLocalPlayerProfilePic();
-			break;
-		case State.FB_NOT_LOGGED_IN:
-			m_fbLoginButton.SetActive(true);
-			m_fbPlayerInfoPanel.SetActive(false);
-			m_postScoreButton.SetActive(true);
-			m_refreshButton.SetActive(false);
-			break;
-		case State.INIT:
-			m_fbLoginButton.SetActive(true);
-			m_fbPlayerInfoPanel.SetActive(false);
-			m_postScoreButton.SetActive(false);
-			m_refreshButton.SetActive(false);
 			break;
 		}
 	}
 
 	/// Called when the user presses the FB login button.
 	///
-	private void OnLoginSelected()
+	private void OnFBLoginSelected()
 	{
-		AccountSystem.Get().Login();
+		AccountSystem.Get().FBLogin();
 	}
 
 	/// Called when the user presses the post score button.
