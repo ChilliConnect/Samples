@@ -73,7 +73,7 @@ public class AccountSystem
 
 				//This is the access token required to login to ChilliConnect via FB.
 				m_fbAccessToken = Facebook.Unity.AccessToken.CurrentAccessToken.TokenString;
-				ChilliConnectLogin(m_fbAccessToken);
+				ChilliConnectFBLogin(m_fbAccessToken);
 			}
 			else
 			{
@@ -114,7 +114,7 @@ public class AccountSystem
 	/// @param fbAccessToken
 	/// 	The string version of the FB access token for the current FB user.
 	/// 
-	public void ChilliConnectLogin(string fbAccessToken)
+	public void ChilliConnectFBLogin(string fbAccessToken)
 	{
 		m_chilliConnect.PlayerAccounts.LogInUsingFacebook(fbAccessToken, (request, response) => OnChilliConnectFBLoggedIn(response), (request, error) => OnChilliConnectLoginFailed(error));
 	}
@@ -135,7 +135,7 @@ public class AccountSystem
 			m_fbAccessToken = Facebook.Unity.AccessToken.CurrentAccessToken.TokenString;
 
 			//First attempt to login to ChilliConnect with this FB token as an account may exist 
-			ChilliConnectLogin(m_fbAccessToken);
+			ChilliConnectFBLogin(m_fbAccessToken);
 		}
 		else
 		{

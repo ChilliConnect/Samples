@@ -6,6 +6,7 @@ using System.Collections;
 ///
 public class LeaderboardElementUIController : MonoBehaviour 
 {
+	//TODO: Profile image
 	private Text m_name;
 	private Text m_score;
 
@@ -17,6 +18,8 @@ public class LeaderboardElementUIController : MonoBehaviour
 		m_score = transform.FindChild("Score").GetComponent<Text>();
 	}
 
+	/// Setup the element with name, score and profile
+	/// 
 	public void Init(string name, int score)
 	{
 		m_name.text = name;

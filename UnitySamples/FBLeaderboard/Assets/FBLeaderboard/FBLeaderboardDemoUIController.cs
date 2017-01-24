@@ -56,7 +56,7 @@ public class FBLeaderboardDemoUIController : MonoBehaviour
 		LeaderboardSystem.Get().OnLeaderboardRefreshed += (scores) => leaderboardUIController.Refresh(scores);
 	}
 
-	/// Set the state of the UI (which governs what is displayed)
+	/// Decides what to display based on the users login status
 	///
 	private void SetState(AccountSystem.AccountStatus status)
 	{
