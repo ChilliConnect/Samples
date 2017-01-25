@@ -22,6 +22,7 @@ public class AccountSystem
 
 	private string m_fbAccessToken;
 	private string m_localPlayerName = "Unknown";
+	private string m_chilliId;
 
 	/// @return Singleton instance if system has been created (not lazily created)
 	/// 
@@ -150,6 +151,8 @@ public class AccountSystem
 	{
 		Debug.Log("ChilliConnect logged in anonymously");
 
+		m_chilliId = PlayerPrefs.GetString("CCId");
+
 		//We consider logging in finished at this point.
 		OnAccountStatusChanged(AccountStatus.LOGIN_ANONYMOUS);
 	}
@@ -166,6 +169,7 @@ public class AccountSystem
 
 		Debug.Log("ChilliConnect logged in with FB account for " + response.FacebookName);
 
+		m_chilliId = response.ChilliConnectId;
 		m_localPlayerName = response.FacebookName;
 
 		//We consider logging in finished at this point.
@@ -202,6 +206,8 @@ public class AccountSystem
 		PlayerPrefs.SetString("CCId", response.ChilliConnectId);
 		PlayerPrefs.SetString("CCSecret", response.ChilliConnectSecret);
 
+		m_chilliId = response.ChilliConnectId;
+
 		//We consider logging in finished at this point.
 		OnAccountStatusChanged(AccountStatus.LOGIN_ANONYMOUS);
 	}
@@ -221,6 +227,14 @@ public class AccountSystem
 
 		//We consider logging in finished at this point.
 		OnAccountStatusChanged(AccountStatus.LOGIN_FB);
+	}
+
+	///
+	/// @return The ChilliConnect account Id for the logged in player
+	///
+	public string GetLocalPlayerId()
+	{
+		return m_chilliId;
 	}
 
 	///

@@ -16,6 +16,7 @@ public class FBLeaderboardDemoUIController : MonoBehaviour
 	private Text m_localPlayerName;
 	private Image m_localPlayerProfile;
 	private Text m_postScoreText;
+	private LeaderboardUIController m_leaderboardUIController;
 
 	private int m_currentPostScore = 0;
 	private float m_postScoreTimer = 0.0f;
@@ -29,6 +30,7 @@ public class FBLeaderboardDemoUIController : MonoBehaviour
 		m_fbLoginButton = fbLoginButton.gameObject;
 
 		m_leaderboardPanel = transform.FindChild("Leaderboard").gameObject;
+		m_leaderboardUIController = m_leaderboardPanel.GetComponent<LeaderboardUIController>();
 
 		m_playerInfoPanel = transform.FindChild("PlayerInfo").gameObject;
 		m_localPlayerName = m_playerInfoPanel.transform.FindChild("Name").GetComponent<Text>();
@@ -50,10 +52,8 @@ public class FBLeaderboardDemoUIController : MonoBehaviour
 	/// 
 	private void Start()
 	{
-		LeaderboardUIController leaderboardUIController = GameObject.FindObjectOfType<LeaderboardUIController>();
-
 		AccountSystem.Get().OnAccountStatusChanged += SetState;
-		LeaderboardSystem.Get().OnLeaderboardRefreshed += (scores) => leaderboardUIController.Refresh(scores);
+		LeaderboardSystem.Get().OnLeaderboardRefreshed += (scores) => m_leaderboardUIController.Refresh(scores);
 	}
 
 	/// Decides what to display based on the users login status
@@ -87,6 +87,7 @@ public class FBLeaderboardDemoUIController : MonoBehaviour
 
 			m_localPlayerName.text = AccountSystem.Get().GetLocalPlayerName();
 //			m_localPlayerProfile = FacebookSystem.Get().GetLocalPlayerProfilePic();
+			LeaderboardSystem.Get().FetchFriendLeaderboard();
 			break;
 		}
 	}

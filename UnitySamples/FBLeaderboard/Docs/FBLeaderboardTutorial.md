@@ -275,6 +275,15 @@ private void OnLeaderboardFetched(GetScoresForFacebookFriendsResponse response)
 
 The data can then be used to popluate the leaderboard UI (NOTE: in our demo the size of the leaderboard is clamped for simplicity, it may make more sense in your game to create a streaming leaderboard in order to handle a large number of scores).
 
+## Troubleshooting
+
+Here are some of the more common issues that might crop up:
+
+- Login to FB using an account that has been added as an admin, developer or tester on the FB app dashboard.
+- Logout of FB via iOS settings prior to deploying the app.
+- Check the bundle id on the FB dashboard matches that in Unity > Player Settings.
+- Changes on the FB dashboard may take time to propagate.
+
 ---------
 Getting FB avatars
 FB url in plist.
