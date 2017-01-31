@@ -61,6 +61,11 @@ namespace ChilliConnect
         public string FacebookName { get; private set; }
 	
 		/// <summary>
+		/// The player's Facebook profile image URL.
+		/// </summary>
+        public string FacebookProfileImage { get; private set; }
+	
+		/// <summary>
 		/// Date that indicates when the score was recorded (UTC). Format: ISO8601 e.g.
 		/// 2016-01-12T11:08:23.
 		/// </summary>
@@ -102,12 +107,14 @@ namespace ChilliConnect
 			
 			ReleaseAssert.IsNotNull(desc.ChilliConnectId, "ChilliConnectId cannot be null.");
 			ReleaseAssert.IsNotNull(desc.FacebookName, "FacebookName cannot be null.");
+			ReleaseAssert.IsNotNull(desc.FacebookProfileImage, "FacebookProfileImage cannot be null.");
 			ReleaseAssert.IsNotNull(desc.Date, "Date cannot be null.");
 	
             ChilliConnectId = desc.ChilliConnectId;
             UserName = desc.UserName;
             DisplayName = desc.DisplayName;
             FacebookName = desc.FacebookName;
+            FacebookProfileImage = desc.FacebookProfileImage;
             Date = desc.Date;
             Data = desc.Data;
             Score = desc.Score;
@@ -126,6 +133,7 @@ namespace ChilliConnect
 			ReleaseAssert.IsNotNull(jsonDictionary, "JSON dictionary cannot be null.");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("ChilliConnectID"), "Json is missing required field 'ChilliConnectID'");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("FacebookName"), "Json is missing required field 'FacebookName'");
+			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("FacebookProfileImage"), "Json is missing required field 'FacebookProfileImage'");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("Date"), "Json is missing required field 'Date'");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("Score"), "Json is missing required field 'Score'");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("GlobalRank"), "Json is missing required field 'GlobalRank'");
@@ -166,6 +174,13 @@ namespace ChilliConnect
 				{
                     ReleaseAssert.IsTrue(entry.Value is string, "Invalid serialised type.");
                     FacebookName = (string)entry.Value;
+				}
+		
+				// Facebook Profile Image
+				else if (entry.Key == "FacebookProfileImage")
+				{
+                    ReleaseAssert.IsTrue(entry.Value is string, "Invalid serialised type.");
+                    FacebookProfileImage = (string)entry.Value;
 				}
 		
 				// Date
@@ -250,6 +265,9 @@ namespace ChilliConnect
 			
 			// Facebook Name
 			dictionary.Add("FacebookName", FacebookName);
+			
+			// Facebook Profile Image
+			dictionary.Add("FacebookProfileImage", FacebookProfileImage);
 			
 			// Date
             dictionary.Add("Date", JsonSerialisation.Serialise(Date));

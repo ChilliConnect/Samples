@@ -21,6 +21,7 @@ public class FBLeaderboardDemoSceneController : MonoBehaviour
 	private ChilliConnectSdk m_chilliConnect = null;
 	private AccountSystem m_accountSystem = new AccountSystem();
 	private LeaderboardSystem m_leaderboardSystem = new LeaderboardSystem();
+	private ProfilePicSystem m_profilePicSystem = new ProfilePicSystem();
 
 	/// Initialised ChilliConnect, create and log in a player.
 	/// 
@@ -29,10 +30,8 @@ public class FBLeaderboardDemoSceneController : MonoBehaviour
 		// Initialise ChilliConnect. Game token can be found on the game dashboard of ChilliConnect
 		m_chilliConnect = new ChilliConnectSdk(GAME_TOKEN, true); 
 
-		// Initialise FB.
 		m_accountSystem.Initialise(m_chilliConnect);
-
-		// Init leaderboards
 		m_leaderboardSystem.Initialise(m_chilliConnect);
+		m_profilePicSystem.Initialise();
 	}
 }

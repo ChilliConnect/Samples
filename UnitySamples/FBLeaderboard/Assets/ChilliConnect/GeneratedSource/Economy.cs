@@ -258,7 +258,7 @@ namespace ChilliConnect
 		/// Get the inventory of the currently logged in player for a given set of keys.
 		/// </summary>
 		///
-		/// <param name="keys">Return only items with these Keys from the player's inventory.</param>
+		/// <param name="keys">Return only items with these Keys from the player's inventory. Maximum 5.</param>
 		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
 		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
 		/// a container with information on what went wrong.</param>
@@ -288,7 +288,7 @@ namespace ChilliConnect
 		/// Get the inventory of the currently logged in player for a given set of Item IDs.
 		/// </summary>
 		///
-		/// <param name="itemIds">Return only these items witihin the player's inventory.</param>
+		/// <param name="itemIds">Return only these items witihin the player's inventory. Maximum 10.</param>
 		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
 		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
 		/// a container with information on what went wrong.</param>

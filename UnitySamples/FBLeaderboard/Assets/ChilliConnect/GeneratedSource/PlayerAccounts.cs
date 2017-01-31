@@ -244,7 +244,7 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
-		/// Updates the player details of an existing ChilliConnect account.
+		/// Updates the details of the currently logged in Player.
 		/// </summary>
 		///
 		/// <param name="desc">The request description.</param>
@@ -274,7 +274,7 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
-		/// Retrieves the details of a ChilliConnect Player and returns them.
+		/// Returns the details of the currently logged in Player.
 		/// </summary>
 		///
 		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
@@ -377,7 +377,7 @@ namespace ChilliConnect
 		/// FacebookName, ChilliConnectID, UserName and DisplayName of the associated player.
 		/// </summary>
 		///
-		/// <param name="facebookIds">An array of FacebookIDs to look up.</param>
+		/// <param name="facebookIds">An array of FacebookIDs to look up. Maximum 10.</param>
 		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
 		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
 		/// a container with information on what went wrong.</param>
@@ -409,7 +409,7 @@ namespace ChilliConnect
 		/// ChilliConnectID, UserName and DisplayName of the associated player.
 		/// </summary>
 		///
-		/// <param name="userNames">An array of UserNames to look up.</param>
+		/// <param name="userNames">An array of UserNames to look up. Maximum 10.</param>
 		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
 		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
 		/// a container with information on what went wrong.</param>

@@ -193,7 +193,7 @@ namespace ChilliConnect
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 429, @"Invalid HTTP response code for error code.");
 					return Error.LimitReached;		
 				default:
-					throw new ArgumentException("Invalid error code.");
+					return Error.UnexpectedError;
 			}
 		}
         
@@ -231,8 +231,6 @@ namespace ChilliConnect
 			{
 				case Error.CouldNotConnect:
 					return "A connection could not be established.";
-				case Error.UnexpectedError:
-					return "An unexpected server error occurred.";
 				case Error.InvalidCredentials:
 					return "Invalid Credentials. The supplied credentials were not recognised.";
 				case Error.TemporaryServiceError:
@@ -246,8 +244,9 @@ namespace ChilliConnect
 						+ " each field.";
 				case Error.LimitReached:
 					return "Limit Reached. The DAU limit for today has been reached.";
+				case Error.UnexpectedError:
 				default:
-					throw new ArgumentException("Invalid error code.");
+					return "An unexpected server error occurred.";
 			}
 		}
 	}

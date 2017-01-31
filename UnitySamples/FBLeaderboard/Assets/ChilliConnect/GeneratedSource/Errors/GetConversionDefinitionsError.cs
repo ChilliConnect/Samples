@@ -178,7 +178,7 @@ namespace ChilliConnect
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
 					return Error.InvalidConnectAccessToken;		
 				default:
-					throw new ArgumentException("Invalid error code.");
+					return Error.UnexpectedError;
 			}
 		}
         
@@ -216,8 +216,6 @@ namespace ChilliConnect
 			{
 				case Error.CouldNotConnect:
 					return "A connection could not be established.";
-				case Error.UnexpectedError:
-					return "An unexpected server error occurred.";
 				case Error.InvalidRequest:
 					return "Invalid Request. One of more of the provided fields were not correctly formatted."
 						+ " The data property of the response body will contain specific error messages for"
@@ -228,8 +226,9 @@ namespace ChilliConnect
 				case Error.InvalidConnectAccessToken:
 					return "Invalid Connect Access Token. The Connect Access Token was not valid and cannot"
 						+ " be used to authenticate requests.";
+				case Error.UnexpectedError:
 				default:
-					throw new ArgumentException("Invalid error code.");
+					return "An unexpected server error occurred.";
 			}
 		}
 	}

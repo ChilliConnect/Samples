@@ -14,7 +14,6 @@ public class FBLeaderboardDemoUIController : MonoBehaviour
 	private GameObject m_leaderboardPanel;
 
 	private Text m_localPlayerName;
-	private Image m_localPlayerProfile;
 	private Text m_postScoreText;
 	private LeaderboardUIController m_leaderboardUIController;
 
@@ -34,7 +33,6 @@ public class FBLeaderboardDemoUIController : MonoBehaviour
 
 		m_playerInfoPanel = transform.FindChild("PlayerInfo").gameObject;
 		m_localPlayerName = m_playerInfoPanel.transform.FindChild("Name").GetComponent<Text>();
-		m_localPlayerProfile = m_playerInfoPanel.transform.FindChild("ProfileImage").GetComponent<Image>();
 
 		var postScoreButton = transform.FindChild("PostScoreButton").GetComponent<Button>();
 		postScoreButton.onClick.AddListener(OnPostScoreSelected);
@@ -86,7 +84,7 @@ public class FBLeaderboardDemoUIController : MonoBehaviour
 			m_leaderboardPanel.SetActive(true);
 
 			m_localPlayerName.text = AccountSystem.Get().GetLocalPlayerName();
-//			m_localPlayerProfile = FacebookSystem.Get().GetLocalPlayerProfilePic();
+
 			LeaderboardSystem.Get().FetchFriendLeaderboard();
 			break;
 		}

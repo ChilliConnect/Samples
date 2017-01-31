@@ -38,17 +38,22 @@ namespace ChilliConnect
 	public sealed class GetPlayerDetailsResponse
 	{
 		/// <summary>
-		/// The player's UserName.
+		/// The ChilliConnectID of the account.
+		/// </summary>
+        public string ChilliConnectId { get; private set; }
+	
+		/// <summary>
+		/// The UserName currently associated with the account.
 		/// </summary>
         public string UserName { get; private set; }
 	
 		/// <summary>
-		/// The player's DisplayName.
+		/// The DisplayName currently associated with the account.
 		/// </summary>
         public string DisplayName { get; private set; }
 	
 		/// <summary>
-		/// The player's Email.
+		/// The Email currently associated with the account.
 		/// </summary>
         public string Email { get; private set; }
 
@@ -60,11 +65,19 @@ namespace ChilliConnect
 		public GetPlayerDetailsResponse(IDictionary<string, object> jsonDictionary)
 		{
 			ReleaseAssert.IsNotNull(jsonDictionary, "JSON dictionary cannot be null.");
+			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("ChilliConnectID"), "Json is missing required field 'ChilliConnectID'");
 	
 			foreach (KeyValuePair<string, object> entry in jsonDictionary)
 			{
+				// Chilli Connect Id
+				if (entry.Key == "ChilliConnectID")
+				{
+                    ReleaseAssert.IsTrue(entry.Value is string, "Invalid serialised type.");
+                    ChilliConnectId = (string)entry.Value;
+				}
+		
 				// User Name
-				if (entry.Key == "UserName")
+				else if (entry.Key == "UserName")
 				{
 					if (entry.Value != null)
 					{

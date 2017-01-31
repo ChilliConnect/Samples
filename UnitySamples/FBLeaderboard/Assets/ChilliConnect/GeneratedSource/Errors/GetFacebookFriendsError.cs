@@ -188,7 +188,7 @@ namespace ChilliConnect
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 422, @"Invalid HTTP response code for error code.");
 					return Error.UnableToGetFacebookFriends;		
 				default:
-					throw new ArgumentException("Invalid error code.");
+					return Error.UnexpectedError;
 			}
 		}
         
@@ -226,8 +226,6 @@ namespace ChilliConnect
 			{
 				case Error.CouldNotConnect:
 					return "A connection could not be established.";
-				case Error.UnexpectedError:
-					return "An unexpected server error occurred.";
 				case Error.ExpiredConnectAccessToken:
 					return "Expired Connect Access Token. The Connect Access Token used to authenticate with"
 						+ " the server has expired and should be renewed.";
@@ -242,8 +240,9 @@ namespace ChilliConnect
 						+ " is no longer valid, there was a temporary error communicating with the Facebook"
 						+ " API, or the AccessToken provided during Facebook Login did not have the player"
 						+ " friends permission.";
+				case Error.UnexpectedError:
 				default:
-					throw new ArgumentException("Invalid error code.");
+					return "An unexpected server error occurred.";
 			}
 		}
 	}

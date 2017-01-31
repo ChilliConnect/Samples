@@ -56,7 +56,7 @@ namespace ChilliConnect
         public string ConnectAccessToken { get; private set; }
 	
 		/// <summary>
-		/// Return only these items witihin the player's inventory.
+		/// Return only these items witihin the player's inventory. Maximum 10.
 		/// </summary>
         public ReadOnlyCollection<string> ItemIds { get; private set; }
 
@@ -64,7 +64,7 @@ namespace ChilliConnect
 		/// Initialises a new instance of the request with the given properties.
 		/// </summary>
 		///
-		/// <param name="itemIds">Return only these items witihin the player's inventory.</param>
+		/// <param name="itemIds">Return only these items witihin the player's inventory. Maximum 10.</param>
 		/// <param name="connectAccessToken">A valid session AccessToken obtained through one of the login endpoints.</param>
 		public GetInventoryForItemIdsRequest(IList<string> itemIds, string connectAccessToken)
 		{
@@ -85,7 +85,7 @@ namespace ChilliConnect
 		/// all server requests. Will return an empty dictionary if there are no headers.
 		/// </summary>
 		///
-		/// <returns>The header hey-value pairs.</returns>
+		/// <returns>The header key-value pairs.</returns>
 		public IDictionary<string, string> SerialiseHeaders()
 		{
 			var dictionary = new Dictionary<string, string>();

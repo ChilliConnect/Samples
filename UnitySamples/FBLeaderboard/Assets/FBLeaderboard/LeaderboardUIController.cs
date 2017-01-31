@@ -45,7 +45,7 @@ public class LeaderboardUIController : MonoBehaviour
 		{
 			bool isLocalPlayer = scores[i].ChilliConnectId == AccountSystem.Get().GetLocalPlayerId();
 			m_elementPool[i].transform.SetParent(m_contentParent, false);
-			m_elementPool[i].Init(scores[i].FacebookName, scores[i].Score, isLocalPlayer ? Color.green : Color.white);
+			m_elementPool[i].Init(scores[i].ChilliConnectId, scores[i].FacebookName, scores[i].FacebookProfileImage, scores[i].Score, isLocalPlayer ? Color.green : Color.white);
 		}
 
 		//Remove unused elements from the leaderboard

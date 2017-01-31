@@ -196,7 +196,7 @@ namespace ChilliConnect
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 400, @"Invalid HTTP response code for error code.");
 					return Error.IapConfigurationNotSpecified;		
 				default:
-					throw new ArgumentException("Invalid error code.");
+					return Error.UnexpectedError;
 			}
 		}
         
@@ -234,8 +234,6 @@ namespace ChilliConnect
 			{
 				case Error.CouldNotConnect:
 					return "A connection could not be established.";
-				case Error.UnexpectedError:
-					return "An unexpected server error occurred.";
 				case Error.InvalidRequest:
 					return "Invalid Request. One of more of the provided fields were not correctly formatted."
 						+ " The data property of the response body will contain specific error messages for"
@@ -252,8 +250,9 @@ namespace ChilliConnect
 				case Error.IapConfigurationNotSpecified:
 					return "IAP Configuration Not Specified. The configuration required to perform IAP"
 						+ " validation has not been set via the ChilliConnect dashboard.";
+				case Error.UnexpectedError:
 				default:
-					throw new ArgumentException("Invalid error code.");
+					return "An unexpected server error occurred.";
 			}
 		}
 	}

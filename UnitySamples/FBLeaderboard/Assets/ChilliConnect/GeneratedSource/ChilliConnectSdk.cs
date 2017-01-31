@@ -99,6 +99,12 @@ namespace ChilliConnect
 		/// modify player currencies and inventory.
 		/// </summary>
 		public Economy Economy { get; private set; }
+	
+		/// <summary>
+		/// The ChilliConnect Messaging module. Enables sending of messages, and gifting
+		/// economy items to players.
+		/// </summary>
+		public Messaging Messaging { get; private set; }
 
 		/// <summary>
 		/// Initialises a new instance with the given App Token. Must be called on the
@@ -128,6 +134,7 @@ namespace ChilliConnect
 			Dlc = new Dlc(logging, taskScheduler, serverRequestSystem, dataStore);
 			Metrics = new Metrics(logging, taskScheduler, serverRequestSystem, dataStore);
 			Economy = new Economy(logging, taskScheduler, serverRequestSystem, dataStore);
+			Messaging = new Messaging(logging, taskScheduler, serverRequestSystem, dataStore);
 		}
 		
 		/// <summary>
