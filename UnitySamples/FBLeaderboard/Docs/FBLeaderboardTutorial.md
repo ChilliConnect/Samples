@@ -16,7 +16,9 @@ The full Unity project for this tutorial is available on the ChilliConnect GitHu
 
 ## Creating a Facebook App
 
-As well as having a game configured on the ChilliConnect dashboard you must also create the game (or app) on Facebook. Creating the app will generate the token required to communicate with Facebook and allow us to query which of the player's friends are also playing our game. A more in depth walkthrough about integrating Unity and Facebook can be found [here](https://developers.facebook.com/docs/unity/gettingstarted),this section will cover the most important aspects:
+As well as having a game configured on the ChilliConnect dashboard you must also create the game (or app) on Facebook. Creating the app will generate the token required to communicate with Facebook and allow us to query which of the player's friends are also playing our game. A more in depth walkthrough about integrating Unity and Facebook can be found [here](https://developers.facebook.com/docs/unity/gettingstarted), this section will cover the most important aspects.
+
+Here are the steps:
 
 - Login to the Facebook account that will be used to create the application (you can add more developers later if you choose).
 - Locate the "Manage Apps" link on the left most navigation bar
@@ -31,7 +33,7 @@ TODO: Link to add new app png
 
 TODO: Link to ConfigureAppId png
 
-- Once the app creation has finished select "Dashboard" from the navigation bar and take note of your "App ID" (we will need this in future steps when setting up our Unity project).
+- Once the app creation has finished, select "Dashboard" from the navigation bar and take note of your "App ID" (we will need this in future steps when setting up our Unity project).
 
 TODO: Link to AppDashboard.png
 
@@ -165,7 +167,7 @@ string fbAccessToken = Facebook.Unity.AccessToken.CurrentAccessToken.TokenString
 m_chilliConnect.PlayerAccounts.LogInUsingFacebook(fbAccessToken, (request, response) => OnChilliConnectFBLoggedIn(response), (request, error) => OnChilliConnectLoginFailed(error));
 ```
 
-A handy feature is that the response returned after logging in to ChilliConnect with FB contains the player's FB name:
+A handy feature is that the response contains the player's FB name:
 
 ```c#
 private void OnChilliConnectFBLoggedIn(LogInUsingFacebookResponse response)
@@ -211,11 +213,11 @@ Successful login will return an access token and a similar flow as above is perf
 
 #### Existing accounts
 
-It may be the case (post re-install or on a different device for example) that the player can login to ChilliConnect with a FB token and already have an account. The player may have even made progress in the game forgetting that they had an existing account. Different games handle this in different ways but the most common solution is to determine whether the local anonymous account or the FB linked account has more progress and use that data.
+It may be the case (post re-install or on a different device for example) that the player logs in to ChilliConnect with a FB token and already has an account. The player may have even made progress in the game forgetting that they had an existing account. Different games handle this in different ways but the most common solution is to determine whether the local anonymous account or the FB linked account has more progress and use that data.
 
 ## Leaderboard
 
-Compared with the login flow the actual leaderboard aspect of the demo is incredibly straightforward. The source for this section is found in 'LeaderboardSystem.cs' and comprises two main parts: posting scores and retrieve scores.
+Compared with the login flow the actual leaderboard aspect of the demo is incredibly straightforward. The source for this section is found in 'LeaderboardSystem.cs' and comprises two main parts: posting scores and retrieving scores.
 
 ### Submitting scores to leaderboard
 
@@ -262,7 +264,7 @@ Our demo is only interested in showing scores for a player's FB friends but Chil
 - 'GetScores': Used to display the entire leaderboard (NOTE: the API returns leaderboard pages and the page must be specified in the request).
 - 'GetScoresAroundPlayer': Returns scores above and below the player in the leaderboard.
 
-The response contains a collection of 'FacebookScore' objects, each object has a friend's facebook name, score and position on the leaderboard:
+The response contains a collection of 'FacebookScore' objects, each object has a friend's facebook name, profile picture url, score and position on the leaderboard:
 
 ```c#
 private void OnLeaderboardFetched(GetScoresForFacebookFriendsResponse response)
@@ -275,6 +277,10 @@ private void OnLeaderboardFetched(GetScoresForFacebookFriendsResponse response)
 
 The data can then be used to popluate the leaderboard UI (NOTE: in our demo the size of the leaderboard is clamped for simplicity, it may make more sense in your game to create a streaming leaderboard in order to handle a large number of scores).
 
+#### Fetching FB profile pictures
+
+While it is trivial to display the score and name in the leaderboard, further steps are required to display the FB profile picture. A basic downloading solution can be found in the demo source code in the "ProfilePicSystem.cs" file. This system uses the url (from the FacebookScore object above) and Unity's WWW class to download the profile images as textures. If you choose to implement image downloading in your own game you should implement a caching system that saves downloaded profile images to file. This will allow your player to access images offline and also reduce data usage. It is worth refreshing this cache every so often to keep up to date with changes to profile pictures.
+
 ## Troubleshooting
 
 Here are some of the more common issues that might crop up:
@@ -284,6 +290,12 @@ Here are some of the more common issues that might crop up:
 - Check the bundle id on the FB dashboard matches that in Unity > Player Settings.
 - Changes on the FB dashboard may take time to propagate.
 
----------
-Getting FB avatars
-FB url in plist.
+## Next steps
+
+That concludes our tutorial on FB and leaderboards, you may wish to expand on the demo by trying out the following:
+
+- Create a streaming leaderboard that can support hundreds of FB friends.
+- Add other leaderboard styles (i.e. around player, global, etc).
+- Cache the downloaded FB images to file.
+- Explore other elements of the FB SDK such as sharing stories or uploading images.
+- Implement a logout or player switching system that allows multiple players to share the same device but have different game data.
