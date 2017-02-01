@@ -5,6 +5,8 @@ using ChilliConnect;
 
 /// Wrapper around the Facebook API and ChilliConnect calls for managing login and local user account
 ///
+
+//TODO: Handle mismatched login with chilli -> login to different fb account -> link the two
 public class AccountSystem 
 {	
 	public enum AccountStatus
@@ -165,8 +167,6 @@ public class AccountSystem
 	/// 
 	private void OnChilliConnectFBLoggedIn(LogInUsingFacebookResponse response)
 	{
-		//TODO: Download local player avatar.
-
 		Debug.Log("ChilliConnect logged in with FB account for " + response.FacebookName);
 
 		m_chilliId = response.ChilliConnectId;
@@ -206,10 +206,8 @@ public class AccountSystem
 		PlayerPrefs.SetString("CCId", response.ChilliConnectId);
 		PlayerPrefs.SetString("CCSecret", response.ChilliConnectSecret);
 
-		m_chilliId = response.ChilliConnectId;
-
-		//We consider logging in finished at this point.
-		OnAccountStatusChanged(AccountStatus.LOGIN_ANONYMOUS);
+		//Once we've created a new player we need to log them in
+		m_chilliConnect.PlayerAccounts.LogInUsingChilliConnect(response.ChilliConnectId, response.ChilliConnectSecret, (loginRequest) => OnChilliConnectAnonLoggedIn(), (loginRequest, error) => Debug.LogError(error.ErrorDescription));
 	}
 
 	/// Called when the request to link FB and Chilli accounts has completed successfully
@@ -219,8 +217,6 @@ public class AccountSystem
 	/// 
 	private void OnChilliConnectLinked(LinkFacebookAccountResponse response)
 	{
-		//TODO: Download local player avatar.
-
 		Debug.Log("ChilliConnect now linked with FB account for " + response.FacebookName);
 
 		m_localPlayerName = response.FacebookName;
