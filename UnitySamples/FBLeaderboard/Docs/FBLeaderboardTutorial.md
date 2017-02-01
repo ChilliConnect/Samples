@@ -269,9 +269,7 @@ The response contains a collection of 'FacebookScore' objects, each object has a
 ```c#
 private void OnLeaderboardFetched(GetScoresForFacebookFriendsResponse response)
 {
-    FacebookScore[] sorted = response.Scores.OrderBy((friend) => friend.LocalRank).ToArray();
-
-    //Populate leaderboard UI.
+    PopulateLeaderboard(response.Scores);
 }
 ```
 
@@ -283,10 +281,12 @@ While it is trivial to display the score and name in the leaderboard, further st
 
 ## Troubleshooting
 
-Here are some of the more common issues that might crop up:
+Here are some of the more common issues that might crop up.
+
+Make sure you:
 
 - Login to FB using an account that has been added as an admin, developer or tester on the FB app dashboard.
-- Logout of FB via iOS settings prior to deploying the app.
+- Logout of FB via iOS settings or via facebook.com prior to deploying the app.
 - Check the bundle id on the FB dashboard matches that in Unity > Player Settings.
 - Changes on the FB dashboard may take time to propagate.
 

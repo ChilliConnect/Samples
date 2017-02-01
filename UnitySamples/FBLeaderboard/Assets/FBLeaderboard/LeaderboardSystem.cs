@@ -69,7 +69,6 @@ public class LeaderboardSystem
 	///
 	private void OnLeaderboardFetched(GetScoresForFacebookFriendsResponse response)
 	{
-		var sorted = response.Scores.OrderBy((friend) => friend.LocalRank).ToArray();
-		OnLeaderboardRefreshed(sorted);
+		OnLeaderboardRefreshed(response.Scores.ToArray());
 	}
 }

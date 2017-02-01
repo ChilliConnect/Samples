@@ -6,7 +6,6 @@ using System.Collections;
 ///
 public class LeaderboardElementUIController : MonoBehaviour 
 {
-	//TODO: Profile image
 	private Text m_name;
 	private Text m_score;
 	private Image m_image;
