@@ -7,6 +7,7 @@ using ChilliConnect;
 ///
 
 //TODO: Handle mismatched login with chilli -> login to different fb account -> link the two
+//TODO: Handle token expiration
 public class AccountSystem 
 {	
 	public enum AccountStatus
