@@ -16,8 +16,6 @@ using ChilliConnect;
 public class FBLeaderboardDemoSceneController : MonoBehaviour 
 {
 	//TODO: Revert token
-	//TODO: Make leaderboard top aligned
-	//TODO: Test with friends
 	const string GAME_TOKEN = "KI5EjX8EU65TNM5fTdCmvGKWixMpENtZ";//"Vv7VANzImRtEUeiYaoz4lWKqB6t349iy";
 
 	private ChilliConnectSdk m_chilliConnect = null;
