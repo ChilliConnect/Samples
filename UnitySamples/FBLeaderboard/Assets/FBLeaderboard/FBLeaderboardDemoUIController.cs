@@ -12,6 +12,7 @@ public class FBLeaderboardDemoUIController : MonoBehaviour
 	private GameObject m_postScoreButton;
 	private GameObject m_refreshButton;
 	private GameObject m_leaderboardPanel;
+	private GameObject m_title;
 
 	private Text m_localPlayerName;
 	private Text m_postScoreText;
@@ -27,6 +28,8 @@ public class FBLeaderboardDemoUIController : MonoBehaviour
 		var fbLoginButton = transform.FindChild("FBLoginButton").GetComponent<Button>();
 		fbLoginButton.onClick.AddListener(OnFBLoginSelected);
 		m_fbLoginButton = fbLoginButton.gameObject;
+
+		m_title = transform.FindChild("Title").gameObject;
 
 		m_leaderboardPanel = transform.FindChild("Leaderboard").gameObject;
 		m_leaderboardUIController = m_leaderboardPanel.GetComponent<LeaderboardUIController>();
@@ -66,6 +69,7 @@ public class FBLeaderboardDemoUIController : MonoBehaviour
 			m_postScoreButton.SetActive(false);
 			m_refreshButton.SetActive(false);
 			m_leaderboardPanel.SetActive(false);
+			m_title.SetActive(false);
 			break;
 		case AccountSystem.AccountStatus.LOGIN_ANONYMOUS:
 			m_fbLoginButton.SetActive(true);
@@ -73,6 +77,7 @@ public class FBLeaderboardDemoUIController : MonoBehaviour
 			m_postScoreButton.SetActive(true);
 			m_refreshButton.SetActive(false);
 			m_leaderboardPanel.SetActive(false);
+			m_title.SetActive(false);
 
 			m_localPlayerName.text = "Anonymous";
 			break;
@@ -82,6 +87,7 @@ public class FBLeaderboardDemoUIController : MonoBehaviour
 			m_postScoreButton.SetActive(true);
 			m_refreshButton.SetActive(true);
 			m_leaderboardPanel.SetActive(true);
+			m_title.SetActive(true);
 
 			m_localPlayerName.text = AccountSystem.Get().GetLocalPlayerName();
 
