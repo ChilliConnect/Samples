@@ -5,9 +5,6 @@ using ChilliConnect;
 
 /// Wrapper around the Facebook API and ChilliConnect calls for managing login and local user account
 ///
-
-//TODO: Handle mismatched login with chilli -> login to different fb account -> link the two
-//TODO: Handle token expiration
 public class AccountSystem 
 {	
 	public enum AccountStatus
@@ -120,7 +117,7 @@ public class AccountSystem
 	/// 
 	public void ChilliConnectFBLogin(string fbAccessToken)
 	{
-		m_chilliConnect.PlayerAccounts.LogInUsingFacebook(fbAccessToken, (request, response) => OnChilliConnectFBLoggedIn(response), (request, error) => OnChilliConnectLoginFailed(error));
+		m_chilliConnect.PlayerAccounts.LogInUsingFacebook(fbAccessToken, (request, response) => OnChilliConnectFBLoggedIn(response), (request, error) => OnChilliConnectFBLoginFailed(error));
 	}
 
 	/// Called when the FB login call has completed. May or may not have been
@@ -171,6 +168,12 @@ public class AccountSystem
 		Debug.Log("ChilliConnect logged in with FB account for " + response.FacebookName);
 
 		m_chilliId = response.ChilliConnectId;
+
+		//NOTE: The Chilli Id prior to this response and after this response will probably be different
+		//as the player was likely using an anon. account before and has now signed into the account attached to FB, it is
+		//up to the game how they wish to handle this but usually you would take the data with the most progress (either the anon. or
+		//the FB data) and associate that with the FB linked account (which is the primary account).
+
 		m_localPlayerName = response.FacebookName;
 
 		//We consider logging in finished at this point.
@@ -184,14 +187,14 @@ public class AccountSystem
 	/// @param error
 	/// 		Error type and description
 	/// 
-	private void OnChilliConnectLoginFailed(LogInUsingFacebookError error)
+	private void OnChilliConnectFBLoginFailed(LogInUsingFacebookError error)
 	{
-		Debug.Log("ChilliConnect logged in failed. Reason: " + error.ErrorDescription);
+		Debug.LogWarning("ChilliConnect logged in failed. Reason: " + error.ErrorDescription);
 
 		if(error.ErrorCode == LogInUsingFacebookError.Error.LoginNotFound)
 		{
 			LinkFacebookAccountRequestDesc requestDesc = new LinkFacebookAccountRequestDesc(m_fbAccessToken);
-			m_chilliConnect.PlayerAccounts.LinkFacebookAccount(requestDesc, (request, linkResponse) => OnChilliConnectLinked(linkResponse), (request, linkError) => Debug.LogError(linkError.ErrorDescription));
+			m_chilliConnect.PlayerAccounts.LinkFacebookAccount(requestDesc, (request, linkResponse) => OnChilliConnectLinked(linkResponse), (request, linkError) => OnChilliConnectLinkedFailed(linkError));
 		}
 	}
 
@@ -224,6 +227,27 @@ public class AccountSystem
 
 		//We consider logging in finished at this point.
 		OnAccountStatusChanged(AccountStatus.LOGIN_FB);
+	}
+
+	/// Called when the request to link FB and Chilli accounts has failed
+	/// There are generally cases where this will be called (connection issues, etc)
+	/// but an important case is if the current Chilli account is already linked to another FB account
+	/// 
+	/// @param error
+	/// 	Holds the error description
+	///
+	private void OnChilliConnectLinkedFailed(LinkFacebookAccountError error)
+	{
+		Debug.LogWarning("ChilliConnect link FB failed. Reason: " + error.ErrorDescription);
+
+		if(error.ErrorCode == LinkFacebookAccountError.Error.FacebookAccountLinkedWithAnotherPlayer)
+		{
+			//There are various solutions in this scenario:
+			// * You can replace the linked account with this one
+			// * You can logout of FB and prompt the user to login to the other account
+			// * You can switch to the ChilliAccount associated with FB (that is what this demo does).
+			ChilliConnectFBLogin(m_fbAccessToken);
+		}
 	}
 
 	///
