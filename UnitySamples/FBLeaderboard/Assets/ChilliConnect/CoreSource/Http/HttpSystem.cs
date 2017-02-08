@@ -167,7 +167,24 @@ namespace SdkCore
             }
             else
             {
-                int httpResponseCode = ParseHttpError(www.error);
+				var bytes = www.bytes;
+				int httpResponseCode = 0;
+
+				#if UNITY_IPHONE && !UNITY_EDITOR
+					var text = www.text;
+					if ( !string.IsNullOrEmpty(text) ) 
+					{
+						var bodyDictionary = Json.Deserialize(text) as Dictionary<string, object>;
+						if (bodyDictionary != null && bodyDictionary.ContainsKey ("HttpCode")) 
+						{
+							httpResponseCode = Convert.ToInt32(bodyDictionary ["HttpCode"]);
+							bytes = Encoding.UTF8.GetBytes(text);
+						}
+					}
+				#else 
+					httpResponseCode = ParseHttpError(www.error);
+				#endif
+                
                 if (httpResponseCode != 0)
                 {
                     desc = new HttpResponseDesc(HttpResult.Success);
