@@ -15,7 +15,6 @@ using ChilliConnect;
 /// 
 public class FBLeaderboardDemoSceneController : MonoBehaviour 
 {
-	//TODO: Revert token
 	const string GAME_TOKEN = "Vv7VANzImRtEUeiYaoz4lWKqB6t349iy";
 
 	private ChilliConnectSdk m_chilliConnect = null;
