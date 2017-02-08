@@ -32,7 +32,8 @@ public class LeaderboardUIController : MonoBehaviour
 		}
 	}
 
-	/// Update the leaderboard with the latest scores
+	/// Update the leaderboard with the latest scores. Any unused leaderboard elements are returned
+	/// to the pool.
 	///
 	public void Refresh(FacebookScore[] scores)
 	{
@@ -43,6 +44,7 @@ public class LeaderboardUIController : MonoBehaviour
 
 		for(int i=0; i<m_numElementsUsed; ++i)
 		{
+			//Local player is highlighted a different colour
 			bool isLocalPlayer = scores[i].ChilliConnectId == AccountSystem.Get().GetLocalPlayerId();
 			m_elementPool[i].transform.SetParent(m_contentParent, false);
 			m_elementPool[i].Init(scores[i].ChilliConnectId, scores[i].FacebookName, scores[i].FacebookProfileImage, scores[i].Score, isLocalPlayer ? Color.green : Color.white);

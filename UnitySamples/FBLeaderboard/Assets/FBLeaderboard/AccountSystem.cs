@@ -3,7 +3,28 @@ using System.Collections;
 using Facebook.Unity;
 using ChilliConnect;
 
-/// Wrapper around the Facebook API and ChilliConnect calls for managing login and local user account
+/// Wrapper around the Facebook API and ChilliConnect calls for managing login and local user accounts. 
+/// There are several "paths" through the login flow but the main ones are:
+/// 
+/// *** First time user flow
+/// * Initialise FB SDK
+/// * Create new ChilliConnect account
+/// * Login to new account
+/// * On user interaction login to FB.
+/// * Attempt to login to ChilliConnect with FB token and fail
+/// * Link FB account with ChilliConnect account.
+/// 
+/// *** Returning user flow (same device)
+/// * Initialise FB SDK
+/// * FB already logged in
+/// * Login to ChilliConnect using FB token
+/// 
+/// *** Returning user flow (new device)
+/// * Initialise FB SDK
+/// * Create new ChilliConnect account
+/// * Login to new account
+/// * On user interaction login to FB.
+/// * Login to ChilliConnect using FB token (switch account)
 ///
 public class AccountSystem 
 {	
@@ -13,7 +34,7 @@ public class AccountSystem
 		LOGIN_ANONYMOUS,
 		LOGIN_FB
 	}
-
+		
 	public event System.Action<AccountStatus> OnAccountStatusChanged = delegate {};
 
 	private static AccountSystem s_singletonInstance = null;
@@ -57,7 +78,8 @@ public class AccountSystem
 	}
 
 	/// Called when the FBInit call has completed
-	/// either successfully or not.
+	/// either successfully or not. Determines if
+	/// we have an existing FB/ChilliConnect login or not 
 	///
 	private void OnFBInitComplete()
 	{
@@ -110,7 +132,7 @@ public class AccountSystem
 	}
 
 	/// Attempts to login to ChilliConnect with the given FB access token
-	/// If no account exists then will pair with the current anonymous chilli account
+	/// If no account exists then we will pair with the current anonymous chilli account post fail
 	/// 
 	/// @param fbAccessToken
 	/// 	The string version of the FB access token for the current FB user.
@@ -135,7 +157,7 @@ public class AccountSystem
 			//This access token is required to link the players FB account to their ChilliConnect account or to login to a ChilliConnect account.
 			m_fbAccessToken = Facebook.Unity.AccessToken.CurrentAccessToken.TokenString;
 
-			//First attempt to login to ChilliConnect with this FB token as an account may exist 
+			//Attempt to login to ChilliConnect with this FB token as an account may already exist (if this fails we then link with this account).
 			ChilliConnectFBLogin(m_fbAccessToken);
 		}
 		else
@@ -198,7 +220,7 @@ public class AccountSystem
 		}
 	}
 
-	/// Called when a new ChilliConnect account is created
+	/// Called when a new ChilliConnect account is created. Once a new account is created you still have to login to it.
 	/// 
 	/// @param response
 	/// 	Holds the Id and Secret required for future anonymouse logins
@@ -251,7 +273,7 @@ public class AccountSystem
 	}
 
 	///
-	/// @return The ChilliConnect account Id for the logged in player
+	/// @return The ChilliConnect account Id for the logged in player. Could be empty if not logged in.
 	///
 	public string GetLocalPlayerId()
 	{
@@ -259,7 +281,7 @@ public class AccountSystem
 	}
 
 	///
-	/// @return Facebook name of the logged in player.
+	/// @return Facebook name of the logged in player. Could be default if not logged in.
 	/// 
 	public string GetLocalPlayerName()
 	{

@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 
 
-/// Manages the elements that make up the Facebook UI interface
+/// Manages the elements that make up the main demo UI including the FB buttons, user info, etc.
 ///
 public class FBLeaderboardDemoUIController : MonoBehaviour 
 {
@@ -49,7 +49,7 @@ public class FBLeaderboardDemoUIController : MonoBehaviour
 		SetState(AccountSystem.AccountStatus.NONE);
 	}
 
-	/// Listen to events that will change the UI
+	/// Listen to events that will change the UI including leaderboard refreshes, score updates or account changes
 	/// 
 	private void Start()
 	{
@@ -60,7 +60,8 @@ public class FBLeaderboardDemoUIController : MonoBehaviour
 		LeaderboardSystem.Get().OnScorePosted += () => LeaderboardSystem.Get().FetchFriendLeaderboard();
 	}
 
-	/// Decides what to display based on the users login status
+	/// Decides what to display based on the users login status.
+	/// What the user sees depends on whether they are logged in via FB or not
 	///
 	private void SetState(AccountSystem.AccountStatus status)
 	{
@@ -109,7 +110,7 @@ public class FBLeaderboardDemoUIController : MonoBehaviour
 	/// Called when the user presses the post score button.
 	/// The current score is captured and set to ChilliConnect. Depending on the
 	/// leaderboard config the score is accepted or discarded. In our case it will only
-	/// be accepted if it is higher than our existing score
+	/// be accepted if it is higher than the existing score
 	/// 
 	private void OnPostScoreSelected()
 	{

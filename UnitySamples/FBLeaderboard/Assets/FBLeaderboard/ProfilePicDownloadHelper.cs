@@ -2,7 +2,8 @@
 using System.Collections;
 
 /// Helper for the ProfilePicSystem that allows it to use coroutines to download
-/// images
+/// images. The WWW class that is used to download the images enforce the use of coroutines
+/// and coroutines can only be used on MonoBehaviours
 /// 
 public class ProfilePicDownloadHelper : MonoBehaviour
 {

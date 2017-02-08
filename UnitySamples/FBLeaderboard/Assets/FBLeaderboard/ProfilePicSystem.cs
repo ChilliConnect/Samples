@@ -3,7 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using Facebook.Unity;
 
-/// Handles the downloading of FB profile pics for the local user and their friends. 
+/// Handles the downloading of FB profile pics for the local user and their friends. Caches
+/// the pictures in memory.
 /// 
 /// NOTE: In a genuine production game you would cache the images to file for a given period of time
 /// 
