@@ -8,6 +8,7 @@ using System.Linq;
 public class LeaderboardSystem 
 {
 	public event System.Action<FacebookScore[]> OnLeaderboardRefreshed = delegate {};
+	public event System.Action OnScorePosted = delegate {};
 
 	private static LeaderboardSystem s_singletonInstance = null;
 
@@ -48,6 +49,7 @@ public class LeaderboardSystem
 	private void OnScoreAdded(AddScoreResponse response)
 	{
 		Debug.Log(string.Format("Player's high score {0}. Player is {1}/{2} on global leaderboard", response.Score, response.GlobalRank, response.GlobalTotal));
+		OnScorePosted();
 	}
 
 	/// Make a request to ChilliConnect to download the latest leaderboard 

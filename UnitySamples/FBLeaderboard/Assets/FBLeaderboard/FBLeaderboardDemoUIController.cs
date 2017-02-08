@@ -55,6 +55,9 @@ public class FBLeaderboardDemoUIController : MonoBehaviour
 	{
 		AccountSystem.Get().OnAccountStatusChanged += SetState;
 		LeaderboardSystem.Get().OnLeaderboardRefreshed += (scores) => m_leaderboardUIController.Refresh(scores);
+
+		//Whenever a new score is posted auto update the leaderboard
+		LeaderboardSystem.Get().OnScorePosted += () => LeaderboardSystem.Get().FetchFriendLeaderboard();
 	}
 
 	/// Decides what to display based on the users login status
@@ -74,7 +77,7 @@ public class FBLeaderboardDemoUIController : MonoBehaviour
 		case AccountSystem.AccountStatus.LOGIN_ANONYMOUS:
 			m_fbLoginButton.SetActive(true);
 			m_playerInfoPanel.SetActive(true);
-			m_postScoreButton.SetActive(true);
+			m_postScoreButton.SetActive(false);
 			m_refreshButton.SetActive(false);
 			m_leaderboardPanel.SetActive(false);
 			m_title.SetActive(false);
