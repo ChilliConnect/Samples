@@ -181,7 +181,7 @@ private void OnChilliConnectFBLoggedIn(LogInUsingFacebookResponse response)
 When 'LogInUsingFacebook' is called (either after FB init or via user button press), ChilliConnect will attempt to find a player account associated with the given FB access token. If no account exists then the FB player is not yet associated with a ChilliConnect account and we link the current logged in FB account with the current local ChilliConnect account. Future attempts to login with the FB access token will return this account.
 
 ```c#
-private void OnChilliConnectLoginFailed(LogInUsingFacebookError error)
+private void OnChilliConnectFBLoginFailed(LogInUsingFacebookError error)
 {
     if(error.ErrorCode == LogInUsingFacebookError.Error.LoginNotFound)
     {
@@ -214,6 +214,14 @@ Successful login will return an access token and a similar flow as above is perf
 #### Existing accounts
 
 It may be the case (post re-install or on a different device for example) that the player logs in to ChilliConnect with a FB token and already has an account. The player may have even made progress in the game forgetting that they had an existing account. Different games handle this in different ways but the most common solution is to determine whether the local anonymous account or the FB linked account has more progress and use that data.
+
+You can use the 'replace' flag on the link call to switch the Chilli account that FB is linked to:
+
+```c#
+LinkFacebookAccountRequestDesc requestDesc = new LinkFacebookAccountRequestDesc(m_fbAccessToken);
+requestDesc.Replace = true;
+m_chilliConnect.PlayerAccounts.LinkFacebookAccount(requestDesc, (request, linkResponse) => OnChilliConnectLinked(linkResponse), (request, linkError) => Debug.LogError(linkError.ErrorDescription));
+```
 
 ## Leaderboard
 
@@ -269,7 +277,7 @@ The response contains a collection of 'FacebookScore' objects, each object has a
 ```c#
 private void OnLeaderboardFetched(GetScoresForFacebookFriendsResponse response)
 {
-    PopulateLeaderboard(response.Scores);
+    OnLeaderboardRefreshed(response.Scores);
 }
 ```
 
