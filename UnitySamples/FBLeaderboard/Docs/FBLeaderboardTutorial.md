@@ -296,7 +296,10 @@ Make sure you:
 - Login to FB using an account that has been added as an admin, developer or tester on the FB app dashboard.
 - Logout of FB via iOS settings or via facebook.com prior to deploying the app.
 - Check the bundle id on the FB dashboard matches that in Unity > Player Settings.
-- Changes on the FB dashboard may take time to propagate.
+- Have the correct FB app id set in Unity Facebook > Settings.
+- Are using the correct ChilliConnect game id when initialising ChilliConnect SDK.
+
+Also note that changes on the FB dashboard may take time to propagate.
 
 ## Next steps
 
