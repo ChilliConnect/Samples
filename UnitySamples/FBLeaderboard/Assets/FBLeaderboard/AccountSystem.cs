@@ -24,7 +24,7 @@ using ChilliConnect;
 /// * Create new ChilliConnect account
 /// * Login to new account
 /// * On user interaction login to FB.
-/// * Login to ChilliConnect using FB token (switch account)
+/// * Login to ChilliConnect using FB token (switch account causing the leaderboards to refresh with the new accounts friend's)
 ///
 public class AccountSystem 
 {	
@@ -179,6 +179,22 @@ public class AccountSystem
 		OnAccountStatusChanged(AccountStatus.LOGIN_ANONYMOUS);
 	}
 
+	/// Called when the ChilliConnect login call has completed using the stored
+	/// id and secret but after the player has already signed into FB. We then need
+	/// to link the accounts. 
+	/// 
+	/// NOTE: This is a bit of an edge case.
+	/// 
+	private void OnChilliConnectAnonLoggedInPostFB()
+	{
+		Debug.Log("ChilliConnect logged in anonymously post FB");
+
+		m_chilliId = PlayerPrefs.GetString("CCId");
+
+		LinkFacebookAccountRequestDesc requestDesc = new LinkFacebookAccountRequestDesc(m_fbAccessToken);
+		m_chilliConnect.PlayerAccounts.LinkFacebookAccount(requestDesc, (request, linkResponse) => OnChilliConnectLinked(linkResponse), (request, linkError) => Debug.LogError(linkError.ErrorDescription));
+	}
+
 	/// Called when the ChilliConnect login call has completed. This means
 	/// that a ChilliConnect account exists for the FB user.
 	/// 
@@ -195,6 +211,9 @@ public class AccountSystem
 		//as the player was likely using an anon. account before and has now signed into the account attached to FB, it is
 		//up to the game how they wish to handle this but usually you would take the data with the most progress (either the anon. or
 		//the FB data) and associate that with the FB linked account (which is the primary account).
+		//
+		//In this demo there is no local data stored against the signed in player as the leaderboard
+		//data is pulled from ChilliConnect it will simply update to reflect the newly signed in player.
 
 		m_localPlayerName = response.FacebookName;
 
@@ -213,10 +232,18 @@ public class AccountSystem
 	{
 		Debug.LogWarning("ChilliConnect logged in failed. Reason: " + error.ErrorDescription);
 
-		if(error.ErrorCode == LogInUsingFacebookError.Error.LoginNotFound)
+		//An edge case that is probably not even possible is that the player has never created a
+		//ChilliConnect but has managed to login to FB. In this case we just create the account
+		//now and link to that.
+		if(IsChilliLoggedIn() == false)
+		{
+			var requestDesc = new CreatePlayerRequestDesc();
+			m_chilliConnect.PlayerAccounts.CreatePlayer(requestDesc, (request, response) => OnChilliConnectAccountCreatedPostFB(response), (request, createError) => Debug.LogError(createError.ErrorDescription));
+		}
+		else if(error.ErrorCode == LogInUsingFacebookError.Error.LoginNotFound)
 		{
 			LinkFacebookAccountRequestDesc requestDesc = new LinkFacebookAccountRequestDesc(m_fbAccessToken);
-			m_chilliConnect.PlayerAccounts.LinkFacebookAccount(requestDesc, (request, linkResponse) => OnChilliConnectLinked(linkResponse), (request, linkError) => OnChilliConnectLinkedFailed(linkError));
+			m_chilliConnect.PlayerAccounts.LinkFacebookAccount(requestDesc, (request, linkResponse) => OnChilliConnectLinked(linkResponse), (request, linkError) => Debug.LogError(linkError.ErrorDescription));
 		}
 	}
 
@@ -236,6 +263,22 @@ public class AccountSystem
 		m_chilliConnect.PlayerAccounts.LogInUsingChilliConnect(response.ChilliConnectId, response.ChilliConnectSecret, (loginRequest) => OnChilliConnectAnonLoggedIn(), (loginRequest, error) => Debug.LogError(error.ErrorDescription));
 	}
 
+	/// Called when a new ChilliConnect account is created and the player has already logged into FB.
+	/// 
+	/// @param response
+	/// 	Holds the Id and Secret required for future anonymouse logins
+	///
+	private void OnChilliConnectAccountCreatedPostFB(CreatePlayerResponse response)
+	{
+		Debug.Log("Created new CC account post FB");
+
+		PlayerPrefs.SetString("CCId", response.ChilliConnectId);
+		PlayerPrefs.SetString("CCSecret", response.ChilliConnectSecret);
+
+		//Once we've created a new player we need to log them in
+		m_chilliConnect.PlayerAccounts.LogInUsingChilliConnect(response.ChilliConnectId, response.ChilliConnectSecret, (loginRequest) => OnChilliConnectAnonLoggedInPostFB(), (loginRequest, error) => Debug.LogError(error.ErrorDescription));
+	}
+
 	/// Called when the request to link FB and Chilli accounts has completed successfully
 	///
 	/// @param response
@@ -249,27 +292,6 @@ public class AccountSystem
 
 		//We consider logging in finished at this point.
 		OnAccountStatusChanged(AccountStatus.LOGIN_FB);
-	}
-
-	/// Called when the request to link FB and Chilli accounts has failed
-	/// There are generally cases where this will be called (connection issues, etc)
-	/// but an important case is if the current Chilli account is already linked to another FB account
-	/// 
-	/// @param error
-	/// 	Holds the error description
-	///
-	private void OnChilliConnectLinkedFailed(LinkFacebookAccountError error)
-	{
-		Debug.LogWarning("ChilliConnect link FB failed. Reason: " + error.ErrorDescription);
-
-		if(error.ErrorCode == LinkFacebookAccountError.Error.FacebookAccountLinkedWithAnotherPlayer)
-		{
-			//There are various solutions in this scenario:
-			// * You can replace the linked account with this one
-			// * You can logout of FB and prompt the user to login to the other account
-			// * You can switch to the ChilliAccount associated with FB (that is what this demo does).
-			ChilliConnectFBLogin(m_fbAccessToken);
-		}
 	}
 
 	///
@@ -286,5 +308,13 @@ public class AccountSystem
 	public string GetLocalPlayerName()
 	{
 		return m_localPlayerName;
+	}
+
+	///
+	/// @return TRUE if the player is logged into ChilliConnect either anon. or via FB.
+	///
+	private bool IsChilliLoggedIn()
+	{
+		return string.IsNullOrEmpty(m_chilliId);
 	}
 }

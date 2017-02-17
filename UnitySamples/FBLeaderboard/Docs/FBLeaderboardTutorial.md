@@ -215,7 +215,7 @@ Successful login will return an access token and a similar flow as above is perf
 
 It may be the case (post re-install or on a different device for example) that the player logs in to ChilliConnect with a FB token and already has an account. The player may have even made progress in the game forgetting that they had an existing account. Different games handle this in different ways but the most common solution is to determine whether the local anonymous account or the FB linked account has more progress and use that data.
 
-You can use the 'replace' flag on the link call to switch the Chilli account that FB is linked to:
+It is worth noting that you can use the 'replace' flag on the link call to switch the Chilli account that FB is linked to:
 
 ```c#
 LinkFacebookAccountRequestDesc requestDesc = new LinkFacebookAccountRequestDesc(m_fbAccessToken);
@@ -296,7 +296,10 @@ Make sure you:
 - Login to FB using an account that has been added as an admin, developer or tester on the FB app dashboard.
 - Logout of FB via iOS settings or via facebook.com prior to deploying the app.
 - Check the bundle id on the FB dashboard matches that in Unity > Player Settings.
-- Changes on the FB dashboard may take time to propagate.
+- Have the correct FB app id set in Unity Facebook > Settings.
+- Are using the correct ChilliConnect game id when initialising ChilliConnect SDK.
+
+Also note that changes on the FB dashboard may take time to propagate.
 
 ## Next steps
 
