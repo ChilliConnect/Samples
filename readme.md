@@ -12,7 +12,7 @@ The CreatePlayerDemoScene uses the Game Jam Menu Template from the Asset store t
 
 ### Teams
 
-The Teams scene is the accompanying demo project for the ChilliConnect [Teams tutorial](https://docs.chilliconnect.com/tutorial-teams). The project will create and save an anonymous player account and then provide a UI for listing, creating, joining and leave teams. To run this project under your own ChilliConnect account, change the `GAME_TOKEN` constant in `TeamsDemoSceneController.cs`
+The Teams scene is the accompanying demo project for the ChilliConnect [Teams tutorial](https://docs.chilliconnect.com/guide/tutorial-teams). The project will create and save an anonymous player account and then provide a UI for listing, creating, joining and leave teams. To run this project under your own ChilliConnect account, change the `GAME_TOKEN` constant in `TeamsDemoSceneController.cs`
 
 ### FBLeaderboard
 
