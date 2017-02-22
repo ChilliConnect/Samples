@@ -3,6 +3,8 @@ using System.Collections;
 using ChilliConnect;
 using System.Collections.Generic;
 
+/// Manages the displaying of teams the team list
+/// 
 public class TeamListUIController: MonoBehaviour 
 {
 	private const int k_maxNumElements = 100;

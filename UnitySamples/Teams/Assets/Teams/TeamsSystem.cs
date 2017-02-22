@@ -7,6 +7,9 @@ using System.Collections.Generic;
 using SdkCore;
 using SdkCore.MiniJSON;
 
+/// Handles interactions with ChilliConnect to create, list, join
+/// and leave teams.
+/// 
 public class TeamsSystem 
 {
 	private const string TEAMS_KEY = "TEAMS";
@@ -22,7 +25,13 @@ public class TeamsSystem
 
 	private static TeamsSystem s_singletonInstance = null;
 
+	/// The list of available teams 
+	/// 
 	public List<Team> Teams { get; set; }
+
+	/// The players current team. Can be null if the player
+	/// is not a member of any team
+	/// 
 	public Team PlayerTeam { get; set; }
 
 	private ChilliConnectSdk m_chilliConnect;
@@ -43,6 +52,9 @@ public class TeamsSystem
 		m_chilliConnect = chilliConnect;
 	}
 
+	/// Leave the current team that the player is a member of. Invokes the ChilliConnect
+	/// Cloud Code script to leave teams.
+	/// 
 	public void LeaveTeam()
 	{
 		var runScriptRequest = new RunScriptRequestDesc(SCRIPT_LEAVE_TEAM);
@@ -52,6 +64,13 @@ public class TeamsSystem
 			(request, error) => Debug.LogError(error.ErrorDescription) );
 	}
 
+	/// Handles the response of the LeaveTeam script from ChilliConnect. Will log any
+	/// any errors returned. If the request was succesfull, will clear the current player
+	/// team and notify any listeners.
+	/// 
+	/// @oaram output 
+	/// 	The response from the ChilliConnect script
+	/// 
 	private void LeaveTeamCallBack(MultiTypeDictionary output)
 	{
 		var wasError = output.GetBool("Error");
@@ -64,6 +83,12 @@ public class TeamsSystem
 		}
 	}
 
+	/// Join the provided team. Invokes the ChilliConnect Join Team Cloud Code script,
+	/// passing the ID of the provided team to the script.
+	/// 
+	/// @oaram team 
+	/// 	The team to join
+	/// 
 	public void JoinTeam (Team team)
 	{
 		var scriptParams = new Dictionary<string, SdkCore.MultiTypeValue> ();
@@ -77,6 +102,16 @@ public class TeamsSystem
 			(request, error) => Debug.LogError(error.ErrorDescription) );
 	}
 
+	/// Handles the response of the JoinTeam script from ChilliConnect. Will log any
+	/// any errors returned. If the request was succesfull, will update the currently
+	/// stored player team and notify any listeners
+	/// 
+	/// @oaram output 
+	/// 	The response from the ChilliConnect script
+	/// 
+	/// @oaram team
+	/// 	The team that the player has joined
+	/// 
 	private void JoinTeamCallBack(MultiTypeDictionary output, Team team)
 	{
 		var wasError = output.GetBool("Error");
@@ -89,6 +124,12 @@ public class TeamsSystem
 		}
 	}
 
+	/// Create a new team. Invokes the ChilliConnect Create Team Cloud Code script,
+	/// passing the name of the team to be created.
+	/// 
+	/// @oaram team 
+	/// 	The name of the new team to create
+	/// 
 	public void CreateTeam (string teamName)
 	{
 		var scriptParams = new Dictionary<string, SdkCore.MultiTypeValue> ();
@@ -102,6 +143,13 @@ public class TeamsSystem
 			(request, error) => Debug.LogError(error.ErrorDescription) );
 	}
 
+	/// Handles the response of the Create Team script from ChilliConnect. Will log any
+	/// errors returned. On success, will add the new team to the local list of teams and
+	/// update the players current team.
+	/// 
+	/// @oaram output 
+	/// 	The output of the create team script
+	/// 
 	private void TeamCreatedCallBack(MultiTypeDictionary output)
 	{
 		//Check the script returned an error as part of the response
@@ -133,6 +181,28 @@ public class TeamsSystem
 		OnPlayerTeamRefreshed(PlayerTeam);
 	}
 
+	/// Loads the currently logged in playres team from ChilliConnect using the 
+	/// GetPlayerData call.
+	/// 
+	public void FetchPlayerTeam()
+	{
+		PlayerTeam = null;
+
+		var keys = new List<string>();
+		keys.Add ( PLAYER_DATA_TEAM_KEY);
+
+		m_chilliConnect.CloudData.GetPlayerData (keys, 
+			(request, response) => OnPlayerTeamFetched (response), 
+			(request, error) => Debug.LogError (error.ErrorDescription) );
+	}
+
+	/// Handles the response of the get player team call from ChilliConnect. Will
+	/// parse the team name and team id from the returned data and store against the 
+	/// current players team.
+	/// 
+	/// @param response
+	/// 	The response of the GetPlayerDataCall from ChilliConnect
+	/// 
 	private void OnPlayerTeamFetched(GetPlayerDataResponse response)
 	{
 		if (response.Values.Count > 0 ) { 
@@ -150,19 +220,10 @@ public class TeamsSystem
 
 		OnPlayerTeamRefreshed (PlayerTeam);
 	}
-
-	public void FetchPlayerTeam()
-	{
-		PlayerTeam = null;
-
-		var keys = new List<string>();
-		keys.Add ( PLAYER_DATA_TEAM_KEY);
-
-		m_chilliConnect.CloudData.GetPlayerData (keys, 
-			(request, response) => OnPlayerTeamFetched (response), 
-			(request, error) => Debug.LogError (error.ErrorDescription) );
-	}
-
+		
+	/// Requests a list of available teams from ChilliConnect using the QueryCollection
+	/// method.
+	/// 
 	public void FetchTeams()
 	{
 		var desc = new QueryCollectionRequestDesc(TEAMS_KEY);
@@ -172,6 +233,12 @@ public class TeamsSystem
 			(request, error) => Debug.LogError(error.ErrorDescription));
 	}
 
+	/// Handles the response of the QueryCollection call to ChilliConnect. Loads the returned
+	/// objects in to a list of Team definitions and notifies listeners.
+	/// 
+	/// @param response
+	/// 		The response of the QueryCollection method
+	/// 
 	private void OnTeamsFetched(QueryCollectionResponse response) 
 	{
 		Teams.Clear ();
@@ -187,5 +254,4 @@ public class TeamsSystem
 
 		OnTeamsRefreshed (Teams);
 	}
-
 }

@@ -2,8 +2,12 @@
 using System.Collections;
 using ChilliConnect;
 
+/// Top level controller for the demo project. Create the systems and initialises 
+/// Chilliconnect.
+/// 
 public class TeamsDemoSceneController : MonoBehaviour 
 {
+	//Replace this with the game token from your ChilliConnect dashboard
 	const string GAME_TOKEN = "";
 
 	private ChilliConnectSdk m_chilliConnect = null;

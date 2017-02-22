@@ -2,6 +2,9 @@
 using System.Collections;
 using ChilliConnect;
 
+/// 
+/// Handles login and creation of anonymous ChilliConnect account if none
+/// 
 public class AccountSystem 
 {	
 	public event System.Action<string> OnPlayerLoggedIn = delegate {};
@@ -9,8 +12,6 @@ public class AccountSystem
 	private static AccountSystem s_singletonInstance = null;
 
 	private ChilliConnectSdk m_chilliConnect;
-
-	private string m_chilliId;
 
 	public static AccountSystem Get()
 	{
@@ -22,6 +23,12 @@ public class AccountSystem
 		s_singletonInstance = this;
 	}
 
+	/// If a player account has already been created and saved in PlayerPrefs
+	/// log that player in. Otherwise, will create a new account.
+	/// 
+	/// @param chilliConnect
+	///		Instance of the chilliConnect SDK
+	/// 
 	public void Initialise(ChilliConnectSdk chilliConnect)
 	{
 		m_chilliConnect = chilliConnect;
@@ -32,17 +39,28 @@ public class AccountSystem
 		}
 	}
 
+	/// Creates a new ChilliConnect player account, replacing the currently 
+	/// persisted credentials. This effectivley logs out the existing player
+	/// 
 	public void CreateNewAccount()
 	{
 		var requestDesc = new CreatePlayerRequestDesc();
 		m_chilliConnect.PlayerAccounts.CreatePlayer(requestDesc, (request, response) => OnChilliConnectAccountCreated(response), (request, createError) => Debug.LogError(createError.ErrorDescription));
 	}
 
+	/// Handler for succesfull log in, will notify listeners a new player has been logged in
+	/// 
 	private void OnChilliConnectLoggedIn(string chilliConnectId, string chilliConnectSecret)
 	{
 		OnPlayerLoggedIn(chilliConnectId);
 	}
 
+	/// Handler for succesfull player account creation. Will persist the new 
+	/// players ChilliConnectID and ChilliConnectSecret and login the player
+	/// 
+	/// @param response
+	/// 	The CreatePlayerReponse from the ChilliConnect SDK
+	/// 
 	private void OnChilliConnectAccountCreated(CreatePlayerResponse response)
 	{
 		PlayerPrefs.SetString("CCId", response.ChilliConnectId);
@@ -51,6 +69,14 @@ public class AccountSystem
 		Login (response.ChilliConnectId, response.ChilliConnectSecret);
 	}
 
+	/// Logs in the player identified
+	/// 
+	/// @param chilliConnectId
+	/// 	The players chilliConnectId
+	/// 
+	/// @param chilliConnectSecret
+	/// 	The players chilliConnectSecret
+	/// 
 	private void Login(string chilliConnectId, string chilliConnectSecret)
 	{
 		m_chilliConnect.PlayerAccounts.LogInUsingChilliConnect(chilliConnectId, chilliConnectSecret, 
