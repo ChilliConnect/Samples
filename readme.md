@@ -10,6 +10,10 @@ The `UnitySamples`directory contains separate Unity projects for each sample.
 
 The CreatePlayerDemoScene uses the Game Jam Menu Template from the Asset store to create a basic test scene that shows creation of a new ChilliConnect player, logging in and persisting the ChilliConnect credentials using Unity `PlayerPrefs`. The `StartOptions` class contains the integration with the ChilliConnect SDK. To run this project under your own ChilliConnect account, change the `GAME_TOKEN` constant.
 
+### Teams
+
+The Teams scene is the accompanying demo project for the ChilliConnect [Teams tutorial](https://docs.chilliconnect.com/tutorial-teams). The project will create and save an anonymous player account and then provide a UI for listing, creating, joining and leave teams. To run this project under your own ChilliConnect account, change the `GAME_TOKEN` constant in `TeamsDemoSceneController.cs`
+
 ### FBLeaderboard
 
 The FBLeaderboardDemoScene uses the Facebook SDK to show how to implementation Facebook integration with ChilliConnect, allowing players to link their ChilliConnect account with a Facebook account and then sign in using Facebook. This project also shows how to retrieve leaderboard scores for Facebook friends.
