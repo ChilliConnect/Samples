@@ -1,0 +1,6 @@
+*.tlog
+*.lastbuildstate
+Release/
+*.idb
+ChilliConnectCppDemo.sdf
+ChilliConnectCppDemo.opensdf
