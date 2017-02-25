@@ -23,3 +23,7 @@ The FBLeaderboardDemoScene uses the Facebook SDK to show how to implementation F
 The IAPDemoScene accompanies the ChilliConnect [IAP tutorial](https://docs.chilliconnect.com/tutorial-iaps) and contains an end-to-end example of integrating the Unity IAP Plugin with ChilliConnect to securely verify and redeem player purchases. 
 
 *To run this project under your own account, you must enable the Unity IAP Plugin from the Services menu and configure the plugin with your own Google Play and App Store settings.* Full instructions are available on the [Unity website](https://unity3d.com/learn/tutorials/topics/analytics/integrating-unity-iap-your-game). You must also supply your own ChilliConnect Game Token in `IAPDemoSceneController.cs`.
+
+## C++
+
+The `CppSamples` directory contains a Visual Studio 2015 project showing a basic integration with ChilliConnect using WinHTTP and JsonCpp.
