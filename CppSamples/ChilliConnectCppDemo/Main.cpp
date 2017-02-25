@@ -6,11 +6,11 @@ using namespace std;
 
 int main()
 {
-	//Replace these with the relvant values from your own dashboard
-	const string gameToken = "Vv7VANzImRtEUeiYaoz4lWKqB6t349iy";
+	//Replace these with the relevant values from your own dashboard
+	const string gameToken = "<GAME-TOKEN>";
 	const string leaderboardKey = "MY_LEADERBOARD";
 
-	//Creatre a new instance of the ChilliConnect client
+	//Create a new instance of the ChilliConnect client
 	ChilliConnect * chilliConnect = new ChilliConnect(gameToken);
 
 	//Create a new player account - usually, in a real game you would save the ChilliConnectID
@@ -30,7 +30,7 @@ int main()
 	string chilliConnectSecret = createPlayer.chilliConnectSecret;
 	LoginResponse login = chilliConnect->Login(chilliConnectId, chilliConnectSecret);
 	if (!login.wasOk) {
-		cout << "Error Loggin In Player:" << login.rawBody;
+		cout << "Error Logging In Player:" << login.rawBody;
 		cin.ignore();
 		exit(1);
 	}
