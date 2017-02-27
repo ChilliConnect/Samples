@@ -6,28 +6,23 @@
 #include <string>
 #include <memory>
 
-using std::string;
-using std::unique_ptr;
-using std::tuple;
-using std::vector;
-
 struct ChilliConnectResponse
 {
 	bool wasOk;
 	int errorCode;
-	string errorMessage;
-	string rawBody;
+	std::string errorMessage;
+	std::string rawBody;
 };
 
 struct CreatePlayerResponse : ChilliConnectResponse
 {
-	string chilliConnectId;
-	string chilliConnectSecret;
+	std::string chilliConnectId;
+	std::string chilliConnectSecret;
 };
 
 struct LoginResponse : ChilliConnectResponse
 {
-	string accessToken;
+	std::string accessToken;
 };
 
 struct AddScoreResponse : ChilliConnectResponse
@@ -36,26 +31,31 @@ struct AddScoreResponse : ChilliConnectResponse
 	int totalScores;
 };
 
+struct Score {
+	std::string chilliConnectId;
+	int score;
+	std::string dateSet;
+};
+
 struct GetScoresResponse : ChilliConnectResponse
 {
-	vector<tuple<string, int, string>> scores;
+	std::vector<Score> scores;
 };
 
 class ChilliConnect
 {
 
 private:
-	string gameToken;
-	unique_ptr<HttpSystem> httpSystem;
+	std::string gameToken;
+	std::unique_ptr<HttpSystem> httpSystem;
 	bool parse(const HttpResult &httpResult, ChilliConnectResponse & response, Json::Value & json);
 
 public:
-	ChilliConnect(const string gameToken);
-	~ChilliConnect();
-
+	ChilliConnect(const std::string & gameToken);
+	
 	CreatePlayerResponse CreatePlayer();
-	LoginResponse Login(const string chilliConnectId, const string chilliConnectSecret);
-	AddScoreResponse AddScore(const string accessToken, const string leaderboardKey, const int score);
-	GetScoresResponse GetScores(const string accessToken, const string leaderboardKey);
+	LoginResponse Login(const std::string & chilliConnectId, const std::string & chilliConnectSecret);
+	AddScoreResponse AddScore(const std::string & accessToken, const std::string & leaderboardKey, const int score);
+	GetScoresResponse GetScores(const std::string & accessToken, const std::string & leaderboardKey);
 };
 

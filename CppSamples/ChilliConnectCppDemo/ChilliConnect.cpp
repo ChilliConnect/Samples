@@ -1,13 +1,14 @@
 #include "ChilliConnect.h"
 
-ChilliConnect::ChilliConnect(const string gameToken)
+using std::string;
+using std::map;
+using std::vector;
+using std::unique_ptr;
+
+ChilliConnect::ChilliConnect(const string & gameToken)
 {
 	this->gameToken = gameToken;
 	this->httpSystem = unique_ptr<HttpSystem>(new HttpSystem());
-}
-
-ChilliConnect::~ChilliConnect()
-{
 }
 
 bool
@@ -51,7 +52,7 @@ ChilliConnect::CreatePlayer()
 }
 
 LoginResponse
-ChilliConnect::Login(const string chilliConnectId, const string chilliConnectSecret)
+ChilliConnect::Login(const string & chilliConnectId, const string & chilliConnectSecret)
 {
 	//https://docs.chilliconnect.com/api/?system=http#api-PlayerAccounts-LogInUsingChilliConnect
 
@@ -74,7 +75,7 @@ ChilliConnect::Login(const string chilliConnectId, const string chilliConnectSec
 }
 
 AddScoreResponse 
-ChilliConnect::AddScore(const string accessToken, const string leaderboardKey, const int score)
+ChilliConnect::AddScore(const string & accessToken, const string & leaderboardKey, const int score)
 {
 	//https://docs.chilliconnect.com/api/?system=http#api-Leaderboards-AddScore
 
@@ -98,7 +99,7 @@ ChilliConnect::AddScore(const string accessToken, const string leaderboardKey, c
 }
 
 GetScoresResponse
-ChilliConnect::GetScores(const string accessToken, const string leaderboardKey)
+ChilliConnect::GetScores(const string & accessToken, const string & leaderboardKey)
 {
 	//https://docs.chilliconnect.com/api/?system=http#api-Leaderboards-GetScores
 
@@ -114,7 +115,12 @@ ChilliConnect::GetScores(const string accessToken, const string leaderboardKey)
 	Json::Value json;
 	if (parse(httpResult, response, json) && response.wasOk) {
 		for (const auto& jsonScore : json["Scores"]) {
-			response.scores.push_back(make_tuple(jsonScore["ChilliConnectID"].asString(), jsonScore["Score"].asInt(), jsonScore["Date"].asString()));
+			Score score;
+			score.chilliConnectId = jsonScore["ChilliConnectID"].asString();
+			score.score = jsonScore["Score"].asInt();
+			score.dateSet = jsonScore["Date"].asString();
+
+			response.scores.push_back(score);
 		}
 	}
 

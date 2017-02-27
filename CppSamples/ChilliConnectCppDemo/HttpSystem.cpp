@@ -7,13 +7,9 @@
 #include <codecvt>
 #include <locale>
 
-HttpSystem::HttpSystem()
-{
-}
-
-HttpSystem::~HttpSystem()
-{
-}
+using std::string;
+using std::map;
+using std::wstring;
 
 wstring
 HttpSystem::CreateHeaderString(const map<string,string>& headers)

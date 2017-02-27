@@ -26,4 +26,4 @@ The IAPDemoScene accompanies the ChilliConnect [IAP tutorial](https://docs.chill
 
 ## C++
 
-The `CppSamples` directory contains a Visual Studio 2015 project showing a basic integration with ChilliConnect using WinHTTP and JsonCpp.
+The `CppSamples` directory contains a Visual Studio 2015 project showing a basic integration with ChilliConnect using WinHTTP and JsonCpp. <strong>Note that the example Http class is for an example only, uses a blocking API and is not intended for production usage.</strong>

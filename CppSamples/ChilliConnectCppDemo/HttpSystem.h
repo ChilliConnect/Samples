@@ -6,27 +6,21 @@
 #include <map>
 #include <winhttp.h>
 
-using std::string;
-using std::map;
-using std::wstring;
-
 struct HttpResult
 {
 	DWORD code;
-	string body;
+	std::string body;
 	bool requestSent;
 };
 
 class HttpSystem
 {
 private:
-	wstring UTF8ToUTF16(const string& in_utf8String);
-	wstring CreateHeaderString(const map<string, string>& headers);
-	BOOL GetResponseData(const HINTERNET hRequest, string & responseData, DWORD & dwStatusCode);
+	std::wstring UTF8ToUTF16(const std::string& in_utf8String);
+	std::wstring CreateHeaderString(const std::map<std::string, std::string>& headers);
+	BOOL GetResponseData(const HINTERNET hRequest, std::string & responseData, DWORD & dwStatusCode);
 
 public:
-	HttpSystem();
-	~HttpSystem();
-	HttpResult MakePostRequest(const string& host, const string& path, const map<string,string>&headers, const string &body);
+	HttpResult MakePostRequest(const std::string& host, const std::string& path, const std::map<std::string, std::string>&headers, const std::string &body);
 };
 

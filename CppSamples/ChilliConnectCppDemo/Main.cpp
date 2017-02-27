@@ -11,11 +11,11 @@ int main()
 	const string leaderboardKey = "MY_LEADERBOARD";
 
 	//Create a new instance of the ChilliConnect client
-	ChilliConnect * chilliConnect = new ChilliConnect(gameToken);
+	ChilliConnect chilliConnect(gameToken);
 
 	//Create a new player account - usually, in a real game you would save the ChilliConnectID
 	//and ChilliConnectSecret and attempt to load on start up.
-	CreatePlayerResponse createPlayer = chilliConnect->CreatePlayer();
+	CreatePlayerResponse createPlayer = chilliConnect.CreatePlayer();
 	if (!createPlayer.wasOk) {
 		cout << "Error Creating ChilliConnect Player: " << createPlayer.rawBody;
 		cin.ignore();
@@ -28,7 +28,7 @@ int main()
 	//subsequent requests
 	string chilliConnectId = createPlayer.chilliConnectId;
 	string chilliConnectSecret = createPlayer.chilliConnectSecret;
-	LoginResponse login = chilliConnect->Login(chilliConnectId, chilliConnectSecret);
+	LoginResponse login = chilliConnect.Login(chilliConnectId, chilliConnectSecret);
 	if (!login.wasOk) {
 		cout << "Error Logging In Player:" << login.rawBody;
 		cin.ignore();
@@ -42,7 +42,7 @@ int main()
 	//Add a random leaderboard score for the player
 	srand(time(NULL));
 	int score = rand() % 1000;
-	AddScoreResponse addScore = chilliConnect->AddScore(accessToken, leaderboardKey, score);
+	AddScoreResponse addScore = chilliConnect.AddScore(accessToken, leaderboardKey, score);
 	if (!addScore.wasOk) {
 		cout << "Error Adding Score:" << addScore.rawBody;
 		cin.ignore();
@@ -52,7 +52,7 @@ int main()
 	cout << "Added Score. Player Is Ranked " << addScore.globalRank << " Of " << addScore.totalScores << endl;
 	
 	//Print out the top scores on the leaderboard
-	GetScoresResponse getScores = chilliConnect->GetScores(accessToken, leaderboardKey);
+	GetScoresResponse getScores = chilliConnect.GetScores(accessToken, leaderboardKey);
 	if (!getScores.wasOk) {
 		cout << "Error Getting Scores:" << addScore.rawBody;
 		cin.ignore();
@@ -61,7 +61,7 @@ int main()
 
 	cout << "Top Scores:" << endl;
 	for (const auto& score : getScores.scores) {
-		cout << get<0>(score) << ":" << get<1>(score) << "( " << get<2>(score) << " )" << endl;
+		cout << score.chilliConnectId  << ":" << score.score << "( " << score.dateSet << " )" << endl;
 	}
 
 	cin.ignore();
