@@ -119,7 +119,7 @@ public class PushNotificationDemoSceneController : MonoBehaviour
 		UnityEngine.Debug.Log("PushNotificationDemoSceneController : RegisterForPushNotification - Attempting to register!");
 
 #if UNITY_ANDROID
-		GooglePushNotificationHandler.Register(k_senderID);
+		GooglePushNotificationHandler.GenerateDeviceID(k_senderID);
 		GooglePushNotificationHandler.SetNotificationIcon("notificationicon");
 #elif UNITY_IOS
         iOSPushNotificationHandler.Register();

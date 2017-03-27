@@ -20,11 +20,11 @@ public class GooglePushNotificationListener : MonoBehaviour
 
 #region Broadcasts
     //------------------------------------------------------------------
-    /// On Registration Error.
+    /// On failed to generate a Device ID.
     /// 
     /// @param in_message - The message form the plugin
     //------------------------------------------------------------------
-    void OnRegistrationError(string in_message)
+	void OnGenerateDeviceIDError(string in_message)
 	{
 		RegistrationFailedEvent(in_message);
 		UnityEngine.Debug.Log ("GoogleCloudMessagingListener : OnRegistrationError: " + in_message);
@@ -32,18 +32,18 @@ public class GooglePushNotificationListener : MonoBehaviour
 	//------------------------------------------------------------------
 	/// On Message received.
 	///
-	/// @param in_message - The message form the plugin 
+	/// @param in_message - The message from the plugin 
 	//------------------------------------------------------------------
 	void OnMessage (string in_message)
 	{
 		UnityEngine.Debug.Log("Message: " + in_message);
 	}
 	//------------------------------------------------------------------
-	/// On OnRegistered.
+	/// On successfully generated a Device ID.
 	/// 
-	/// @param registrationId - The Registration ID
+	/// @param in_deviceID - The Device ID
 	//------------------------------------------------------------------
-	void OnRegistered (string in_deviceID)
+	void OnGeneratedDeviceID (string in_deviceID)
 	{
 		RegistrationSucceededEvent(in_deviceID);
 		UnityEngine.Debug.Log ("GoogleCloudMessagingListener : OnRegistered: " + in_deviceID);

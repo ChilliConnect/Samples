@@ -1,4 +1,4 @@
-﻿﻿using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 
 //------------------------------------------------------------------
@@ -7,12 +7,12 @@ using System.Collections;
 public static class GooglePushNotificationHandler
 {
 	//--- Name of Java class Unity interacts with for registering
-	private const string PLUGIN_REGISTER_CLASS_NAME = "com.chilliexamplecloudmessaging.unitygcmplugin.UnityGCMRegister";
+	private const string PLUGIN_CLASS_NAME = "com.chilliexamplecloudmessaging.unitygcmplugin.UnityGCMHandler";
 
     //------------------------------------------------------------------
     public static void SetRecieverGameObject(string in_name)
     {
-        using (AndroidJavaClass cls = new AndroidJavaClass(PLUGIN_REGISTER_CLASS_NAME))
+		using (AndroidJavaClass cls = new AndroidJavaClass(PLUGIN_CLASS_NAME))
         {
             cls.CallStatic("SetRecieverGameObject", in_name);
         }
@@ -23,14 +23,14 @@ public static class GooglePushNotificationHandler
     ///
     /// @param senderIds - params - The sender IDs
     //------------------------------------------------------------------
-    public static void Register (params string[] senderIds) 
+	public static void GenerateDeviceID (params string[] senderIds) 
 	{
 		string senderIdsStr = string.Join (",", senderIds);
 		Debug.Log("GoogleCloudMessagingPluginHandler : Register : Registering IDS: " + senderIdsStr);
 		
-		using (AndroidJavaClass cls = new AndroidJavaClass (PLUGIN_REGISTER_CLASS_NAME))
+		using (AndroidJavaClass cls = new AndroidJavaClass (PLUGIN_CLASS_NAME))
 		{
-			cls.CallStatic ("Register", senderIdsStr);
+			cls.CallStatic ("GenerateDeviceID", senderIdsStr);
 		}
 	}
 
@@ -41,7 +41,7 @@ public static class GooglePushNotificationHandler
 	//------------------------------------------------------------------
 	public static void SetNotificationIcon (string in_identifier) 
 	{
-		using (AndroidJavaClass cls = new AndroidJavaClass (PLUGIN_REGISTER_CLASS_NAME))
+		using (AndroidJavaClass cls = new AndroidJavaClass (PLUGIN_CLASS_NAME))
 		{
 			cls.CallStatic ("SetNotificationIcon", in_identifier);
 		}
@@ -50,7 +50,7 @@ public static class GooglePushNotificationHandler
 	//------------------------------------------------------------------
 	public static bool IsRegistered ()
 	{
-		using (AndroidJavaClass cls = new AndroidJavaClass (PLUGIN_REGISTER_CLASS_NAME))
+		using (AndroidJavaClass cls = new AndroidJavaClass (PLUGIN_CLASS_NAME))
 		{
 			return cls.CallStatic<bool> ("IsRegistered");
 		}
@@ -59,7 +59,7 @@ public static class GooglePushNotificationHandler
 	//------------------------------------------------------------------
 	public static string GetNotificationTypes()
 	{
-		using (AndroidJavaClass cls = new AndroidJavaClass (PLUGIN_REGISTER_CLASS_NAME))
+		using (AndroidJavaClass cls = new AndroidJavaClass (PLUGIN_CLASS_NAME))
 		{
 			return cls.CallStatic<string> ("GetAllNotifications");
 		}
@@ -73,7 +73,7 @@ public static class GooglePushNotificationHandler
 	//------------------------------------------------------------------
 	public static bool CheckAndConsumeWasLaunchedFromNotification()
 	{
-		using (AndroidJavaClass cls = new AndroidJavaClass (PLUGIN_REGISTER_CLASS_NAME))
+		using (AndroidJavaClass cls = new AndroidJavaClass (PLUGIN_CLASS_NAME))
 		{
 			return cls.CallStatic<bool> ("CheckAndConsumeWasLaunchedFromNotification");
 		}

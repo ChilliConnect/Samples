@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System;
 
 //------------------------------------------------------------------
-///  Listener for iOS Push Notification events.
+/// Listener for iOS Push Notification events.
 //------------------------------------------------------------------
 public class iOSPushNotificationListener : MonoBehaviour
 {
@@ -30,20 +30,16 @@ public class iOSPushNotificationListener : MonoBehaviour
 				byte[] token = UnityEngine.iOS.NotificationServices.deviceToken;
 	            if(token != null)
 	            {
-					string tokenString =  System.BitConverter.ToString(token).Replace("-", "").ToLower();
+					UnityEngine.Debug.Log ("iOSPushNotificationListener : OnRegistered: Stabdard Token - " + System.BitConverter.ToString(token).Replace("-", "").ToLower());
+					string tokenString = PushNotifications.PushNotificationUtils.Base64Encode(token);
 
-					UnityEngine.Debug.Log ("iOSPushNotificationListener : OnRegistered: tokenString - " + tokenString);
+					UnityEngine.Debug.Log ("iOSPushNotificationListener : OnRegistered: Base64 Token - " + tokenString);
 
 					iOSPushNotificationHandler.ConsumePendingRegistration();
 					RegistrationSucceededEvent(tokenString);
 	            }
             }
         }
-
-		for(int i=0; i < UnityEngine.iOS.NotificationServices.remoteNotificationCount; ++i)
-		{
-			UnityEngine.Debug.LogFormat("Remote Notification: {0}", UnityEngine.iOS.NotificationServices.GetRemoteNotification(i));
-		}
 	}
 }
 #endif
