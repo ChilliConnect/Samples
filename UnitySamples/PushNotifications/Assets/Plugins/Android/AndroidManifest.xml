@@ -12,8 +12,8 @@
 	<!--- Dave A - Needed for Reciever -->
 
 	<!-- Dave A - gcm Permissions -->
-    <permission android:name="com.taggames.chillitest.permission.C2D_MESSAGE" android:protectionLevel="signature" />
-    <uses-permission android:name="com.taggames.chillitest.permission.C2D_MESSAGE" />
+    <permission android:name="com.taggames.push.test.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+    <uses-permission android:name="com.taggames.push.test.permission.C2D_MESSAGE" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 	<!--- End of Dave A - gcm Permissions -->
 
@@ -32,12 +32,7 @@
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-                <category android:name="com.taggames.popcorn" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-                <category android:name="com.rovio.popcorn" />
+                <category android:name="com.taggames.push.test" />
             </intent-filter>
         </receiver>
         <service android:name="com.chilliexamplecloudmessaging.unitygcmplugin.UnityGCMBaseIntentService" />
