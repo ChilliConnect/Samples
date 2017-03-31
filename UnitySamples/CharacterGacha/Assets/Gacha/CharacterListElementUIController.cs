@@ -26,16 +26,10 @@ public class CharacterListElementUIController : MonoBehaviour
 		m_background = GetComponent<Image>();
 	}
 
-	/// Update the element with the team data
+	/// Update the element with the character data
 	///
-	/// @param team
-	/// 	The Team to displa
-	/// 
-	/// @param isPlayersTeam
-	/// 	Is player a memeber of the provided team?
-	/// 
-	/// @param playerHasTeam
-	/// 	Is the player a member of any team?
+	/// @param character
+	/// 	The Character to display
 	/// 
 	public void Init(Character character)
 	{

@@ -57,7 +57,8 @@ public class AccountSystem
 		m_chilliConnect.PlayerAccounts.CreatePlayer(requestDesc, (request, response) => OnChilliConnectAccountCreated(response), (request, createError) => Debug.LogError(createError.ErrorDescription));
 	}
 
-	/// Handler for succesfull log in, will notify listeners a new player has been logged in
+	/// Handler for succesfull log in, will set chilliConnectId to private member variable then
+	/// call the function responsible for login and TestGroup setting
 	/// 
 	private void OnChilliConnectLoggedIn(string chilliConnectId, string chilliConnectSecret)
 	{
@@ -82,6 +83,8 @@ public class AccountSystem
 		Login (response.ChilliConnectId, response.ChilliConnectSecret);
 	}
 
+	/// Handler for setting the TestGroup name and will notify listeners a new player has been logged in
+    /// 
 	private void OnActiveTestReturned(GetActiveTestResponse response)
 	{
 		var testGroup = response.TestGroup;

@@ -4,7 +4,7 @@ using System.Collections;
 using UnityEngine.EventSystems;
 using ChilliConnect;
 
-/// Controls the elements rendered in the list of teams.
+/// Controls the elements rendered in the list of recipes.
 /// 
 public class RecipeListElementUIController : MonoBehaviour
 {
@@ -29,24 +29,19 @@ public class RecipeListElementUIController : MonoBehaviour
 		m_background = GetComponent<Image>();
 	}
 
-	/// When the Join button is clicked, use the TeamsSystem to 
-	/// join the team
+	/// When the Create button is clicked, use the EconomySystem to 
+	/// to call a script on server that will generate a new character 
+	/// and add it to the users inventory
 	/// 
 	private void OnCreateButtonClicked ()
 	{
 		EconomySystem.Get ().CookRecipe (m_recipe);
 	}
 
-	/// Update the element with the team data
+	/// Update the element with the recipe data
 	///
-	/// @param team
-	/// 	The Team to displau
-	/// 
-	/// @param isPlayersTeam
-	/// 	Is player a memeber of the provided team?
-	/// 
-	/// @param playerHasTeam
-	/// 	Is the player a member of any team?
+	/// @param recipe
+	/// 	The recipe to display
 	/// 
 	public void Init(Recipe recipe)
 	{

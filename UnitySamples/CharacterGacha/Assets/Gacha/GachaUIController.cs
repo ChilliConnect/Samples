@@ -3,9 +3,9 @@ using UnityEngine.UI;
 using System.Collections;
 using ChilliConnect;
 
-/// Handles main UI interactions including team creation, leaving a team and 
+/// Handles main UI interactions including creating a new character for the logged in user, 
 /// creating a new player account. Is responsible for refreshing UI elements
-/// when player account or team status is changed.
+/// when player account or character list is updated/changed.
 ///  
 public class GachaUIController : MonoBehaviour 
 {
@@ -36,7 +36,7 @@ public class GachaUIController : MonoBehaviour
 		createNewPlayerButton.onClick.AddListener (OnCreateNewPlayerClicked);
 	}
 
-	/// Registers handlers for team and account system
+	/// Registers handlers for economy and account system
 	/// 
 	private void Start()
 	{
@@ -47,22 +47,20 @@ public class GachaUIController : MonoBehaviour
 		EconomySystem.Get().OnCharacterListPopulate += (characters) => m_characterListUIController.populateCharacterList(characters);
 	}
 		
-	/// Handler for the player logging in. Refreshes the team list from
-	/// ChilliConnect as well as the players selected team.
+	/// Handler for the player logging in. Refreshes the recipe and 
+	/// character list from ChilliConnect
 	/// 
 	/// @param chilliConnectId
 	/// 	The ChilliConnectId of the player logged in
 	/// 
 	private void OnPlayerLoggedIn( string chilliConnectId ) {
 		EconomySystem.Get ().GetPlayerCoinBalance();
-
 		EconomySystem.Get ().GetRecipeMetaData(AccountSystem.Get().TestGroup);
-
 		EconomySystem.Get ().GetPlayersCharacterList();
 
 		m_loginLabel.text = "Logged in as " + chilliConnectId;
 	}
-
+		
 	public void CurrencyBalanceRetrieved( int coinBalance ) 
 	{
 		m_balanceAmount.text = "Coins: " + coinBalance;

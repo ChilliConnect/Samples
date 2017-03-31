@@ -44,6 +44,10 @@ public class EconomySystem
 		Characters = new List<Character> ();
 	}
 
+
+	/// Gets the players character list. invokes a call to ChilliConnect GetInventoryByKeys 
+	/// with a list of keys to retrieve, only one needed here.
+	/// 
 	public void GetPlayersCharacterList()
 	{
 		var keys = new List<string>();
@@ -54,6 +58,10 @@ public class EconomySystem
 			(request, error) => Debug.LogError (error.ErrorDescription));
 	}
 
+	/// Gets the recipe list for the user depending on their TestGroup. 
+	/// TestGroup is populated before the login event happens and defaults to 
+	/// a static defined on the  AccountSystem
+	///
 	public void GetRecipeMetaData(string testGroup)
 	{			
 		var tags = new List<string>();
@@ -68,6 +76,9 @@ public class EconomySystem
 			(request, error) => Debug.LogError (error.ErrorDescription));
 	}
 
+	/// Gets the currently logged in players "Coins" balance.
+	/// Updates the display on completion
+	///
 	public void GetPlayerCoinBalance()
 	{
 		var keys = new List<string>();
@@ -87,6 +98,9 @@ public class EconomySystem
 		CurrencyBalanceRetrieved(response.Balances[0].Balance);
 	}
 
+	/// Handles the response of the GetRecipeMetaData call to ChilliConnect.
+	/// Loads the returned objects to a list of Recipe definitions and notifies listeners
+	///
 	private void RenderRecipeList(GetMetadataDefinitionsResponse response)
 	{
 		Recipes.Clear ();
@@ -111,6 +125,9 @@ public class EconomySystem
 		OnRecipeListPopulate (Recipes);
 	}
 
+	/// Handles the response of the GetPlayersCharacterList call to ChilliConnect.
+	/// Loads the returned objects to a list of Character definitions and notifies listeners
+	///
 	private void RenderCharacterList(GetInventoryForKeysResponse response)
 	{
 		Characters.Clear ();
@@ -134,6 +151,9 @@ public class EconomySystem
 		OnCharacterListPopulate (Characters);
 	}
 
+	/// Invokes ChilliConnect to run the SPAWN_CHARACTER script with the recipe key from
+	/// the clicked recipe on the UI.
+	///
 	public void CookRecipe(Recipe recipeKey)
 	{
 		var scriptParams = new Dictionary<string, SdkCore.MultiTypeValue> ();
@@ -147,6 +167,9 @@ public class EconomySystem
 			(request, error) => Debug.LogError(error.ErrorDescription) );
 	}
 
+	/// Handles the response of the CookRecipe call. Calls the method responsible for 
+	/// rendering characters and updates the currency display.
+	///
 	public void PostCharacterCreationActions(RunScriptResponse response)
 	{
 		var scriptResponse = response.Output.AsDictionary ();

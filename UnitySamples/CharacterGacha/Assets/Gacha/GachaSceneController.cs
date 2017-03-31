@@ -2,7 +2,7 @@
 using System.Collections;
 using ChilliConnect;
 
-/// Top level controller for the demo project. Create the systems and initialises 
+/// Top level controller for the Gacha project. Create the systems and initialises 
 /// Chilliconnect.
 /// 
 public class GachaSceneController : MonoBehaviour 
