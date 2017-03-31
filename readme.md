@@ -18,6 +18,10 @@ The Teams scene is the accompanying demo project for the ChilliConnect [Teams tu
 
 The FBLeaderboardDemoScene uses the Facebook SDK to show how to implementation Facebook integration with ChilliConnect, allowing players to link their ChilliConnect account with a Facebook account and then sign in using Facebook. This project also shows how to retrieve leaderboard scores for Facebook friends.
 
+### CharacterGacha
+
+The Gacha sample project accompanies the ChilliConnect [Gacha and A/B Testing Tutorial](https://docs.chilliconnect.com/tutorial-gache) and shows how create and A/B Test a simple gacha style spawning system in ChilliConnect.
+
 ### IAP
 
 The IAPDemoScene accompanies the ChilliConnect [IAP tutorial](https://docs.chilliconnect.com/tutorial-iaps) and contains an end-to-end example of integrating the Unity IAP Plugin with ChilliConnect to securely verify and redeem player purchases. 
