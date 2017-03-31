@@ -73,6 +73,12 @@ namespace ChilliConnect
 		/// checking don't provide this parameter - data will be written with no checking.
 		/// </summary>
         public string WriteLock { get; private set; }
+	
+		/// <summary>
+		/// The attachment data to be saved to the Custom Data Key. The maximum size is 2mb.
+		/// To remove Attachment Data set to empty string.
+		/// </summary>
+        public string Attachment { get; private set; }
 
 		/// <summary>
 		/// Initialises a new instance of the request with the given description.
@@ -85,13 +91,13 @@ namespace ChilliConnect
 			ReleaseAssert.IsNotNull(desc, "A description object cannot be null.");
 			
 			ReleaseAssert.IsNotNull(desc.Key, "Key cannot be null.");
-			ReleaseAssert.IsNotNull(desc.Value, "Value cannot be null.");
 	
 			ReleaseAssert.IsNotNull(connectAccessToken, "Connect Access Token cannot be null.");
 	
             Key = desc.Key;
             Value = desc.Value;
             WriteLock = desc.WriteLock;
+            Attachment = desc.Attachment;
             ConnectAccessToken = connectAccessToken;
 	
 			Url = "https://connect.chilliconnect.com/1.0/data/player/set";
@@ -130,12 +136,21 @@ namespace ChilliConnect
 			dictionary.Add("Key", Key);
 			
 			// Value
-            dictionary.Add("Value", Value.Serialise());
+            if (Value != null)
+			{
+                dictionary.Add("Value", Value.Serialise());
+            }
 			
 			// Write Lock
             if (WriteLock != null)
 			{
 				dictionary.Add("WriteLock", WriteLock);
+            }
+			
+			// Attachment
+            if (Attachment != null)
+			{
+				dictionary.Add("Attachment", Attachment);
             }
 	
 			return dictionary;

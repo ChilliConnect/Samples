@@ -9,17 +9,15 @@ using ChilliConnect;
 ///  
 public class GachaUIController : MonoBehaviour 
 {
-	private GameObject m_createTeamButton;
-	private GameObject m_leaveTeamButton;
-	private GameObject m_teamName;
-	private GameObject m_teamsPanel;
-	private Text m_playerTeamLabel;
 	private Text m_loginLabel;
 	private Text m_balanceAmount;
 
-
 	private RecipeListUIController m_recipeListUIController;
 	private GameObject m_recipeListPanel;
+
+	private CharacterListUIController m_characterListUIController;
+	private GameObject m_characterListPanel;
+
 
 	/// Gather the UI
 	/// 
@@ -30,6 +28,9 @@ public class GachaUIController : MonoBehaviour
 
 		m_recipeListPanel = transform.FindChild("RecipeList").gameObject;
 		m_recipeListUIController= m_recipeListPanel.GetComponent<RecipeListUIController>();
+
+		m_characterListPanel = transform.FindChild("CharacterList").gameObject;
+		m_characterListUIController = m_characterListPanel.GetComponent<CharacterListUIController>();
 
 		var createNewPlayerButton = transform.FindChild("CreateNewPlayerButton").GetComponent<Button>();
 		createNewPlayerButton.onClick.AddListener (OnCreateNewPlayerClicked);
@@ -42,7 +43,8 @@ public class GachaUIController : MonoBehaviour
 		AccountSystem.Get().OnPlayerLoggedIn += OnPlayerLoggedIn;
 
 		EconomySystem.Get().CurrencyBalanceRetrieved += CurrencyBalanceRetrieved;
-		EconomySystem.Get ().OnRecipeListPopulate += (recipes) => m_recipeListUIController.populateRecipeList(recipes);
+		EconomySystem.Get().OnRecipeListPopulate += (recipes) => m_recipeListUIController.populateRecipeList(recipes);
+		EconomySystem.Get().OnCharacterListPopulate += (characters) => m_characterListUIController.populateCharacterList(characters);
 	}
 		
 	/// Handler for the player logging in. Refreshes the team list from
@@ -53,12 +55,15 @@ public class GachaUIController : MonoBehaviour
 	/// 
 	private void OnPlayerLoggedIn( string chilliConnectId ) {
 		EconomySystem.Get ().GetPlayerCoinBalance();
-		EconomySystem.Get ().GetRecipeMetaData();
+
+		EconomySystem.Get ().GetRecipeMetaData(AccountSystem.Get().TestGroup);
+
+		EconomySystem.Get ().GetPlayersCharacterList();
 
 		m_loginLabel.text = "Logged in as " + chilliConnectId;
 	}
 
-	private void CurrencyBalanceRetrieved( int coinBalance ) 
+	public void CurrencyBalanceRetrieved( int coinBalance ) 
 	{
 		m_balanceAmount.text = "Coins: " + coinBalance;
 	}

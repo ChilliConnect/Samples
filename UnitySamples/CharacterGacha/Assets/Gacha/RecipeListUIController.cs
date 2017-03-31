@@ -29,19 +29,17 @@ public class RecipeListUIController: MonoBehaviour
 
 	public void populateRecipeList(List<Recipe> recipes)
 	{
-		int numCurrentlyUsedElements = m_numElementsUsed;
-		m_numElementsUsed = Mathf.Min(m_elementPool.Length, recipes.Count);
-		int numToRemove = Mathf.Max(m_numElementsUsed - numCurrentlyUsedElements, 0);
+		for(int i=0; i<m_numElementsUsed; ++i)
+		{
+			m_elementPool[i].transform.SetParent(m_pooledParent, false);
+		}
+
+		m_numElementsUsed = recipes.Count;
 
 		for(int i=0; i<m_numElementsUsed; ++i)
 		{
 			m_elementPool[i].transform.SetParent(m_contentParent, false);
 			m_elementPool[i].Init(recipes[i]);
-		}
-
-		for(int i=m_numElementsUsed; i<m_numElementsUsed+numToRemove; ++i)
-		{
-			m_elementPool[i].transform.SetParent(m_pooledParent, false);
 		}
 	}
 }

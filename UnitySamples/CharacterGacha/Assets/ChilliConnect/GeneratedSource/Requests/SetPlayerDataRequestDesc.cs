@@ -58,21 +58,23 @@ namespace ChilliConnect
 		/// checking don't provide this parameter - data will be written with no checking.
 		/// </summary>
         public string WriteLock { get; set; }
+	
+		/// <summary>
+		/// The attachment data to be saved to the Custom Data Key. The maximum size is 2mb.
+		/// To remove Attachment Data set to empty string.
+		/// </summary>
+        public string Attachment { get; set; }
 
 		/// <summary>
 		/// Initialises a new instance of the description with the given required properties.
 		/// </summary>
 		///
 		/// <param name="key">The Custom Data Key to set value of. Maximum length is 50 characters.</param>
-		/// <param name="value">The value the Custom Data Key should be set to. When serialised the maximum size
-		/// is 7kb.</param>
-		public SetPlayerDataRequestDesc(string key, MultiTypeValue value)
+		public SetPlayerDataRequestDesc(string key)
 		{
 			ReleaseAssert.IsNotNull(key, "Key cannot be null.");
-			ReleaseAssert.IsNotNull(value, "Value cannot be null.");
 	
             Key = key;
-            Value = value;
 		}
 	}
 }

@@ -13,6 +13,12 @@ public class AccountSystem
 
 	private ChilliConnectSdk m_chilliConnect;
 
+	private string m_chilliConnectId;
+
+	private const string DEFAULT_TEST_GROUP = "Default";
+
+	public string TestGroup { get; set; }
+
 	public static AccountSystem Get()
 	{
 		return s_singletonInstance;
@@ -55,7 +61,11 @@ public class AccountSystem
 	/// 
 	private void OnChilliConnectLoggedIn(string chilliConnectId, string chilliConnectSecret)
 	{
-		OnPlayerLoggedIn(chilliConnectId);
+		m_chilliConnect.LiveOps.GetActiveTest( 
+			(response) => OnActiveTestReturned(response), 
+			(error) => Debug.LogError(error.ErrorDescription));
+
+		m_chilliConnectId = chilliConnectId;
 	}
 
 	/// Handler for succesfull player account creation. Will persist the new 
@@ -72,6 +82,19 @@ public class AccountSystem
 		Login (response.ChilliConnectId, response.ChilliConnectSecret);
 	}
 
+	private void OnActiveTestReturned(GetActiveTestResponse response)
+	{
+		var testGroup = response.TestGroup;
+
+		if (testGroup != null) {
+			TestGroup = testGroup.Name;
+		} else {
+			TestGroup = DEFAULT_TEST_GROUP;
+		}
+			
+		OnPlayerLoggedIn (m_chilliConnectId);
+	}
+
 	/// Logs in the player identified
 	/// 
 	/// @param chilliConnectId
@@ -82,7 +105,9 @@ public class AccountSystem
 	/// 
 	private void Login(string chilliConnectId, string chilliConnectSecret)
 	{
-		m_chilliConnect.PlayerAccounts.LogInUsingChilliConnect(chilliConnectId, chilliConnectSecret, 
+		var loginUsingChilliConnectRequestDesc = new LogInUsingChilliConnectRequestDesc (chilliConnectId, chilliConnectSecret);
+
+		m_chilliConnect.PlayerAccounts.LogInUsingChilliConnect(loginUsingChilliConnectRequestDesc, 
 			(loginRequest) => OnChilliConnectLoggedIn( chilliConnectId, chilliConnectSecret), 
 			(loginRequest, error) => Debug.LogError(error.ErrorDescription));
 	}

@@ -109,17 +109,16 @@ namespace ChilliConnect
 		/// on subsequent requests.
 		/// </summary>
 		///
-		/// <param name="chilliConnectId">The player's ChilliConnectID.</param>
-		/// <param name="chilliConnectSecret">The player's ChilliConnectSecret.</param>
+		/// <param name="desc">The request description.</param>
 		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
 		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
 		/// a container with information on what went wrong.</param>
-		public void LogInUsingChilliConnect(string chilliConnectId, string chilliConnectSecret, Action<LogInUsingChilliConnectRequest> successCallback, Action<LogInUsingChilliConnectRequest, LogInUsingChilliConnectError> errorCallback)
+		public void LogInUsingChilliConnect(LogInUsingChilliConnectRequestDesc desc, Action<LogInUsingChilliConnectRequest> successCallback, Action<LogInUsingChilliConnectRequest, LogInUsingChilliConnectError> errorCallback)
 		{
 			m_logging.LogVerboseMessage("Sending Log In Using Chilli Connect request.");
 			
             var gameToken = m_dataStore.GetString("AppToken");
-			var request = new LogInUsingChilliConnectRequest(chilliConnectId, chilliConnectSecret, gameToken);
+			var request = new LogInUsingChilliConnectRequest(desc, gameToken);
 	
 			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
 			{
@@ -145,17 +144,16 @@ namespace ChilliConnect
 		/// reauthenticate.
 		/// </summary>
 		///
-		/// <param name="email">The player's Email.</param>
-		/// <param name="password">The player's Password.</param>
+		/// <param name="desc">The request description.</param>
 		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
 		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
 		/// a container with information on what went wrong.</param>
-		public void LogInUsingEmail(string email, string password, Action<LogInUsingEmailRequest, LogInUsingEmailResponse> successCallback, Action<LogInUsingEmailRequest, LogInUsingEmailError> errorCallback)
+		public void LogInUsingEmail(LogInUsingEmailRequestDesc desc, Action<LogInUsingEmailRequest, LogInUsingEmailResponse> successCallback, Action<LogInUsingEmailRequest, LogInUsingEmailError> errorCallback)
 		{
 			m_logging.LogVerboseMessage("Sending Log In Using Email request.");
 			
             var gameToken = m_dataStore.GetString("AppToken");
-			var request = new LogInUsingEmailRequest(email, password, gameToken);
+			var request = new LogInUsingEmailRequest(desc, gameToken);
 	
 			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
 			{
@@ -181,16 +179,16 @@ namespace ChilliConnect
 		/// reauthenticate.
 		/// </summary>
 		///
-		/// <param name="facebookAccessToken">Access Token provided from the Facebook API.</param>
+		/// <param name="desc">The request description.</param>
 		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
 		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
 		/// a container with information on what went wrong.</param>
-		public void LogInUsingFacebook(string facebookAccessToken, Action<LogInUsingFacebookRequest, LogInUsingFacebookResponse> successCallback, Action<LogInUsingFacebookRequest, LogInUsingFacebookError> errorCallback)
+		public void LogInUsingFacebook(LogInUsingFacebookRequestDesc desc, Action<LogInUsingFacebookRequest, LogInUsingFacebookResponse> successCallback, Action<LogInUsingFacebookRequest, LogInUsingFacebookError> errorCallback)
 		{
 			m_logging.LogVerboseMessage("Sending Log In Using Facebook request.");
 			
             var gameToken = m_dataStore.GetString("AppToken");
-			var request = new LogInUsingFacebookRequest(facebookAccessToken, gameToken);
+			var request = new LogInUsingFacebookRequest(desc, gameToken);
 	
 			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
 			{
@@ -216,17 +214,16 @@ namespace ChilliConnect
 		/// reauthenticate.
 		/// </summary>
 		///
-		/// <param name="userName">The player's Username.</param>
-		/// <param name="password">The player's Password.</param>
+		/// <param name="desc">The request description.</param>
 		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
 		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
 		/// a container with information on what went wrong.</param>
-		public void LogInUsingUserName(string userName, string password, Action<LogInUsingUserNameRequest, LogInUsingUserNameResponse> successCallback, Action<LogInUsingUserNameRequest, LogInUsingUserNameError> errorCallback)
+		public void LogInUsingUserName(LogInUsingUserNameRequestDesc desc, Action<LogInUsingUserNameRequest, LogInUsingUserNameResponse> successCallback, Action<LogInUsingUserNameRequest, LogInUsingUserNameError> errorCallback)
 		{
 			m_logging.LogVerboseMessage("Sending Log In Using User Name request.");
 			
             var gameToken = m_dataStore.GetString("AppToken");
-			var request = new LogInUsingUserNameRequest(userName, password, gameToken);
+			var request = new LogInUsingUserNameRequest(desc, gameToken);
 	
 			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
 			{

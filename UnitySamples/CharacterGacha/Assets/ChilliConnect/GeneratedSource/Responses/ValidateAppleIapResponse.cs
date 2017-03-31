@@ -94,14 +94,6 @@ namespace ChilliConnect
                     ReleaseAssert.IsTrue(entry.Value is IDictionary<string, object>, "Invalid serialised type.");
                     AppStore = new AppStore((IDictionary<string, object>)entry.Value);	
 				}
-	
-				// An error has occurred.
-				else
-				{
-#if DEBUG
-					throw new ArgumentException("Input Json contains an invalid field.");
-#endif
-				}
 			}
 		}
 	}

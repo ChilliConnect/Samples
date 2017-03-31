@@ -64,25 +64,47 @@ namespace ChilliConnect
 		/// The player's ChilliConnectSecret.
 		/// </summary>
         public string ChilliConnectSecret { get; private set; }
+	
+		/// <summary>
+		/// Model of device being used by the player. E.g. SamsungABC123.
+		/// </summary>
+        public string DeviceModel { get; private set; }
+	
+		/// <summary>
+		/// Type of device being used by the player. Accepted values: PHONE, TABLET, BROWSER,
+		/// DESKTOP, OTHER.
+		/// </summary>
+        public string DeviceType { get; private set; }
+	
+		/// <summary>
+		/// Platform of the device being used by the player. A string containing one of the
+		/// accepted values will be mapped to the accepted value. Accepted values: ANDROID,
+		/// IOS, KINDLE, WINDOWS, MACOS, LINUX, OTHER.
+		/// </summary>
+        public string Platform { get; private set; }
 
 		/// <summary>
-		/// Initialises a new instance of the request with the given properties.
+		/// Initialises a new instance of the request with the given description.
 		/// </summary>
 		///
-		/// <param name="chilliConnectId">The player's ChilliConnectID.</param>
-		/// <param name="chilliConnectSecret">The player's ChilliConnectSecret.</param>
+		/// <param name="desc">The description.</param>
 		/// <param name="gameToken">The Game to log in to.</param>
-		public LogInUsingChilliConnectRequest(string chilliConnectId, string chilliConnectSecret, string gameToken)
+		public LogInUsingChilliConnectRequest(LogInUsingChilliConnectRequestDesc desc, string gameToken)
 		{
-			ReleaseAssert.IsNotNull(chilliConnectId, "Chilli Connect Id cannot be null.");
-			ReleaseAssert.IsNotNull(chilliConnectSecret, "Chilli Connect Secret cannot be null.");
+			ReleaseAssert.IsNotNull(desc, "A description object cannot be null.");
+			
+			ReleaseAssert.IsNotNull(desc.ChilliConnectId, "ChilliConnectId cannot be null.");
+			ReleaseAssert.IsNotNull(desc.ChilliConnectSecret, "ChilliConnectSecret cannot be null.");
 	
 			ReleaseAssert.IsNotNull(gameToken, "Game Token cannot be null.");
 	
-            ChilliConnectId = chilliConnectId;
-            ChilliConnectSecret = chilliConnectSecret;
+            ChilliConnectId = desc.ChilliConnectId;
+            ChilliConnectSecret = desc.ChilliConnectSecret;
+            DeviceModel = desc.DeviceModel;
+            DeviceType = desc.DeviceType;
+            Platform = desc.Platform;
             GameToken = gameToken;
-			
+	
 			Url = "https://connect.chilliconnect.com/1.0/player/login/chilli";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
@@ -120,6 +142,24 @@ namespace ChilliConnect
 			
 			// Chilli Connect Secret
 			dictionary.Add("ChilliConnectSecret", ChilliConnectSecret);
+			
+			// Device Model
+            if (DeviceModel != null)
+			{
+				dictionary.Add("DeviceModel", DeviceModel);
+            }
+			
+			// Device Type
+            if (DeviceType != null)
+			{
+				dictionary.Add("DeviceType", DeviceType);
+            }
+			
+			// Platform
+            if (Platform != null)
+			{
+				dictionary.Add("Platform", Platform);
+            }
 	
 			return dictionary;
 		}

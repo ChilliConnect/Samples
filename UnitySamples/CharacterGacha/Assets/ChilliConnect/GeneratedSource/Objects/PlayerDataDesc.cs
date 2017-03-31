@@ -51,6 +51,11 @@ namespace ChilliConnect
         public MultiTypeValue Value { get; set; }
 	
 		/// <summary>
+		/// True if the Key has Attachment data associated with it.
+		/// </summary>
+        public bool? HasAttachment { get; set; }
+	
+		/// <summary>
 		/// The current value of the WriteLock for this Key. To enable conflict checking, the
 		/// returned WriteLock can be provided to the Add Data call on subsequent update
 		/// attempts.
@@ -72,18 +77,15 @@ namespace ChilliConnect
 		/// </summary>
 		///
 		/// <param name="key">The requested Custom Data Key.</param>
-		/// <param name="value">The value of the Custom Data Key.</param>
 		/// <param name="dateCreated">The Date the Key was first created. Format: ISO8601 e.g. 2016-01-12T11:08:23.</param>
 		/// <param name="dateModified">The Date the Key was last updated. Format: ISO8601 e.g. 2016-01-12T11:08:23.</param>
-		public PlayerDataDesc(string key, MultiTypeValue value, DateTime dateCreated, DateTime dateModified)
+		public PlayerDataDesc(string key, DateTime dateCreated, DateTime dateModified)
 		{
 			ReleaseAssert.IsNotNull(key, "Key cannot be null.");
-			ReleaseAssert.IsNotNull(value, "Value cannot be null.");
 			ReleaseAssert.IsNotNull(dateCreated, "Date Created cannot be null.");
 			ReleaseAssert.IsNotNull(dateModified, "Date Modified cannot be null.");
 	
             Key = key;
-            Value = value;
             DateCreated = dateCreated;
             DateModified = dateModified;
 		}

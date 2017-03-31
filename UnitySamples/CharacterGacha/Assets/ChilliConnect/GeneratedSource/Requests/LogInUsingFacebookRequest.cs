@@ -59,22 +59,45 @@ namespace ChilliConnect
 		/// Access Token provided from the Facebook API.
 		/// </summary>
         public string FacebookAccessToken { get; private set; }
+	
+		/// <summary>
+		/// Model of device being used by the player. E.g. SamsungABC123.
+		/// </summary>
+        public string DeviceModel { get; private set; }
+	
+		/// <summary>
+		/// Type of device being used by the player. Accepted values: PHONE, TABLET, BROWSER,
+		/// DESKTOP, OTHER.
+		/// </summary>
+        public string DeviceType { get; private set; }
+	
+		/// <summary>
+		/// Platform of the device being used by the player. A string containing one of the
+		/// accepted values will be mapped to the accepted value. Accepted values: ANDROID,
+		/// IOS, KINDLE, WINDOWS, MACOS, LINUX, OTHER.
+		/// </summary>
+        public string Platform { get; private set; }
 
 		/// <summary>
-		/// Initialises a new instance of the request with the given properties.
+		/// Initialises a new instance of the request with the given description.
 		/// </summary>
 		///
-		/// <param name="facebookAccessToken">Access Token provided from the Facebook API.</param>
+		/// <param name="desc">The description.</param>
 		/// <param name="gameToken">The Game to log in to.</param>
-		public LogInUsingFacebookRequest(string facebookAccessToken, string gameToken)
+		public LogInUsingFacebookRequest(LogInUsingFacebookRequestDesc desc, string gameToken)
 		{
-			ReleaseAssert.IsNotNull(facebookAccessToken, "Facebook Access Token cannot be null.");
+			ReleaseAssert.IsNotNull(desc, "A description object cannot be null.");
+			
+			ReleaseAssert.IsNotNull(desc.FacebookAccessToken, "FacebookAccessToken cannot be null.");
 	
 			ReleaseAssert.IsNotNull(gameToken, "Game Token cannot be null.");
 	
-            FacebookAccessToken = facebookAccessToken;
+            FacebookAccessToken = desc.FacebookAccessToken;
+            DeviceModel = desc.DeviceModel;
+            DeviceType = desc.DeviceType;
+            Platform = desc.Platform;
             GameToken = gameToken;
-			
+	
 			Url = "https://connect.chilliconnect.com/1.0/player/login/facebook";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
@@ -109,6 +132,24 @@ namespace ChilliConnect
 			
 			// Facebook Access Token
 			dictionary.Add("FacebookAccessToken", FacebookAccessToken);
+			
+			// Device Model
+            if (DeviceModel != null)
+			{
+				dictionary.Add("DeviceModel", DeviceModel);
+            }
+			
+			// Device Type
+            if (DeviceType != null)
+			{
+				dictionary.Add("DeviceType", DeviceType);
+            }
+			
+			// Platform
+            if (Platform != null)
+			{
+				dictionary.Add("Platform", Platform);
+            }
 	
 			return dictionary;
 		}

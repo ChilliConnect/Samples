@@ -7,18 +7,21 @@ using System;
 public class EconomySystem 
 {
 	public event System.Action<int> CurrencyBalanceRetrieved = delegate {};
-
 	public event Action<List<Recipe>> OnRecipeListPopulate = delegate {};
+	public event Action<List<Character>> OnCharacterListPopulate = delegate {};
 
 	private const string SPAWN_CHARACTER = "SPAWN_CHARACTER";
-
 	private const string CURRENCY_KEY = "COINS";
-
 	private const string RECIPE_TAG = "Recipe";
+	private const string CHARACTER_KEY = "CHARACTER";
 
-	/// The list of available teams 
+	/// The list of available recipes 
 	/// 
 	public List<Recipe> Recipes { get; set; }
+
+	/// The list of available characters for the logged in character 
+	/// 
+	public List<Character> Characters { get; set; }
 
 	private static EconomySystem s_singletonInstance = null;
 
@@ -38,12 +41,24 @@ public class EconomySystem
 	{
 		m_chilliConnect = chilliConnect;
 		Recipes = new List<Recipe> ();
+		Characters = new List<Character> ();
 	}
 
-	public void GetRecipeMetaData()
+	public void GetPlayersCharacterList()
 	{
+		var keys = new List<string>();
+		keys.Add ( CHARACTER_KEY );
+
+		m_chilliConnect.Economy.GetInventoryForKeys (keys,
+			(request, response) => RenderCharacterList(response), 
+			(request, error) => Debug.LogError (error.ErrorDescription));
+	}
+
+	public void GetRecipeMetaData(string testGroup)
+	{			
 		var tags = new List<string>();
 		tags.Add ( RECIPE_TAG );
+		tags.Add ( testGroup );
 
 		var getMetadataDefinitionsRequestDesc = new GetMetadataDefinitionsRequestDesc ();
 		getMetadataDefinitionsRequestDesc.Tags = tags;
@@ -92,8 +107,31 @@ public class EconomySystem
 			recipe.CoinCost = coinCost;
 			Recipes.Add( recipe );
 		};
-
+	
 		OnRecipeListPopulate (Recipes);
+	}
+
+	private void RenderCharacterList(GetInventoryForKeysResponse response)
+	{
+		Characters.Clear ();
+
+		foreach( PlayerInventoryItem inventoryItem in response.Items) {
+			var instanceData = inventoryItem.InstanceData.AsDictionary();
+
+			var characterId = inventoryItem.ItemId;
+			var characterLevel = instanceData.GetInt ("Level");
+			var characterAttack = instanceData.GetInt ("Attack");
+			var characterDefence = instanceData.GetInt ("Defence");
+
+			var character = new Character ();
+			character.CharacterID = characterId;
+			character.CharacterLevel = characterLevel;
+			character.CharacterAtk = characterAttack;
+			character.CharacterDef = characterDefence;
+			Characters.Add( character );
+		};
+
+		OnCharacterListPopulate (Characters);
 	}
 
 	public void CookRecipe(Recipe recipeKey)
@@ -105,7 +143,22 @@ public class EconomySystem
 		runScriptRequest.Params = scriptParams;
 
 		m_chilliConnect.CloudCode.RunScript( runScriptRequest, 
-			(request, response) => UnityEngine.Debug.Log("Charcter has been created! Gud Jerb!"),
+			(request, response) => PostCharacterCreationActions(response),
 			(request, error) => Debug.LogError(error.ErrorDescription) );
 	}
+
+	public void PostCharacterCreationActions(RunScriptResponse response)
+	{
+		var scriptResponse = response.Output.AsDictionary ();
+		var wasError = scriptResponse.GetBool ("Error");
+
+		if (wasError) {
+			UnityEngine.Debug.Log ("Not Enough Coins");
+		} else {
+			GetPlayersCharacterList ();
+
+			var remainingCoins = scriptResponse.GetInt("CoinBalance");
+			CurrencyBalanceRetrieved (remainingCoins);
+		}
+	}	
 }
