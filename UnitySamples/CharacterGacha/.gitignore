@@ -1,0 +1,7 @@
+Library
+Temp
+obj
+Assets/Plugins/UnityPurchasing
+*.csproj
+*.sln
+*.userprefs
