@@ -8,7 +8,7 @@ using ChilliConnect;
 public class GachaSceneController : MonoBehaviour 
 {
 	//Replace this with the game token from your ChilliConnect dashboard
-	const string GAME_TOKEN = "Hamlv2T6qpBdc0HfNez39i8PVwCgEbGi";
+	const string GAME_TOKEN = "";
 
 	private ChilliConnectSdk m_chilliConnect = null;
 	private AccountSystem m_accountSystem = new AccountSystem();
