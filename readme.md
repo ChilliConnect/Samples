@@ -20,7 +20,7 @@ The FBLeaderboardDemoScene uses the Facebook SDK to show how to implementation F
 
 ### CharacterGacha
 
-The Gacha sample project accompanies the ChilliConnect [Gacha and A/B Testing Tutorial](https://docs.chilliconnect.com/tutorial-gache) and shows how create and A/B Test a simple gacha style spawning system in ChilliConnect.
+The Gacha sample project accompanies the ChilliConnect [Gacha and A/B Testing Tutorial](https://docs.chilliconnect.com/tutorial-gacha) and shows how create and A/B Test a simple gacha style spawning system in ChilliConnect.
 
 ### IAP
 
