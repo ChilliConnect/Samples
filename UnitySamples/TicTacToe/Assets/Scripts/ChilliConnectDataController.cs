@@ -50,7 +50,7 @@ public class ChilliConnectDataController : MonoBehaviour
         gameController.onSideSelected += CreateNewGame;
         gameController.onTurnEnded += UpdateChilliConnectGameState;
 		onGameStateRetrievedFromServer += InitialiseGameController;
-        chilliConnect = new ChilliConnectSdk("wggM8r8m9qTUr1IHO9pr6sNqrrWTs8Xg", false);
+		chilliConnect = new ChilliConnectSdk("Vv7VANzImRtEUeiYaoz4lWKqB6t349iy", false);
         chilliConnectGameState = new ChilliConnectGameState();
         LoadOrCreatePlayerData();
     }
@@ -112,46 +112,31 @@ public class ChilliConnectDataController : MonoBehaviour
 	bool LoadPlayerData()
 	{
 		gameController.ShowChilliInfoPanel (k_message_loadingPlayerData);
-		bool success = true;
-		if (File.Exists(fileName))
+
+		var chilliConnectId = PlayerPrefs.GetString ("ChilliConnectID");
+		var chilliConnectSecret = PlayerPrefs.GetString ("ChilliConnectSecret");
+
+		if (chilliConnectId != null && chilliConnectSecret != null) 
 		{
-			StreamReader reader = File.OpenText(fileName);
-
-			// We saved the file out in this specific order
-			m_chilliConnectId = reader.ReadLine();
-			m_chilliConnectSecret = reader.ReadLine();
-			reader.Close();
-
-			if (onReadyToLogIn != null)
+			m_chilliConnectId = chilliConnectId;
+			m_chilliConnectSecret = chilliConnectSecret;
+			if (onReadyToLogIn != null) 
 			{
 				onReadyToLogIn.Invoke();
 			}
+
+			return true;
 		}
-		else
-		{
-			Debug.Log("Could not Open the file: " + fileName + " for reading.");
-			success = false;
-		}
-		return success;
+
+		return false;
 	}
 
 	/// Saves player account data to file
 	/// 
 	void SavePlayerData(string id, string secret)
 	{
-		if (File.Exists(fileName)) 
-		{
-			Debug.Log(fileName + " already exists.");
-		}
-		else
-		{
-			var sr = File.CreateText(fileName);
-			sr.WriteLine(id);
-			sr.WriteLine(secret);
-			sr.Close();
-
-			Debug.Log(fileName + " saved successfully.");
-		}
+		PlayerPrefs.SetString("ChilliConnectID", id);
+		PlayerPrefs.SetString("ChilliConnectSecret", secret);
 	}
 
 	/// Creates a player account and logs it into chilli connect
