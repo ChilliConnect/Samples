@@ -7,20 +7,19 @@ using ChilliConnect;
 
 /// Controller for all interaction with Chilli Connect
 /// 
-public class ChilliConnectDataController : MonoBehaviour
+public class SceneController : MonoBehaviour
 {
-	public delegate void SetGameState(ChilliConnectGameState gameState);
-	public event SetGameState onGameStateRetrievedFromServer;
-	public delegate void LogInDelegate();
-	public event LogInDelegate onReadyToLogIn;
+	private const string MESSAGE_STARTUP = "Starting Up";
+	private const string MESSAGE_LOADING_DATA = "Loading Player Data";
+	private const string MESSAGE_CREATING_ACCOUNT = "Creating Chilli Account";
+	private const string MESSAGE_LOGGING_IN = "Logging In";
+	private const string MESSAGE_MATCHMAKING = "Matchmaking";
+	private const string MESSAGE_CHOOSE_SIDE = "Choose A Side";
+	private const string MESSAGE_OPPONENT_TURRN = "Opponent's Turn";
 
-    private const string k_matchState_Complete = "COMPLETE";
-    private const string k_matchState_WaitingForPlayers = "WAITING_FOR_PLAYERS";
-    private const string k_matchState_xPlayerTurn = "X_PLAYER_TURN";
-    private const string k_matchState_oPlayerTurn = "O_PLAYER_TURN";
-    private const string k_matchState_GameOver = "GAME_OVER";
+	const string GAME_TOKEN = "Vv7VANzImRtEUeiYaoz4lWKqB6t349iy";
 
-    private const string k_newGameQueryFormat = "Value.MatchState = \"{0}\""; 
+	/*private const string k_newGameQueryFormat = "Value.MatchState = \"{0}\""; 
     private const string k_activeGameQueryFormat = "Value.MatchState != \"{0}\" AND (Value.PlayerX = \"{1}\" OR Value.PlayerO = \"{1}\")";
 
 	private const string k_message_startingUp = "Starting Up";
@@ -30,36 +29,41 @@ public class ChilliConnectDataController : MonoBehaviour
     private const string k_message_matchmaking = "Matchmaking";
     private const string k_message_ChooseSide = "Choose A Side";
     private const string k_message_waitingForOpponent = "Opponent's Turn";
+	const string k_keyGamestate = "GAMESTATE";*/
 
-    ChilliConnectSdk chilliConnect = null;
-    string fileName = "SaveData.txt";
-	const string k_keyGamestate = "GAMESTATE";
-	string m_chilliConnectId = string.Empty;
+    private ChilliConnectSdk m_chilliConnect = null;
+	private MatchSystem m_matchSystem = new MatchSystem ();
+
+	/*string m_chilliConnectId = string.Empty;
 	string m_chilliConnectSecret = string.Empty;
-	string m_collectionObjectId = string.Empty;
-    ChilliConnectGameState chilliConnectGameState = null;
-
+	string m_collectionObjectId = string.Empty;*/
+    
 	public GameController gameController = null;
+
 
     /// Initialization
 	/// 
-    void Start()
+    private void Awake()
     {
-		gameController.ShowChilliInfoPanel (k_message_startingUp);
-        onReadyToLogIn += CallLogIn;
+		m_chilliConnect = new ChilliConnectSdk(GAME_TOKEN);
+		m_matchSystem.Initialise (m_chilliConnect);
+		m_matchSystem.OnMatchUpdated 
+		gameController.ShowChilliInfoPanel (MESSAGE_CHOOSE_SIDE);
         gameController.onSideSelected += CreateNewGame;
         gameController.onTurnEnded += UpdateChilliConnectGameState;
-		onGameStateRetrievedFromServer += InitialiseGameController;
-		chilliConnect = new ChilliConnectSdk("Vv7VANzImRtEUeiYaoz4lWKqB6t349iy", false);
-        chilliConnectGameState = new ChilliConnectGameState();
+		//onGameStateRetrievedFromServer += InitialiseGameController;
+
+        
         LoadOrCreatePlayerData();
     }
 
-	/// De-Initialization
-	/// 
+	private void OnMatchUpdated(MatchState match)
+	{
+		
+	}
+
     void OnDestroy()
 	{
-		onReadyToLogIn -= CallLogIn;
         chilliConnect.Dispose();
 	}
 
@@ -67,7 +71,7 @@ public class ChilliConnectDataController : MonoBehaviour
 	/// 
 	void InitialiseGameController(ChilliConnectGameState gameState)
 	{
-		if (gameState.m_playerO.CompareTo (m_chilliConnectId) == 0) 
+		if (gameState.m_playerO.Equals (m_chilliConnectId)) 
 		{
 			gameController.SetLocalPlayerSide ("O");
 		} 
@@ -75,12 +79,13 @@ public class ChilliConnectDataController : MonoBehaviour
 		{
 			gameController.SetLocalPlayerSide ("X");
         }
+
         gameController.StartGame();
         gameController.SetBoardState(gameState.m_board);
         if (gameController.IsGameOver())
         {
             chilliConnectGameState.m_matchState = k_matchState_Complete;
-            UpdateCollection();
+			UpdateGameOnServer(false);
             gameController.HideChilliInfoPanel();
         }
         else
@@ -92,6 +97,7 @@ public class ChilliConnectDataController : MonoBehaviour
             else
             {
                 gameController.ShowChilliInfoPanel(k_message_waitingForOpponent);
+				WaitThenCheckCollectionForUpdates ();
             }
         }
 	}
@@ -101,9 +107,8 @@ public class ChilliConnectDataController : MonoBehaviour
 	/// 
 	void LoadOrCreatePlayerData()
 	{
-		if (LoadPlayerData() == false)
-		{
-			CreatePlayer();
+		if (!LoadPlayerData()) {
+			CreateAndLoginNewPlayer();
 		}
 	}
 
@@ -113,17 +118,15 @@ public class ChilliConnectDataController : MonoBehaviour
 	{
 		gameController.ShowChilliInfoPanel (k_message_loadingPlayerData);
 
-		var chilliConnectId = PlayerPrefs.GetString ("ChilliConnectID");
-		var chilliConnectSecret = PlayerPrefs.GetString ("ChilliConnectSecret");
+		var chilliConnectId = PlayerPrefs.GetString ("ChilliConnectID", null);
+		var chilliConnectSecret = PlayerPrefs.GetString ("ChilliConnectSecret", null);
 
 		if (chilliConnectId != null && chilliConnectSecret != null) 
 		{
 			m_chilliConnectId = chilliConnectId;
 			m_chilliConnectSecret = chilliConnectSecret;
-			if (onReadyToLogIn != null) 
-			{
-				onReadyToLogIn.Invoke();
-			}
+
+			LogInToChilliConnect ();
 
 			return true;
 		}
@@ -139,9 +142,9 @@ public class ChilliConnectDataController : MonoBehaviour
 		PlayerPrefs.SetString("ChilliConnectSecret", secret);
 	}
 
-	/// Creates a player account and logs it into chilli connect
+	/// Creates a new player account and logs into ChilliConnect
 	/// 
-    void CreatePlayer()
+    void CreateAndLoginNewPlayer()
 	{
 		gameController.ShowChilliInfoPanel (k_message_creatingChilliAccount);
         var playerAccounts = chilliConnect.PlayerAccounts;
@@ -154,10 +157,7 @@ public class ChilliConnectDataController : MonoBehaviour
             UnityEngine.Debug.Log("Player created with ChilliConnectId: " + m_chilliConnectId);
 
 			SavePlayerData(m_chilliConnectId, m_chilliConnectSecret);
-			if (onReadyToLogIn != null)
-			{
-				onReadyToLogIn.Invoke();
-			}
+			LogInToChilliConnect ();
         };
 
         System.Action<CreatePlayerRequest, CreatePlayerError> errorCallback = (CreatePlayerRequest request, CreatePlayerError error) =>
@@ -165,71 +165,76 @@ public class ChilliConnectDataController : MonoBehaviour
             UnityEngine.Debug.Log("An error occurred while creating a new player: " + error.ErrorDescription);
         };
 
-        var requestDesc = new CreatePlayerRequestDesc();
-        requestDesc.DisplayName = "TicTacToePlayer";
-
-        playerAccounts.CreatePlayer(requestDesc, successCallback, errorCallback);
-	}
-
-	/// Calls the log in function
-	/// 
-	void CallLogIn()
-	{
-		LogIn (m_chilliConnectId, m_chilliConnectSecret);
+        playerAccounts.CreatePlayer(new CreatePlayerRequestDesc(), successCallback, errorCallback);
 	}
 
 	/// Logs player in to Chilli Connect
 	/// 
-    void LogIn(string chilliConnectID, string chilliConnectSecret)
+    void LogInToChilliConnect()
 	{
 		gameController.ShowChilliInfoPanel (k_message_loggingIn);
-        var playerAccounts = chilliConnect.PlayerAccounts;
-
+        
         System.Action<LogInUsingChilliConnectRequest> successCallback = (LogInUsingChilliConnectRequest request) =>
         {
             UnityEngine.Debug.Log("Successfully logged in!");
-
-            QueryGameTableCollectionForActiveGames();
+			CheckForExistingGame();
         };
 
         System.Action<LogInUsingChilliConnectRequest, LogInUsingChilliConnectError> errorCallback = (LogInUsingChilliConnectRequest request, LogInUsingChilliConnectError error) =>
         {
             UnityEngine.Debug.Log("An error occurred while logging in: " + error.ErrorDescription);
-            CreatePlayer();
         };
 
-        playerAccounts.LogInUsingChilliConnect(chilliConnectID, chilliConnectSecret, successCallback, errorCallback);
+		chilliConnect.PlayerAccounts.LogInUsingChilliConnect(m_chilliConnectId, m_chilliConnectSecret, successCallback, errorCallback);
+	}
+
+	void CheckForExistingGame()
+	{
+		m_collectionObjectId = PlayerPrefs.GetString ("GameId");
+		if (m_collectionObjectId.Length == 0 ) {
+			UnityEngine.Debug.Log("Looking for a new match");
+			StartMatchmaking ();
+		}
+		else {
+			UnityEngine.Debug.Log("Refreshing existing match:" + m_collectionObjectId);
+			RefreshExistingGame ();
+		}
+	}
+
+	void SetExistingGame(string gameId)
+	{
+		m_collectionObjectId = gameId;
+		PlayerPrefs.SetString("GameId", gameId);
 	}
 
 	/// Uses QueryCollection to Query for games that this player is already part of
 	/// 
-    void QueryGameTableCollectionForActiveGames()
+    void FindNewGame()
 	{
 		gameController.ShowChilliInfoPanel (k_message_matchmaking);
+
         System.Action<QueryCollectionRequest, QueryCollectionResponse> successCallback = (QueryCollectionRequest request, QueryCollectionResponse response) =>
         {
             if (response.Total > 0)
 			{
-				//we have a match
-				m_collectionObjectId = response.Objects[0].ObjectId;
+				var collectionObject = response.Objects[0];
+				SetExistingGame( collectionObject.ObjectId );
 
-				chilliConnectGameState = ChilliConnectGameState.FromMultiTypeDictionary(response.Objects[0].Value.AsDictionary());
-				if (onGameStateRetrievedFromServer != null)
-				{
-					onGameStateRetrievedFromServer.Invoke(chilliConnectGameState);
-				}
+				chilliConnectGameState = ChilliConnectGameState.FromMultiTypeDictionary(collectionObject.Value.AsDictionary());
+				InitialiseGameController( chilliConnectGameState );
             }
             else
             {
-				//we don't have a match
-                QueryGameTableCollectionForAvailableGames ();
+				//we don't have a match, find a new one
+				m_collectionObjectId = null;
+				StartMatchmaking();
             }
         };
 
         System.Action<QueryCollectionRequest, QueryCollectionError> errorCallback = (QueryCollectionRequest request, QueryCollectionError error) =>
 		{
 			UnityEngine.Debug.Log("An error occurred while querying collection: " + error.ErrorDescription);
-			UnityEngine.Debug.Log("The query that was issued was: " + request.Query);
+
         };
         QueryCollectionRequestDesc requestDesc = new QueryCollectionRequestDesc(k_keyGamestate);
 		requestDesc.Query = string.Format(k_activeGameQueryFormat, k_matchState_Complete, m_chilliConnectId);
@@ -238,19 +243,23 @@ public class ChilliConnectDataController : MonoBehaviour
 
 	/// Uses QueryCollection to Query for games that are waiting for a player to join
 	/// 
-    void QueryGameTableCollectionForAvailableGames()
+	void StartMatchmaking()
 	{
 		gameController.ShowChilliInfoPanel (k_message_matchmaking);
+
         System.Action<QueryCollectionRequest, QueryCollectionResponse> successCallback = (QueryCollectionRequest request, QueryCollectionResponse response) =>
         {
             if (response.Total > 0)
 			{
 				//we have a match
-				m_collectionObjectId = response.Objects[0].ObjectId;
+				SetExistingGame(response.Objects[0].ObjectId);
+
 				chilliConnectGameState = ChilliConnectGameState.FromMultiTypeDictionary(response.Objects[0].Value.AsDictionary());
+
 				string side = chilliConnectGameState.OccupyEmptyPlayerPosition(m_chilliConnectId);
+
                 //if this game hasn't started yet, we go first
-                if (side.CompareTo("X") == 0)
+				if (side.Equals("X"))
                 {
                     chilliConnectGameState.m_matchState = k_matchState_xPlayerTurn;
                 }
@@ -258,12 +267,9 @@ public class ChilliConnectDataController : MonoBehaviour
                 {
                     chilliConnectGameState.m_matchState = k_matchState_oPlayerTurn;
                 }
-				UpdateCollection();
 
-				if (onGameStateRetrievedFromServer != null)
-				{
-					onGameStateRetrievedFromServer.Invoke(chilliConnectGameState);
-				}
+				UpdateGameOnServer(false);
+				InitialiseGameController( chilliConnectGameState );
 				gameController.HideChilliInfoPanel();
             }
             else
@@ -288,7 +294,7 @@ public class ChilliConnectDataController : MonoBehaviour
 	/// 
 	void CreateNewGame(string selectedSide)
     {
-		if (selectedSide.CompareTo ("X") == 0) 
+		if (selectedSide.Equals("X")) 
 		{
 			chilliConnectGameState.m_playerX = m_chilliConnectId;
 		} 
@@ -296,6 +302,7 @@ public class ChilliConnectDataController : MonoBehaviour
 		{
 			chilliConnectGameState.m_playerO = m_chilliConnectId;
 		}
+
 		chilliConnectGameState.m_matchState = k_matchState_WaitingForPlayers;
 
 		// Push game state to collection
@@ -322,11 +329,8 @@ public class ChilliConnectDataController : MonoBehaviour
 	{
 		System.Action<AddCollectionObjectRequest, AddCollectionObjectResponse> successCallback = (AddCollectionObjectRequest request, AddCollectionObjectResponse response) =>
 		{
-			m_collectionObjectId = response.ObjectId;
-			if (onGameStateRetrievedFromServer != null)
-			{
-				onGameStateRetrievedFromServer.Invoke(gameState);
-			}
+			SetExistingGame(response.ObjectId);
+			InitialiseGameController(chilliConnectGameState);
 			UnityEngine.Debug.Log("New Game Created On Server");
 		};
 
@@ -340,11 +344,14 @@ public class ChilliConnectDataController : MonoBehaviour
 
 	/// Uses UpdateCollectionObject to update an existing game in the collection
 	/// 
-	void UpdateCollection()
+	void UpdateGameOnServer(bool pollForUpdates)
 	{
 		System.Action<UpdateCollectionObjectRequest, UpdateCollectionObjectResponse> successCallback = (UpdateCollectionObjectRequest request, UpdateCollectionObjectResponse response) =>
 		{
 			UnityEngine.Debug.Log("Game Updated On Server");
+			if ( pollForUpdates ) {
+				WaitThenCheckCollectionForUpdates();
+			}
 		};
 
 		System.Action<UpdateCollectionObjectRequest, UpdateCollectionObjectError> errorCallback = (UpdateCollectionObjectRequest request, UpdateCollectionObjectError error) =>
@@ -361,10 +368,11 @@ public class ChilliConnectDataController : MonoBehaviour
     /// 
     void UpdateChilliConnectGameState(string player, string board)
     {
+		bool pollForUpdates = false;
         chilliConnectGameState.m_board = board;
         if (gameController.IsGameOver() == false)
         {
-            if (player.CompareTo("X") == 0)// change who's turn it is
+            if (player.Equals("X"))// change who's turn it is
             {
                 chilliConnectGameState.m_matchState = k_matchState_xPlayerTurn;
             }
@@ -373,6 +381,7 @@ public class ChilliConnectDataController : MonoBehaviour
                 chilliConnectGameState.m_matchState = k_matchState_oPlayerTurn;
             }
 
+			pollForUpdates = true;
             gameController.ShowChilliInfoPanel(k_message_waitingForOpponent);
         }
         else 
@@ -380,32 +389,34 @@ public class ChilliConnectDataController : MonoBehaviour
             chilliConnectGameState.m_matchState = k_matchState_GameOver;
         }
 
-        UpdateCollection();
+		UpdateGameOnServer(pollForUpdates );
     }
 
     /// Uses QueryCollection to Query for games that this player is already part of
     /// 
-    void GetCurrentCollectionObject()
+	void RefreshExistingGame()
     {
+		UnityEngine.Debug.Log("Polling for updates..." + Time.time);
+
         System.Action<GetCollectionObjectsRequest, GetCollectionObjectsResponse> successCallback = (GetCollectionObjectsRequest request, GetCollectionObjectsResponse response) =>
         {
+			//we have a match
             if (response.Objects.Count > 0)
             {
-                //we have a match
-                if (chilliConnectGameState.m_board.CompareTo(response.Objects[0].Value.AsDictionary().GetString("Board")) == 0)
-                {
-                    //no changes
-                    WaitThenCheckCollectionForUpdates();
-                }
-                else
-                {
-                    //changes found - assimilate them
-                    chilliConnectGameState = ChilliConnectGameState.FromMultiTypeDictionary(response.Objects[0].Value.AsDictionary());
-                    gameController.HideChilliInfoPanel();
-                }
+				chilliConnectGameState = ChilliConnectGameState.FromMultiTypeDictionary(response.Objects[0].Value.AsDictionary());
+				if ( IsLocalPlayersTurn() ) {
+					gameController.HideChilliInfoPanel();
+					UnityEngine.Debug.Log("Is Local players turn");
+				}
+				else {
+					UnityEngine.Debug.Log("wairting");
+					WaitThenCheckCollectionForUpdates();
+				}
             }
             else
             {
+				UnityEngine.Debug.Log("No match found");
+
                 //we don't have a match
                 WaitThenCheckCollectionForUpdates();
             }
@@ -415,6 +426,7 @@ public class ChilliConnectDataController : MonoBehaviour
         {
             UnityEngine.Debug.Log("An error occurred while getting collection objects: " + error.ErrorDescription);
         };
+
         chilliConnect.CloudData.GetCollectionObjects(k_keyGamestate, new List<string>{m_collectionObjectId}, successCallback, errorCallback);
     }
 
@@ -422,7 +434,7 @@ public class ChilliConnectDataController : MonoBehaviour
     /// 
     void WaitThenCheckCollectionForUpdates()
     {
-        StartCoroutine(DoSomethingAfterWait(3, GetCurrentCollectionObject));
+		StartCoroutine(DoSomethingAfterWait(3, RefreshExistingGame));
     }
 
     /// Waits for a given time before performing a given action

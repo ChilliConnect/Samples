@@ -1,13 +1,21 @@
-﻿/// Represents the collection in chilli cloud data
-/// 
-public class ChilliConnectGameState
+﻿/// 
+public class MatchState
 {
+	private const string MATCHSTATE_COMPLETE = "COMPLETE";
+	private const string MATCHSTATE_WAITING = "WAITING_FOR_PLAYERS";
+	private const string MATCHSTATE_XPLAYER = "X_PLAYER_TURN";
+	private const string MATCHSTATE_OPLAYER = "O_PLAYER_TURN";
+	private const string MATCHSTATE_GAMEOVER = "GAME_OVER";
+
+	//TODO Change to getters/setters
+
     public string m_board = "?????????";
     public string m_matchState = "WAITING";
     public string m_playerO = string.Empty;
 	public string m_playerX = string.Empty;
+	public string m_matchId = string.Empty;
 
-	/// @return MultiTypeDictionary representing the ChilliConnectGameState
+	/// @return MultiTypeDictionary representing the MatchState
 	/// 
 	public SdkCore.MultiTypeDictionary AsMultiTypeDictionary()
 	{
@@ -21,20 +29,16 @@ public class ChilliConnectGameState
 		return dictionary.Build();
 	}
 
-	/// @return ChilliConnectGameState built from the data in the MultiTypeDictionary
+	/// Update the match state from the provided dictionary
 	/// 
-	public static ChilliConnectGameState FromMultiTypeDictionary(SdkCore.MultiTypeDictionary multiTypeDictionary)
+	public void Update(SdkCore.MultiTypeDictionary multiTypeDictionary)
 	{
-		ChilliConnectGameState chilliConnectGameState = new ChilliConnectGameState ();
-
-		chilliConnectGameState.m_playerO = multiTypeDictionary.GetString("PlayerO");
-		chilliConnectGameState.m_playerX = multiTypeDictionary.GetString("PlayerX");
-		chilliConnectGameState.m_matchState = multiTypeDictionary.GetString("MatchState");
-		chilliConnectGameState.m_board = multiTypeDictionary.GetString("Board");
-
-		return chilliConnectGameState;
+		m_playerO = multiTypeDictionary.GetString("PlayerO");
+		m_playerX = multiTypeDictionary.GetString("PlayerX");
+		m_matchState = multiTypeDictionary.GetString("MatchState");
+		m_board = multiTypeDictionary.GetString("Board");
 	}
-
+		
 	/// puts the given playerID player into an empty player position in the data
 	/// 
 	/// @return the player position that was occupied
