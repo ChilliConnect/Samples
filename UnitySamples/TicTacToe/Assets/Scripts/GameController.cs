@@ -22,8 +22,11 @@ public class GameController : MonoBehaviour {
     public delegate void TurnEndedDelegate(string playerSide, string boardState);
     public event TurnEndedDelegate onTurnEnded;
 
+	public event System.Action OnNewGameSelected = delegate {};
+
 	public Text[] buttonList;
 	public GameObject gameOverPanel;
+
 	public Text gameOverText;
 	public GameObject restartButton;
 	public Player playerX;
@@ -31,7 +34,7 @@ public class GameController : MonoBehaviour {
 	public PlayerColor activePlayerColor;
 	public PlayerColor inactivePlayerColor;
 	public GameObject startInfo;
-
+	public GameObject newGame;
 	public GameObject inputBlockingPanel;
 	public Image blockingImage;
 	public Text chilliInfoText;
@@ -45,6 +48,11 @@ public class GameController : MonoBehaviour {
 		gameOverPanel.SetActive(false);
 		moveCount = 0;
 		restartButton.SetActive(false);
+	}
+
+	public void StartNewGame()
+	{
+		OnNewGameSelected ();
 	}
 
 	void SetGameControllerReferenceOnButtons ()
@@ -82,6 +90,7 @@ public class GameController : MonoBehaviour {
 	{
 		SetBoardInteractable(true);
 		SetPlayerButtons (false);
+		SetNewGameButton (false);
 		startInfo.SetActive(false);
 		HideChilliInfoPanel ();
 	}
@@ -114,6 +123,7 @@ public class GameController : MonoBehaviour {
     /// 
     public void SetBoardState(string board)
     {
+		moveCount = 0;
         char[] boardChars = board.ToCharArray();
         for(int i = 0; i < boardChars.Length; ++i)
         {
@@ -234,6 +244,7 @@ public class GameController : MonoBehaviour {
 	void GameOver (string winningPlayer)
 	{
 		SetBoardInteractable(false);
+		SetNewGameButton (true);
 		if (winningPlayer == "draw")
 		{
 			SetGameOverText("It's a Draw!");
@@ -294,6 +305,11 @@ public class GameController : MonoBehaviour {
 	{
 		playerX.button.interactable = toggle;
 		playerO.button.interactable = toggle;  
+	}
+
+	public void SetNewGameButton (bool toggle)
+	{
+		newGame.SetActive (toggle);
 	}
 
 	void SetPlayerColorsInactive ()
