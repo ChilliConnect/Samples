@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System;
 using UnityEngine;
 
 using ChilliConnect;
@@ -23,16 +24,45 @@ public class SceneController : MonoBehaviour
     private ChilliConnectSdk m_chilliConnect = null;
 	private MatchSystem m_matchSystem = new MatchSystem ();
 	private AccountSystem m_accountSystem = new AccountSystem();
+	private PushSystem m_pushSystem = new PushSystem();
 
 	private string m_chilliConnectId = string.Empty;
 
 	public GameController gameController = null;
+
+	#if UNITY_ANDROID
+	private const string k_pushService = "GCM";
+
+	//Daves
+	//private const string k_senderID = "658616921793";
+
+	//GCM Test App
+	private const string k_senderID = "182016186583";
+
+
+	private const string PLUGIN_CLASS_NAME = "com.chilliexamplecloudmessaging.unitygcmplugin.UnityGCMHandler";
+	#elif UNITY_IOS
+	private const string k_pushService = "APNS";
+	#else
+	private const string k_pushService = "";
+	#endif 
+
+	private string m_deviceIdentifier = string.Empty;
 
     /// Initialization
 	/// 
     private void Awake()
     {
 		m_chilliConnect = new ChilliConnectSdk(GAME_TOKEN,false);
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+		GooglePushNotificationHandler.SetRecieverGameObject("GooglePushNotificationListener");
+		GameObject.FindObjectOfType<GooglePushNotificationListener>().RegistrationSucceededEvent = OnPluginRegistered;
+		GameObject.FindObjectOfType<GooglePushNotificationListener>().RegistrationFailedEvent = OnPluginFailed;
+#elif UNITY_IOS
+		GameObject.FindObjectOfType<iOSPushNotificationListener>().RegistrationSucceededEvent = OnPluginRegistered;
+		GameObject.FindObjectOfType<iOSPushNotificationListener>().RegistrationFailedEvent = OnPluginFailed;
+#endif
 
 		m_matchSystem.Initialise (m_chilliConnect);
 		m_matchSystem.OnMatchUpdated += OnMatchUpdated;
@@ -44,12 +74,38 @@ public class SceneController : MonoBehaviour
 
 		m_accountSystem.Initialise (m_chilliConnect);
 		m_accountSystem.OnPlayerLoggedIn += OnPlayerLoggedIn;
-			
+
 		gameController.ShowChilliInfoPanel (MESSAGE_LOGGING_IN);
 		gameController.onSideSelected += OnSideSelected;
 		gameController.onTurnEnded += OnTurnEnded;
 		gameController.OnNewGameSelected += OnNewGameSelected;
     }
+
+	private void OnPluginRegistered(string in_deviceID)
+	{
+		m_deviceIdentifier = in_deviceID;
+
+		Action<RegisterTokenRequest> successCallback = (RegisterTokenRequest request) =>
+		{
+			UnityEngine.Debug.Log("PushNotificationDemoSceneController : OnPluginRegistered - Success!");
+		};
+
+		Action<RegisterTokenRequest, RegisterTokenError> errorCallback = (RegisterTokenRequest request, RegisterTokenError error) =>
+		{
+			UnityEngine.Debug.Log(string.Format("An error occurred while Registering Push Notifications: {0} - Device Token -", error.ErrorDescription));
+		};
+
+		RegisterTokenRequestDesc desc = new RegisterTokenRequestDesc(k_pushService, m_deviceIdentifier);
+
+		ChilliConnect.PushNotifications pushNotificationModule = m_chilliConnect.PushNotifications;
+
+		pushNotificationModule.RegisterToken(desc, successCallback, errorCallback);
+	}
+
+	private void OnPluginFailed(string in_error)
+	{
+		UnityEngine.Debug.Log("An error occurred while REgistering for Push Notifications: " + in_error);
+	}
 
 	public void OnPlayerLoggedIn(string chilliConnectId)
 	{
@@ -68,7 +124,6 @@ public class SceneController : MonoBehaviour
 	public void OnNewMatchCreated(MatchState state)
 	{
 		UpdateGameController (state);
-		gameController.HideChilliInfoPanel ();
 	}
 
 	public void OnMatchSavedOnServer(MatchState state)
@@ -91,7 +146,6 @@ public class SceneController : MonoBehaviour
 	public void OnMatchMakingSucceeded(MatchState state)
 	{
 		UpdateGameController (state);
-		gameController.HideChilliInfoPanel ();
 	}
 
 	public void OnTurnEnded(string nextPlayer, string boardState)
@@ -101,6 +155,12 @@ public class SceneController : MonoBehaviour
 		if (!gameController.IsGameOver())
 		{
 			matchState.SwitchTurn (nextPlayer);
+
+			m_pushSystem.Initialise (m_chilliConnect);
+			string opponentid = matchState.GetOpponentId (m_chilliConnectId);
+
+			m_pushSystem.SendPush(opponentid);
+
 			gameController.ShowChilliInfoPanel(MESSAGE_OPPONENT_TURN);
 		}
 		else 
@@ -129,25 +189,30 @@ public class SceneController : MonoBehaviour
 
 	private void UpdateGameController(MatchState state)
 	{
+		UnityEngine.Debug.Log ("UpdateGameContoller, State:" + state.m_matchState);
 		gameController.SetLocalPlayerSide (state.GetPlayerSide(m_chilliConnectId));
         gameController.StartGame();
         gameController.SetBoardState(state.m_board);
 
         if (gameController.IsGameOver())
         {
+			UnityEngine.Debug.Log ("UpdateGameContoller, GameOver");
 			m_matchSystem.SetGameComplete ();
             gameController.HideChilliInfoPanel();
 			gameController.SetNewGameButton (true);
         }
         else if (state.IsPlayersTurn(m_chilliConnectId))
         {
+			UnityEngine.Debug.Log ("UpdateGameContoller, IsPlayersTurns");
             gameController.HideChilliInfoPanel();
         }
         else
         {
 			if (state.m_matchState == MatchState.MATCHSTATE_WAITING) {
+				UnityEngine.Debug.Log ("UpdateGameContoller, waiting");
 				gameController.ShowChilliInfoPanel (MESSAGE_WAITING_OPPONENT);
 			} else {
+				UnityEngine.Debug.Log ("UpdateGameContoller, opponents turn");
 				gameController.ShowChilliInfoPanel (MESSAGE_OPPONENT_TURN);
 			}
         }

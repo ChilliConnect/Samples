@@ -112,6 +112,15 @@ public class MatchState
 		return PLAYER_X;
 	}
 
+	public string GetOpponentId (string m_chilliConnectId)
+	{
+		if (m_chilliConnectId == m_playerO) {
+			return m_playerX;
+		}
+
+		return m_playerO;
+	}
+
 	public MatchState copy ()
 	{
 		var copy = new MatchState ();

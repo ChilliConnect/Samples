@@ -40,6 +40,7 @@ public class GameController : MonoBehaviour {
 	public Text chilliInfoText;
 
 	private string playerSide;
+	private string opponentChilliId;
 	private int moveCount;
 
 	void Awake ()

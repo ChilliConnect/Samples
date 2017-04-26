@@ -13,6 +13,8 @@ public class AccountSystem
 
 	private ChilliConnectSdk m_chilliConnect;
 
+	private PushSystem m_pushSystem = new PushSystem();
+
 	public static AccountSystem Get()
 	{
 		return s_singletonInstance;
@@ -32,6 +34,7 @@ public class AccountSystem
 	public void Initialise(ChilliConnectSdk chilliConnect)
 	{
 		m_chilliConnect = chilliConnect;
+
 		if (PlayerPrefs.HasKey ("CCId") && PlayerPrefs.HasKey ("CCSecret")) {
 			Login (PlayerPrefs.GetString ("CCId"), PlayerPrefs.GetString ("CCSecret"));
 		} else {
@@ -66,6 +69,8 @@ public class AccountSystem
 	{
 		PlayerPrefs.SetString("CCId", response.ChilliConnectId);
 		PlayerPrefs.SetString("CCSecret", response.ChilliConnectSecret);
+
+		m_pushSystem.RegisterForPushNotification();
 
 		Login (response.ChilliConnectId, response.ChilliConnectSecret);
 	}
