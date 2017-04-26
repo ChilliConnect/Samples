@@ -46,12 +46,12 @@ public class SceneController : MonoBehaviour
 		m_accountSystem.OnPlayerLoggedIn += OnPlayerLoggedIn;
 			
 		gameController.ShowChilliInfoPanel (MESSAGE_LOGGING_IN);
-		gameController.onSideSelected += OnSideSelected;
+		gameController.OnSideSelected += OnSideSelected;
 		gameController.onTurnEnded += OnTurnEnded;
 		gameController.OnNewGameSelected += OnNewGameSelected;
     }
 
-	public void OnPlayerLoggedIn(string chilliConnectId)
+	private void OnPlayerLoggedIn(string chilliConnectId)
 	{
 		m_chilliConnectId = chilliConnectId;
 		gameController.ShowChilliInfoPanel (MESSAGE_LOADING_DATA);
@@ -65,13 +65,12 @@ public class SceneController : MonoBehaviour
 		gameController.ShowChilliInfoPanel (MESSAGE_CHOOSE_SIDE, false);
 	}
 
-	public void OnNewMatchCreated(MatchState state)
+	public void OnNewMatchCreated(Match state)
 	{
 		UpdateGameController (state);
-		gameController.HideChilliInfoPanel ();
 	}
 
-	public void OnMatchSavedOnServer(MatchState state)
+	public void OnMatchSavedOnServer(Match state)
 	{
 		if (!state.IsPlayersTurn(m_chilliConnectId) && state.IsWaitingForTurn()) {
 			WaitThenRefreshMatchFromServer();
@@ -88,7 +87,7 @@ public class SceneController : MonoBehaviour
 		gameController.ShowChilliInfoPanel (MESSAGE_CHOOSE_SIDE, false);
 	}
 
-	public void OnMatchMakingSucceeded(MatchState state)
+	public void OnMatchMakingSucceeded(Match state)
 	{
 		UpdateGameController (state);
 		gameController.HideChilliInfoPanel ();
@@ -97,7 +96,7 @@ public class SceneController : MonoBehaviour
 	public void OnTurnEnded(string nextPlayer, string boardState)
 	{
 		var matchState = m_matchSystem.CurrentMatch;
-		matchState.m_board = boardState;
+		matchState.Board = boardState;
 		if (!gameController.IsGameOver())
 		{
 			matchState.SwitchTurn (nextPlayer);
@@ -105,15 +104,15 @@ public class SceneController : MonoBehaviour
 		}
 		else 
 		{
-			matchState.m_matchState = MatchState.MATCHSTATE_GAMEOVER;
+			matchState.MatchState = Match.MATCHSTATE_GAMEOVER;
 		}
 
 		m_matchSystem.SaveMatchOnServer();
 	}
 
-	public void OnMatchUpdated(MatchState updated, MatchState previous)
+	public void OnMatchUpdated(Match updated, Match previous)
 	{
-		if (!updated.m_board.Equals (previous.m_board)) {
+		if (!updated.Board.Equals (previous.Board)) {
 			UpdateGameController (updated);
 		} 
 
@@ -127,11 +126,11 @@ public class SceneController : MonoBehaviour
 		m_chilliConnect.Dispose();
 	}
 
-	private void UpdateGameController(MatchState state)
+	private void UpdateGameController(Match state)
 	{
 		gameController.SetLocalPlayerSide (state.GetPlayerSide(m_chilliConnectId));
         gameController.StartGame();
-        gameController.SetBoardState(state.m_board);
+		gameController.SetBoardState(state.Board);
 
         if (gameController.IsGameOver())
         {
@@ -145,7 +144,7 @@ public class SceneController : MonoBehaviour
         }
         else
         {
-			if (state.m_matchState == MatchState.MATCHSTATE_WAITING) {
+			if (state.MatchState == Match.MATCHSTATE_WAITING) {
 				gameController.ShowChilliInfoPanel (MESSAGE_WAITING_OPPONENT);
 			} else {
 				gameController.ShowChilliInfoPanel (MESSAGE_OPPONENT_TURN);

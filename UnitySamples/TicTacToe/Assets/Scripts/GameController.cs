@@ -17,8 +17,8 @@ public class PlayerColor {
 
 public class GameController : MonoBehaviour {
 
-	public delegate void SideSelectedDelegate(string selectedSide);
-    public event SideSelectedDelegate onSideSelected;
+	public event System.Action<string> OnSideSelected = delegate {};
+
     public delegate void TurnEndedDelegate(string playerSide, string boardState);
     public event TurnEndedDelegate onTurnEnded;
 
@@ -65,10 +65,7 @@ public class GameController : MonoBehaviour {
 
 	public void SetStartingSide (string startingSide)
 	{
-		if (onSideSelected != null) 
-		{
-			onSideSelected.Invoke (startingSide);
-		}
+		OnSideSelected (startingSide);
 	}
 
 	/// Sets the local player's side, X or O

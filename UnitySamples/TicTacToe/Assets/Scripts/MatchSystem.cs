@@ -5,19 +5,19 @@ using System.Collections.Generic;
 
 public class MatchSystem
 {
-	const string GAMESTATE_COLLECTION = "GAMESTATE";
+	const string MATCHES_COLLECTION = "GAMESTATE";
 	const string QUERY_FIND_MATCH = "Value.MatchState = \"{0}\""; 
     
-	public event System.Action<MatchState, MatchState> OnMatchUpdated = delegate {};
+	public event System.Action<Match, Match> OnMatchUpdated = delegate {};
 	public event System.Action OnMatchMakingStarted = delegate {};
 	public event System.Action OnMatchMakingFailed = delegate {};
-	public event System.Action<MatchState> OnMatchMakingSuceeded = delegate {};
-	public event System.Action<MatchState> OnNewMatchCreated = delegate {};
-	public event System.Action<MatchState> OnMatchSavedOnServer = delegate {};
+	public event System.Action<Match> OnMatchMakingSuceeded = delegate {};
+	public event System.Action<Match> OnNewMatchCreated = delegate {};
+	public event System.Action<Match> OnMatchSavedOnServer = delegate {};
 
 	private static MatchSystem s_singletonInstance;
 
-	public MatchState CurrentMatch { get; set; }
+	public Match CurrentMatch { get; set; }
 
 	private ChilliConnectSdk m_chilliConnect;
 
@@ -36,7 +36,7 @@ public class MatchSystem
 	public void Initialise(ChilliConnectSdk chilliConnect)
 	{
 		m_chilliConnect = chilliConnect;
-		CurrentMatch = new MatchState ();
+		CurrentMatch = new Match ();
 	}
 
 	public void LoadExistingOrFindNewGame(string chilliConnectId)
@@ -50,7 +50,7 @@ public class MatchSystem
 		}
 		else {
 			UnityEngine.Debug.Log("Found existing game [" +  existingMatchId + "], refreshing from server");
-			CurrentMatch.m_matchId = existingMatchId;
+			CurrentMatch.MatchId = existingMatchId;
 			RefreshMatchFromServer ();
 		}
 	}
@@ -72,7 +72,7 @@ public class MatchSystem
 	
 	public void SetGameComplete()
 	{
-		CurrentMatch.m_matchState = MatchState.MATCHSTATE_COMPLETE;
+		CurrentMatch.MatchState = Match.MATCHSTATE_COMPLETE;
 		SaveMatchOnServer();
 	}
 
@@ -84,8 +84,8 @@ public class MatchSystem
 
 		OnMatchMakingStarted ();
 
-		QueryCollectionRequestDesc requestDesc = new QueryCollectionRequestDesc(GAMESTATE_COLLECTION);
-		requestDesc.Query = string.Format(QUERY_FIND_MATCH, MatchState.MATCHSTATE_WAITING);
+		QueryCollectionRequestDesc requestDesc = new QueryCollectionRequestDesc(MATCHES_COLLECTION);
+		requestDesc.Query = string.Format(QUERY_FIND_MATCH, Match.MATCHSTATE_WAITING);
 
 		m_chilliConnect.CloudData.QueryCollection(requestDesc, 
 			(request, response ) => StartMatchmakingCallback(response),
@@ -100,7 +100,7 @@ public class MatchSystem
 
 			SaveMatchId(matchObject.ObjectId);
 
-			CurrentMatch.m_matchId = matchObject.ObjectId;
+			CurrentMatch.MatchId = matchObject.ObjectId;
 			CurrentMatch.Update (matchObject.Value.AsDictionary ());
 			CurrentMatch.OccupyEmptyPlayerPosition (m_chilliConnectId);
 
@@ -122,11 +122,11 @@ public class MatchSystem
 
 	/// Uses AddCollectionObject to add a new game to the existing collection
 	/// 
-	private void AddCollectionObject(MatchState matchState)
+	private void AddCollectionObject(Match matchState)
 	{
 		UnityEngine.Debug.Log("Saving new game");
 
-		m_chilliConnect.CloudData.AddCollectionObject( GAMESTATE_COLLECTION, matchState.AsMultiTypeDictionary(), 
+		m_chilliConnect.CloudData.AddCollectionObject( MATCHES_COLLECTION, matchState.AsMultiTypeDictionary(), 
 			(request, response) => AddCollectionObjectCallBack(response),
 			(request, error) => Debug.Log(error.ErrorDescription) );
 	}
@@ -137,7 +137,7 @@ public class MatchSystem
 
 		var newMatchId = response.ObjectId;
 
-		CurrentMatch.m_matchId = newMatchId;
+		CurrentMatch.MatchId = newMatchId;
 		SaveMatchId(newMatchId);
 		OnNewMatchCreated(CurrentMatch);
 	}
@@ -148,8 +148,8 @@ public class MatchSystem
 	{
 		UnityEngine.Debug.Log("Saving match on server");
 
-		UpdateCollectionObjectRequestDesc desc = new UpdateCollectionObjectRequestDesc(GAMESTATE_COLLECTION, 
-			CurrentMatch.m_matchId, CurrentMatch.AsMultiTypeDictionary());
+		UpdateCollectionObjectRequestDesc desc = new UpdateCollectionObjectRequestDesc(MATCHES_COLLECTION, 
+			CurrentMatch.MatchId, CurrentMatch.AsMultiTypeDictionary());
 
 		m_chilliConnect.CloudData.UpdateCollectionObject(desc, 
 			(request, response) => OnUpdateGameOnServer(),
@@ -165,7 +165,7 @@ public class MatchSystem
 	{
 		UnityEngine.Debug.Log("Refreshing game: " + Time.time);
 
-		m_chilliConnect.CloudData.GetCollectionObjects(GAMESTATE_COLLECTION, new List<string>{CurrentMatch.m_matchId}, 
+		m_chilliConnect.CloudData.GetCollectionObjects(MATCHES_COLLECTION, new List<string>{CurrentMatch.MatchId}, 
 			(request, response) => RefreshGameCallback(response),
 			(request, error) => Debug.Log(error.ErrorDescription) );
 	}
