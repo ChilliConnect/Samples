@@ -24,7 +24,7 @@ The Gacha sample project accompanies the ChilliConnect [Gacha and A/B Testing Tu
 
 ### TicTacToe
 
-An asynchronous multiplayer game that uses Collection Data to save and search for matches. See the [Asynchronous Multiplayer Tutorial](https://docs.chilliconnect.com/guide/asynchronous-multiplayer) on the ChilliConnect docs site for a full write up. To run this project under your own ChilliConnect account, change the `GAME_TOKEN` constant in `SceneController.cs`
+An asynchronous multiplayer game that uses Collection Data to save and search for matches. See the [Asynchronous Multiplayer Tutorial](https://docs.chilliconnect.com/guide/tutorial-async-multiplayer/) on the ChilliConnect docs site for a full write up. To run this project under your own ChilliConnect account, change the `GAME_TOKEN` constant in `SceneController.cs`
 
 ### IAP
 
