@@ -5,8 +5,6 @@ using UnityEngine;
 
 using ChilliConnect;
 
-/// Controller for all interaction with Chilli Connect
-/// 
 public class SceneController : MonoBehaviour
 {
 	private const int POLL_WAIT_SECONDS = 5;
@@ -29,8 +27,6 @@ public class SceneController : MonoBehaviour
 
 	public GameController gameController = null;
 
-    /// Initialization
-	/// 
     private void Awake()
     {
 		m_chilliConnect = new ChilliConnectSdk(GAME_TOKEN,false);
@@ -70,10 +66,7 @@ public class SceneController : MonoBehaviour
 	public void OnNewMatchCreated(Match state)
 	{
 		UpdateGameController (state);
-
-		if (!state.IsPlayersTurn(m_chilliConnectId) && state.IsWaitingForTurn()) {
-			WaitThenRefreshMatchFromServer();
-		}
+		WaitThenRefreshMatchFromServer();
 	}
 
 	public void OnMatchSavedOnServer(Match state)
