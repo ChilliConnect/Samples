@@ -63,12 +63,17 @@ public class SceneController : MonoBehaviour
 	{
 		m_matchSystem.ClearMatchId ();
 		gameController.RestartGame ();
-		gameController.ShowChilliInfoPanel (MESSAGE_CHOOSE_SIDE, false);
+		gameController.ShowChilliInfoPanel (MESSAGE_LOADING_DATA);
+		m_matchSystem.LoadExistingOrFindNewGame (m_chilliConnectId);
 	}
 
 	public void OnNewMatchCreated(Match state)
 	{
 		UpdateGameController (state);
+
+		if (!state.IsPlayersTurn(m_chilliConnectId) && state.IsWaitingForTurn()) {
+			WaitThenRefreshMatchFromServer();
+		}
 	}
 
 	public void OnMatchSavedOnServer(Match state)
