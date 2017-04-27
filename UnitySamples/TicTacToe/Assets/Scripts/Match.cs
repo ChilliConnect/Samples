@@ -119,7 +119,7 @@
 		return PLAYER_X;
 	}
 
-	public Match copy ()
+	public Match Copy ()
 	{
 		var copy = new Match ();
 		copy.MatchId = MatchId;

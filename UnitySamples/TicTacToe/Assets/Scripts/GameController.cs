@@ -18,23 +18,21 @@ public class PlayerColor {
 public class GameController : MonoBehaviour {
 
 	public event System.Action<string> OnSideSelected = delegate {};
-
-    public delegate void TurnEndedDelegate(string playerSide, string boardState);
-    public event TurnEndedDelegate onTurnEnded;
-
+	public event System.Action<string, string> OnTurnEnded = delegate {};
 	public event System.Action OnNewGameSelected = delegate {};
 
 	public Text[] buttonList;
 	public GameObject gameOverPanel;
 
-	public Text gameOverText;
+	public GameObject newGame;
+
 	public GameObject restartButton;
+	public Text gameOverText;
 	public Player playerX;
 	public Player playerO;
 	public PlayerColor activePlayerColor;
 	public PlayerColor inactivePlayerColor;
 	public GameObject startInfo;
-	public GameObject newGame;
 	public GameObject inputBlockingPanel;
 	public Image blockingImage;
 	public Text chilliInfoText;
@@ -210,10 +208,7 @@ public class GameController : MonoBehaviour {
 			ChangeSides();
         }
 
-        if (onTurnEnded != null)
-        {
-            onTurnEnded.Invoke(playerSide, CreateBoardString());
-        }
+        OnTurnEnded(playerSide, CreateBoardString());
 	}
 
 	void ChangeSides ()

@@ -2,9 +2,12 @@
 using ChilliConnect;
 using UnityEngine;
 using System.Collections.Generic;
+using System.IO;
 
 public class MatchSystem
 {
+	private const string MATCH_FILE = "MatchId.txt";
+
 	const string MATCHES_COLLECTION = "GAMESTATE";
 	const string QUERY_FIND_MATCH = "Value.MatchState = \"{0}\""; 
     
@@ -57,28 +60,24 @@ public class MatchSystem
 
 	private void SaveMatchId(string matchId)
 	{
-		PlayerPrefs.SetString("MatchId", matchId);
+		File.WriteAllText(MATCH_FILE, matchId);
 	}
 
 	private string LoadMatchId()
 	{
-		return PlayerPrefs.GetString ("MatchId");
+		if (!File.Exists (MATCH_FILE)) {
+			return "";
+		}
+
+		return File.ReadAllText(MATCH_FILE);
 	}
 
 	public void ClearMatchId ()
 	{
-		PlayerPrefs.SetString ("MatchId", "");
-	}
-	
-	public void SetGameComplete()
-	{
-		CurrentMatch.MatchState = Match.MATCHSTATE_COMPLETE;
-		SaveMatchOnServer();
+		File.WriteAllText(MATCH_FILE, "");
 	}
 
-	/// Uses QueryCollection to Query for games that are waiting for a player to join
-	/// 
-	void StartMatchmaking()
+	public void StartMatchmaking()
 	{
 		UnityEngine.Debug.Log("Looking for new matches");
 
@@ -104,7 +103,6 @@ public class MatchSystem
 			CurrentMatch.Update (matchObject.Value.AsDictionary ());
 			CurrentMatch.OccupyEmptyPlayerPosition (m_chilliConnectId);
 
-			//TODO Write lock to make sure not taken
 			SaveMatchOnServer();
 			OnMatchMakingSuceeded (CurrentMatch);
 		}
@@ -142,8 +140,6 @@ public class MatchSystem
 		OnNewMatchCreated(CurrentMatch);
 	}
 
-	/// Uses UpdateCollectionObject to update an existing game in the collection
-	/// 
 	public void SaveMatchOnServer()
 	{
 		UnityEngine.Debug.Log("Saving match on server");
@@ -174,12 +170,13 @@ public class MatchSystem
 	{
 		if (response.Objects.Count > 0)
 		{
-			var previous = CurrentMatch.copy ();
+			var previous = CurrentMatch.Copy ();
 			CurrentMatch.Update(response.Objects[0].Value.AsDictionary());
 			OnMatchUpdated (CurrentMatch, previous);
 		}
 		else
 		{
+			ClearMatchId ();
 			UnityEngine.Debug.Log("Error, match not found");
 		}
 	}

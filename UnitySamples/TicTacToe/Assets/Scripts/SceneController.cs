@@ -9,6 +9,7 @@ using ChilliConnect;
 /// 
 public class SceneController : MonoBehaviour
 {
+	private const int POLL_WAIT_SECONDS = 5;
 	private const string MESSAGE_STARTUP = "Starting Up";
 	private const string MESSAGE_LOADING_DATA = "Loading Player Data";
 	private const string MESSAGE_CREATING_ACCOUNT = "Creating Chilli Account";
@@ -38,7 +39,7 @@ public class SceneController : MonoBehaviour
 		m_matchSystem.OnMatchUpdated += OnMatchUpdated;
 		m_matchSystem.OnMatchMakingStarted += OnMatchMakingStarted;
 		m_matchSystem.OnMatchMakingFailed += OnMatchMakingFailed;
-		m_matchSystem.OnMatchMakingSuceeded += OnMatchMakingSucceeded;
+		m_matchSystem.OnMatchMakingSuceeded += OnMatchMakingSuceeded;
 		m_matchSystem.OnNewMatchCreated += OnNewMatchCreated;
 		m_matchSystem.OnMatchSavedOnServer += OnMatchSavedOnServer;
 
@@ -47,7 +48,7 @@ public class SceneController : MonoBehaviour
 			
 		gameController.ShowChilliInfoPanel (MESSAGE_LOGGING_IN);
 		gameController.OnSideSelected += OnSideSelected;
-		gameController.onTurnEnded += OnTurnEnded;
+		gameController.OnTurnEnded += OnTurnEnded;
 		gameController.OnNewGameSelected += OnNewGameSelected;
     }
 
@@ -87,10 +88,9 @@ public class SceneController : MonoBehaviour
 		gameController.ShowChilliInfoPanel (MESSAGE_CHOOSE_SIDE, false);
 	}
 
-	public void OnMatchMakingSucceeded(Match state)
+	public void OnMatchMakingSuceeded(Match state)
 	{
 		UpdateGameController (state);
-		gameController.HideChilliInfoPanel ();
 	}
 
 	public void OnTurnEnded(string nextPlayer, string boardState)
@@ -112,11 +112,13 @@ public class SceneController : MonoBehaviour
 
 	public void OnMatchUpdated(Match updated, Match previous)
 	{
-		if (!updated.Board.Equals (previous.Board)) {
+		bool isWaitingOnOpponent = updated.MatchState == Match.MATCHSTATE_WAITING;
+		if (!updated.Board.Equals (previous.Board)|| isWaitingOnOpponent ) {
 			UpdateGameController (updated);
-		} 
+		}
 
-		if (!updated.IsPlayersTurn (m_chilliConnectId) && updated.IsWaitingForTurn ()) {
+		bool isWaitingOnOtherPlayer = !updated.IsPlayersTurn (m_chilliConnectId) && updated.IsWaitingForTurn ();
+		if ( isWaitingOnOtherPlayer || isWaitingOnOpponent ) {
 			WaitThenRefreshMatchFromServer ();
 		}
 	}
@@ -134,7 +136,6 @@ public class SceneController : MonoBehaviour
 
         if (gameController.IsGameOver())
         {
-			m_matchSystem.SetGameComplete ();
             gameController.HideChilliInfoPanel();
 			gameController.SetNewGameButton (true);
         }
@@ -160,7 +161,7 @@ public class SceneController : MonoBehaviour
  
     private void WaitThenRefreshMatchFromServer()
     {
-		StartCoroutine(DoSomethingAfterWait(3, m_matchSystem.RefreshMatchFromServer));
+		StartCoroutine(DoSomethingAfterWait(POLL_WAIT_SECONDS, m_matchSystem.RefreshMatchFromServer));
     }
 
     IEnumerator DoSomethingAfterWait(float wait, System.Action callBack)
