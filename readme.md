@@ -22,6 +22,10 @@ The FBLeaderboardDemoScene uses the Facebook SDK to show how to implementation F
 
 The Gacha sample project accompanies the ChilliConnect [Gacha and A/B Testing Tutorial](https://docs.chilliconnect.com/guide/tutorial-gacha) and shows how create and A/B Test a simple gacha style spawning system in ChilliConnect.
 
+### TicTacToe
+
+An asynchronous multiplayer game that uses Collection Data to save and search for matches. See the [Asynchronous Multiplayer Tutorial](https://docs.chilliconnect.com/guide/asynchronous-multiplayer) on the ChilliConnect docs site for a full write up. To run this project under your own ChilliConnect account, change the `GAME_TOKEN` constant in `SceneController.cs`
+
 ### IAP
 
 The IAPDemoScene accompanies the ChilliConnect [IAP tutorial](https://docs.chilliconnect.com/tutorial-iaps) and contains an end-to-end example of integrating the Unity IAP Plugin with ChilliConnect to securely verify and redeem player purchases. 
