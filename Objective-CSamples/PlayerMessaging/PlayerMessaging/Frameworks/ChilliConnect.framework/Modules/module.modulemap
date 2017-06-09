@@ -1,0 +1,6 @@
+framework module ChilliConnect {
+  umbrella header "ChilliConnect.h"
+
+  export *
+  module * { export * }
+}
