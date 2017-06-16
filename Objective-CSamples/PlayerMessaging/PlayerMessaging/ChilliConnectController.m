@@ -49,7 +49,7 @@ static NSString* const k_ChilliConnectKeychainAccount = @"User";
 {
     if(!self.chilliConnect)
     {
-        self.chilliConnect = [CCChilliConnectSdk chilliConnectSdkWithAppToken:@"ZdTSeXXP3vhN67xg4T7JjImHDcRnPAoL" verboseLogging:NO];
+        self.chilliConnect = [CCChilliConnectSdk chilliConnectSdkWithAppToken:@"<YOUR GAME TOKEN HERE>" verboseLogging:NO];
     }
     
     [self loadCredentials];
