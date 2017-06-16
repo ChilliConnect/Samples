@@ -1,0 +1,444 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6A0CA8951DDCF543004F50E3 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A0CA8941DDCF543004F50E3 /* Security.framework */; };
+		6A0CA89D1DDCF58D004F50E3 /* SAMKeychain.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0CA89A1DDCF58D004F50E3 /* SAMKeychain.m */; };
+		6A0CA89E1DDCF58D004F50E3 /* SAMKeychainQuery.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0CA89C1DDCF58D004F50E3 /* SAMKeychainQuery.m */; };
+		6A49A2AC1DCA869800139CA3 /* Bolts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A49A2AB1DCA869800139CA3 /* Bolts.framework */; };
+		6A9B2D7D1D78A89700076616 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A9B2D7C1D78A89700076616 /* main.m */; };
+		6A9B2D801D78A89700076616 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A9B2D7F1D78A89700076616 /* AppDelegate.m */; };
+		6A9B2D831D78A89700076616 /* FBViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A9B2D821D78A89700076616 /* FBViewController.m */; };
+		6A9B2D861D78A89700076616 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6A9B2D841D78A89700076616 /* Main.storyboard */; };
+		6A9B2D881D78A89700076616 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A9B2D871D78A89700076616 /* Assets.xcassets */; };
+		6A9B2D8B1D78A89700076616 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6A9B2D891D78A89700076616 /* LaunchScreen.storyboard */; };
+		6AD8BC4B1DC7EFFE00B8DCC8 /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6AD8BC4A1DC7EFFE00B8DCC8 /* MainViewController.m */; };
+		811549201DA5558A00E2E511 /* FBSDKCoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8115491D1DA5558A00E2E511 /* FBSDKCoreKit.framework */; };
+		811549211DA5558A00E2E511 /* FBSDKLoginKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8115491E1DA5558A00E2E511 /* FBSDKLoginKit.framework */; };
+		811549221DA5558A00E2E511 /* FBSDKShareKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8115491F1DA5558A00E2E511 /* FBSDKShareKit.framework */; };
+		811F43811EAF64AC007B2AA7 /* ChilliConnectController.m in Sources */ = {isa = PBXBuildFile; fileRef = 811F43801EAF64AC007B2AA7 /* ChilliConnectController.m */; };
+		812317621DFB0AC000784B9D /* SendViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 812317611DFB0AC000784B9D /* SendViewCell.m */; };
+		814E63AA1DD625460095BB6F /* SendViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 814E63A91DD625460095BB6F /* SendViewController.m */; };
+		81ADD02B1DDA268300DDEFB8 /* InboxViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 81ADD02A1DDA268300DDEFB8 /* InboxViewController.m */; };
+		81E2BFDE1ECF3CA500B199A2 /* InboxViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 81E2BFDD1ECF3CA500B199A2 /* InboxViewCell.m */; };
+		81EA280E1DD0E52200807613 /* ChilliConnect.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81EA280D1DD0E52200807613 /* ChilliConnect.framework */; };
+		81F141DC1DCC7D5000F683DB /* LaunchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 81F141DB1DCC7D5000F683DB /* LaunchViewController.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		6A0CA8941DDCF543004F50E3 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		6A0CA8991DDCF58D004F50E3 /* SAMKeychain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SAMKeychain.h; path = SAMKeychain/SAMKeychain.h; sourceTree = "<group>"; };
+		6A0CA89A1DDCF58D004F50E3 /* SAMKeychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SAMKeychain.m; path = SAMKeychain/SAMKeychain.m; sourceTree = "<group>"; };
+		6A0CA89B1DDCF58D004F50E3 /* SAMKeychainQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SAMKeychainQuery.h; path = SAMKeychain/SAMKeychainQuery.h; sourceTree = "<group>"; };
+		6A0CA89C1DDCF58D004F50E3 /* SAMKeychainQuery.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SAMKeychainQuery.m; path = SAMKeychain/SAMKeychainQuery.m; sourceTree = "<group>"; };
+		6A49A2AB1DCA869800139CA3 /* Bolts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Bolts.framework; path = PlayerMessaging/Frameworks/Bolts.framework; sourceTree = "<group>"; };
+		6A9B2D781D78A89500076616 /* PlayerMessaging.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PlayerMessaging.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6A9B2D7C1D78A89700076616 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		6A9B2D7E1D78A89700076616 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		6A9B2D7F1D78A89700076616 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		6A9B2D811D78A89700076616 /* FBViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FBViewController.h; sourceTree = "<group>"; };
+		6A9B2D821D78A89700076616 /* FBViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FBViewController.m; sourceTree = "<group>"; };
+		6A9B2D851D78A89700076616 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		6A9B2D871D78A89700076616 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		6A9B2D8A1D78A89700076616 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		6A9B2D8C1D78A89700076616 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6AD8BC491DC7EFFE00B8DCC8 /* MainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainViewController.h; sourceTree = "<group>"; };
+		6AD8BC4A1DC7EFFE00B8DCC8 /* MainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainViewController.m; sourceTree = "<group>"; };
+		8115491D1DA5558A00E2E511 /* FBSDKCoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKCoreKit.framework; path = PlayerMessaging/Frameworks/FBSDKCoreKit.framework; sourceTree = "<group>"; };
+		8115491E1DA5558A00E2E511 /* FBSDKLoginKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKLoginKit.framework; path = PlayerMessaging/Frameworks/FBSDKLoginKit.framework; sourceTree = "<group>"; };
+		8115491F1DA5558A00E2E511 /* FBSDKShareKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKShareKit.framework; path = PlayerMessaging/Frameworks/FBSDKShareKit.framework; sourceTree = "<group>"; };
+		811F437F1EAF64AC007B2AA7 /* ChilliConnectController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChilliConnectController.h; sourceTree = "<group>"; };
+		811F43801EAF64AC007B2AA7 /* ChilliConnectController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChilliConnectController.m; sourceTree = "<group>"; };
+		812317601DFB0AC000784B9D /* SendViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SendViewCell.h; sourceTree = "<group>"; };
+		812317611DFB0AC000784B9D /* SendViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SendViewCell.m; sourceTree = "<group>"; };
+		814E63A81DD625460095BB6F /* SendViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SendViewController.h; sourceTree = "<group>"; };
+		814E63A91DD625460095BB6F /* SendViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SendViewController.m; sourceTree = "<group>"; };
+		81ADD0281DDA241400DDEFB8 /* PlayerMessaging.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PlayerMessaging.entitlements; sourceTree = "<group>"; };
+		81ADD02A1DDA268300DDEFB8 /* InboxViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InboxViewController.m; sourceTree = "<group>"; };
+		81ADD02C1DDA26E100DDEFB8 /* InboxViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InboxViewController.h; sourceTree = "<group>"; };
+		81E2BFDC1ECF3CA500B199A2 /* InboxViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InboxViewCell.h; sourceTree = "<group>"; };
+		81E2BFDD1ECF3CA500B199A2 /* InboxViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InboxViewCell.m; sourceTree = "<group>"; };
+		81EA280D1DD0E52200807613 /* ChilliConnect.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ChilliConnect.framework; path = PlayerMessaging/Frameworks/ChilliConnect.framework; sourceTree = "<group>"; };
+		81F141DB1DCC7D5000F683DB /* LaunchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LaunchViewController.m; sourceTree = "<group>"; };
+		81F141DD1DCC7D6400F683DB /* LaunchViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LaunchViewController.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6A9B2D751D78A89500076616 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6A0CA8951DDCF543004F50E3 /* Security.framework in Frameworks */,
+				81EA280E1DD0E52200807613 /* ChilliConnect.framework in Frameworks */,
+				6A49A2AC1DCA869800139CA3 /* Bolts.framework in Frameworks */,
+				811549211DA5558A00E2E511 /* FBSDKLoginKit.framework in Frameworks */,
+				811549201DA5558A00E2E511 /* FBSDKCoreKit.framework in Frameworks */,
+				811549221DA5558A00E2E511 /* FBSDKShareKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6A0CA8981DDCF581004F50E3 /* SAMKeychain */ = {
+			isa = PBXGroup;
+			children = (
+				6A0CA8991DDCF58D004F50E3 /* SAMKeychain.h */,
+				6A0CA89A1DDCF58D004F50E3 /* SAMKeychain.m */,
+				6A0CA89B1DDCF58D004F50E3 /* SAMKeychainQuery.h */,
+				6A0CA89C1DDCF58D004F50E3 /* SAMKeychainQuery.m */,
+			);
+			name = SAMKeychain;
+			sourceTree = "<group>";
+		};
+		6A9B2D6F1D78A89500076616 = {
+			isa = PBXGroup;
+			children = (
+				8115491C1DA5557E00E2E511 /* Frameworks */,
+				6A9B2D7A1D78A89700076616 /* PlayerMessaging */,
+				6A9B2D791D78A89500076616 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		6A9B2D791D78A89500076616 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6A9B2D781D78A89500076616 /* PlayerMessaging.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		6A9B2D7A1D78A89700076616 /* PlayerMessaging */ = {
+			isa = PBXGroup;
+			children = (
+				6A9B2D7E1D78A89700076616 /* AppDelegate.h */,
+				6A9B2D7F1D78A89700076616 /* AppDelegate.m */,
+				6A9B2D871D78A89700076616 /* Assets.xcassets */,
+				811F437F1EAF64AC007B2AA7 /* ChilliConnectController.h */,
+				811F43801EAF64AC007B2AA7 /* ChilliConnectController.m */,
+				6A9B2D811D78A89700076616 /* FBViewController.h */,
+				6A9B2D821D78A89700076616 /* FBViewController.m */,
+				81E2BFDC1ECF3CA500B199A2 /* InboxViewCell.h */,
+				81E2BFDD1ECF3CA500B199A2 /* InboxViewCell.m */,
+				81ADD02C1DDA26E100DDEFB8 /* InboxViewController.h */,
+				81ADD02A1DDA268300DDEFB8 /* InboxViewController.m */,
+				6A9B2D8C1D78A89700076616 /* Info.plist */,
+				6A9B2D891D78A89700076616 /* LaunchScreen.storyboard */,
+				81F141DD1DCC7D6400F683DB /* LaunchViewController.h */,
+				81F141DB1DCC7D5000F683DB /* LaunchViewController.m */,
+				6A9B2D841D78A89700076616 /* Main.storyboard */,
+				6AD8BC491DC7EFFE00B8DCC8 /* MainViewController.h */,
+				6AD8BC4A1DC7EFFE00B8DCC8 /* MainViewController.m */,
+				81ADD0281DDA241400DDEFB8 /* PlayerMessaging.entitlements */,
+				6A0CA8981DDCF581004F50E3 /* SAMKeychain */,
+				812317601DFB0AC000784B9D /* SendViewCell.h */,
+				812317611DFB0AC000784B9D /* SendViewCell.m */,
+				814E63A81DD625460095BB6F /* SendViewController.h */,
+				814E63A91DD625460095BB6F /* SendViewController.m */,
+				6A9B2D7B1D78A89700076616 /* Supporting Files */,
+			);
+			path = PlayerMessaging;
+			sourceTree = "<group>";
+		};
+		6A9B2D7B1D78A89700076616 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				6A9B2D7C1D78A89700076616 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		8115491C1DA5557E00E2E511 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				6A0CA8941DDCF543004F50E3 /* Security.framework */,
+				81EA280D1DD0E52200807613 /* ChilliConnect.framework */,
+				6A49A2AB1DCA869800139CA3 /* Bolts.framework */,
+				8115491D1DA5558A00E2E511 /* FBSDKCoreKit.framework */,
+				8115491E1DA5558A00E2E511 /* FBSDKLoginKit.framework */,
+				8115491F1DA5558A00E2E511 /* FBSDKShareKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6A9B2D771D78A89500076616 /* PlayerMessaging */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6A9B2D8F1D78A89700076616 /* Build configuration list for PBXNativeTarget "PlayerMessaging" */;
+			buildPhases = (
+				6A9B2D741D78A89500076616 /* Sources */,
+				6A9B2D751D78A89500076616 /* Frameworks */,
+				6A9B2D761D78A89500076616 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PlayerMessaging;
+			productName = PlayerMessaging;
+			productReference = 6A9B2D781D78A89500076616 /* PlayerMessaging.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6A9B2D701D78A89500076616 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0830;
+				ORGANIZATIONNAME = "Chilli Technologies";
+				TargetAttributes = {
+					6A9B2D771D78A89500076616 = {
+						CreatedOnToolsVersion = 7.3.1;
+						DevelopmentTeam = SAG97E7HLS;
+						SystemCapabilities = {
+							com.apple.Keychain = {
+								enabled = 1;
+							};
+						};
+					};
+				};
+			};
+			buildConfigurationList = 6A9B2D731D78A89500076616 /* Build configuration list for PBXProject "PlayerMessaging" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 6A9B2D6F1D78A89500076616;
+			productRefGroup = 6A9B2D791D78A89500076616 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6A9B2D771D78A89500076616 /* PlayerMessaging */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6A9B2D761D78A89500076616 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6A9B2D8B1D78A89700076616 /* LaunchScreen.storyboard in Resources */,
+				6A9B2D881D78A89700076616 /* Assets.xcassets in Resources */,
+				6A9B2D861D78A89700076616 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6A9B2D741D78A89500076616 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				811F43811EAF64AC007B2AA7 /* ChilliConnectController.m in Sources */,
+				81E2BFDE1ECF3CA500B199A2 /* InboxViewCell.m in Sources */,
+				81F141DC1DCC7D5000F683DB /* LaunchViewController.m in Sources */,
+				6A9B2D831D78A89700076616 /* FBViewController.m in Sources */,
+				814E63AA1DD625460095BB6F /* SendViewController.m in Sources */,
+				6A9B2D801D78A89700076616 /* AppDelegate.m in Sources */,
+				6A9B2D7D1D78A89700076616 /* main.m in Sources */,
+				6A0CA89E1DDCF58D004F50E3 /* SAMKeychainQuery.m in Sources */,
+				6A0CA89D1DDCF58D004F50E3 /* SAMKeychain.m in Sources */,
+				6AD8BC4B1DC7EFFE00B8DCC8 /* MainViewController.m in Sources */,
+				812317621DFB0AC000784B9D /* SendViewCell.m in Sources */,
+				81ADD02B1DDA268300DDEFB8 /* InboxViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		6A9B2D841D78A89700076616 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6A9B2D851D78A89700076616 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		6A9B2D891D78A89700076616 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6A9B2D8A1D78A89700076616 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		6A9B2D8D1D78A89700076616 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		6A9B2D8E1D78A89700076616 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		6A9B2D901D78A89700076616 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = PlayerMessaging/PlayerMessaging.entitlements;
+				DEVELOPMENT_TEAM = SAG97E7HLS;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/PlayerMessaging/Frameworks",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/SAMKeychain",
+				);
+				INFOPLIST_FILE = PlayerMessaging/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/PlayerMessaging/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.chilliconnect.playermessaging;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		6A9B2D911D78A89700076616 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = PlayerMessaging/PlayerMessaging.entitlements;
+				DEVELOPMENT_TEAM = SAG97E7HLS;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/PlayerMessaging/Frameworks",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/SAMKeychain",
+				);
+				INFOPLIST_FILE = PlayerMessaging/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/PlayerMessaging/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.chilliconnect.playermessaging;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6A9B2D731D78A89500076616 /* Build configuration list for PBXProject "PlayerMessaging" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6A9B2D8D1D78A89700076616 /* Debug */,
+				6A9B2D8E1D78A89700076616 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6A9B2D8F1D78A89700076616 /* Build configuration list for PBXNativeTarget "PlayerMessaging" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6A9B2D901D78A89700076616 /* Debug */,
+				6A9B2D911D78A89700076616 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 6A9B2D701D78A89500076616 /* Project object */;
+}
