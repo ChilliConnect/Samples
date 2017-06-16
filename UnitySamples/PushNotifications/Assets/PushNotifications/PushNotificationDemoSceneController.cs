@@ -42,11 +42,8 @@ public class PushNotificationDemoSceneController : MonoBehaviour
 #if UNITY_ANDROID && !UNITY_EDITOR
         GooglePushNotificationHandler.SetRecieverGameObject("GooglePushNotificationListener");
 		GameObject.FindObjectOfType<GooglePushNotificationListener>().RegistrationSucceededEvent = OnPluginRegistered;
-		GameObject.FindObjectOfType<GooglePushNotificationListener>().RegistrationFailedEvent = OnPluginFailed;
 #elif UNITY_IOS
-
 		GameObject.FindObjectOfType<iOSPushNotificationListener>().RegistrationSucceededEvent = OnPluginRegistered;
-		GameObject.FindObjectOfType<iOSPushNotificationListener>().RegistrationFailedEvent = OnPluginFailed;
 #endif
     }
 
@@ -110,7 +107,6 @@ public class PushNotificationDemoSceneController : MonoBehaviour
         playerAccounts.LogInUsingChilliConnect(m_chilliConnectId, m_chilliConnectSecret, successCallback, errorCallback);
     }
 
-    #region Push Notifications
 	//------------------------------------------------------------------
 	/// Requests a Device Identifier for Push Notifications.
 	//------------------------------------------------------------------
@@ -120,7 +116,6 @@ public class PushNotificationDemoSceneController : MonoBehaviour
 
 #if UNITY_ANDROID
 		GooglePushNotificationHandler.GenerateDeviceID(k_senderID);
-		GooglePushNotificationHandler.SetNotificationIcon("notificationicon");
 #elif UNITY_IOS
         iOSPushNotificationHandler.Register();
 #endif
@@ -150,15 +145,7 @@ public class PushNotificationDemoSceneController : MonoBehaviour
         ChilliConnect.PushNotifications pushNotificationModule = m_chilliConnect.PushNotifications;
         pushNotificationModule.RegisterToken(desc, successCallback, errorCallback);
     }
-	//------------------------------------------------------------------
-	/// Callback for failing to register for push notifications.
-	//------------------------------------------------------------------
-    private void OnPluginFailed(string in_error)
-    {
-        UnityEngine.Debug.Log("An error occurred while REgistering for Push Notifications: " + in_error);
-    }
 
-    #endregion
 	
 	//------------------------------------------------------------------
 	/// Handles actions to perform on states.
