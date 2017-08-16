@@ -38,6 +38,11 @@ namespace ChilliConnect
 	public sealed class GetMetadataDefinitionsResponse
 	{
 		/// <summary>
+		/// The Economy Version.
+		/// </summary>
+        public string EconomyVersion { get; private set; }
+	
+		/// <summary>
 		/// List of Metadata definitions.
 		/// </summary>
         public ReadOnlyCollection<MetadataDefinition> Items { get; private set; }
@@ -65,6 +70,7 @@ namespace ChilliConnect
 		public GetMetadataDefinitionsResponse(IDictionary<string, object> jsonDictionary)
 		{
 			ReleaseAssert.IsNotNull(jsonDictionary, "JSON dictionary cannot be null.");
+			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("EconomyVersion"), "Json is missing required field 'EconomyVersion'");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("Items"), "Json is missing required field 'Items'");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("Total"), "Json is missing required field 'Total'");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("Page"), "Json is missing required field 'Page'");
@@ -72,8 +78,15 @@ namespace ChilliConnect
 	
 			foreach (KeyValuePair<string, object> entry in jsonDictionary)
 			{
+				// Economy Version
+				if (entry.Key == "EconomyVersion")
+				{
+                    ReleaseAssert.IsTrue(entry.Value is string, "Invalid serialised type.");
+                    EconomyVersion = (string)entry.Value;
+				}
+		
 				// Items
-				if (entry.Key == "Items")
+				else if (entry.Key == "Items")
 				{
                     ReleaseAssert.IsTrue(entry.Value is IList<object>, "Invalid serialised type.");
                     Items = JsonSerialisation.DeserialiseList((IList<object>)entry.Value, (object element) =>
@@ -102,14 +115,6 @@ namespace ChilliConnect
 				{
                     ReleaseAssert.IsTrue(entry.Value is long, "Invalid serialised type.");
                     PageSize = (int)(long)entry.Value;
-				}
-	
-				// An error has occurred.
-				else
-				{
-#if DEBUG
-					throw new ArgumentException("Input Json contains an invalid field.");
-#endif
 				}
 			}
 		}

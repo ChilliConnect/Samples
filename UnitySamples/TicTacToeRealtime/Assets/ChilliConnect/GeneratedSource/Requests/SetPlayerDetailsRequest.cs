@@ -100,7 +100,7 @@ namespace ChilliConnect
             Password = desc.Password;
             ConnectAccessToken = connectAccessToken;
 	
-			Url = "https://connect.chilliconnect.com/1.0/player/update";
+			Url = "https://test-connect.chilliconnect.com/1.0/player/update";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

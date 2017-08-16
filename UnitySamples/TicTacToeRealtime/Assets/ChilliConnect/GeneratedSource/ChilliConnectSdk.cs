@@ -105,6 +105,17 @@ namespace ChilliConnect
 		/// economy items to players.
 		/// </summary>
 		public Messaging Messaging { get; private set; }
+	
+		/// <summary>
+		/// The ChilliConnect LiveOps module.
+		/// </summary>
+		public LiveOps LiveOps { get; private set; }
+	
+		/// <summary>
+		/// The ChilliConnect Multiplayer module. For providing synchronous and asynchronous
+		/// multiplayer support.
+		/// </summary>
+		public Multiplayer Multiplayer { get; private set; }
 
 		/// <summary>
 		/// Initialises a new instance with the given App Token. Must be called on the
@@ -135,6 +146,8 @@ namespace ChilliConnect
 			Metrics = new Metrics(logging, taskScheduler, serverRequestSystem, dataStore);
 			Economy = new Economy(logging, taskScheduler, serverRequestSystem, dataStore);
 			Messaging = new Messaging(logging, taskScheduler, serverRequestSystem, dataStore);
+			LiveOps = new LiveOps(logging, taskScheduler, serverRequestSystem, dataStore);
+			Multiplayer = new Multiplayer(logging, taskScheduler, serverRequestSystem, dataStore);
 		}
 		
 		/// <summary>

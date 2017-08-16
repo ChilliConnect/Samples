@@ -46,6 +46,11 @@ namespace ChilliConnect
 		/// The player's ChilliConnectSecret.
 		/// </summary>
         public string ChilliConnectSecret { get; private set; }
+	
+		/// <summary>
+		/// The Economy Version.
+		/// </summary>
+        public string EconomyVersion { get; private set; }
 
 		/// <summary>
 		/// Initialises the response with the given json dictionary.
@@ -73,6 +78,16 @@ namespace ChilliConnect
                     ReleaseAssert.IsTrue(entry.Value is string, "Invalid serialised type.");
                     ChilliConnectSecret = (string)entry.Value;
 				}
+		
+				// Economy Version
+				else if (entry.Key == "EconomyVersion")
+				{
+					if (entry.Value != null)
+					{
+                        ReleaseAssert.IsTrue(entry.Value is string, "Invalid serialised type.");
+                        EconomyVersion = (string)entry.Value;
+                    }
+				}
 	
 				// Connect Access Token
 				else if (entry.Key == "ConnectAccessToken")
@@ -80,12 +95,10 @@ namespace ChilliConnect
 					//Do nothing
 				}
 	
-				// An error has occurred.
-				else
+				// Metrics Access Token
+				else if (entry.Key == "MetricsAccessToken")
 				{
-#if DEBUG
-					throw new ArgumentException("Input Json contains an invalid field.");
-#endif
+					//Do nothing
 				}
 			}
 		}

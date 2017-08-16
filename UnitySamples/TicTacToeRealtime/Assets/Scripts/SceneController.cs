@@ -17,7 +17,7 @@ public class SceneController : MonoBehaviour
 	private const string MESSAGE_WAITING_OPPONENT = "Finding Opponent";
 	private const string MESSAGE_OPPONENT_TURN = "Opponent's Turn";
 
-	private const string GAME_TOKEN = "Vv7VANzImRtEUeiYaoz4lWKqB6t349iy";
+	private const string GAME_TOKEN = "ETS6a0CydqViNvOWqlH8U3ftcrmyeix7";
 
     private ChilliConnectSdk m_chilliConnect = null;
 	private MatchSystem m_matchSystem = new MatchSystem ();
@@ -41,6 +41,7 @@ public class SceneController : MonoBehaviour
 		m_matchSystem.OnMatchSavedOnServer += OnMatchSavedOnServer;
 
 		m_photonSystem.Initialise (m_chilliConnect);
+		m_photonSystem.OnPhotonConnect += OnPhotonConnect;
 
 		m_accountSystem.Initialise (m_chilliConnect);
 		m_accountSystem.OnPlayerLoggedIn += OnPlayerLoggedIn;
@@ -56,6 +57,11 @@ public class SceneController : MonoBehaviour
 		m_chilliConnectId = chilliConnectId;
 		gameController.ShowChilliInfoPanel (MESSAGE_LOADING_DATA);
 		m_photonSystem.LoadPhotonInstance (m_chilliConnectId);
+	}
+
+	private void OnPhotonConnect()
+	{
+		UnityEngine.Debug.Log("DEBUGDEBUGDBEUGUBEUBUBEUBFUBE");
 		m_matchSystem.LoadExistingOrFindNewGame (m_chilliConnectId);
 	}
 

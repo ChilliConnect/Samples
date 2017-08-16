@@ -1,18 +1,20 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using UnityEngine;
+using UnityEngine; 
 
 using ChilliConnect;
 
 public class PhotonSystem : MonoBehaviour {
-	
-	public string photonAppId = null;
-	public string photonGameId = null;
 
 	private string m_chilliConnectId;
 
+	private string m_photonApplicationId = "67746b32-42f7-47fe-9459-057dccc4d884";
+
 	private ChilliConnectSdk m_chilliConnect;
+
+	public event System.Action OnPhotonConnect = delegate {};
 
 	/// Make instance of ChilliConnectId.
 	/// 
@@ -33,30 +35,44 @@ public class PhotonSystem : MonoBehaviour {
 
 		UnityEngine.Debug.Log ("Photon Multiplayer - Starting Photon Access Token Generation");
 
-		var requestDesc = new GeneratePhotonAccessTokenRequestDesc();
-		m_chilliConnect.Multiplayer.GeneratePhotonAccessToken(requestDesc, (request, response) => OnPhotonAccessTokenRetrieved(response), (request, createError) => Debug.LogError(createError.ErrorDescription));
+		m_chilliConnect.Multiplayer.GeneratePhotonAccessToken(m_photonApplicationId, (request, response) => OnPhotonAccessTokenRetrieved(response), (request, createError) => Debug.LogError(createError.ErrorDescription));
 	}
 
-	/// Handler for succesfull log in, will notify listeners a new player has been logged in
+	/// Handler for successful PhotonAccessToken retrieval, will connect to Photon Services
 	/// 
-	private void OnPhotonAccessTokenRetrieved(string photonAccessToken)
+	private void OnPhotonAccessTokenRetrieved(GeneratePhotonAccessTokenResponse photonAccessToken)
 	{
-		UnityEngine.Debug.Log ("Photon Multiplayer - Retrieved Initial Access Token: " + photonAccessToken);
-		photonConnect(photonAccessToken);
-	}
+		// #Critical, we must first and foremost connect to Photon Online Server.
+		UnityEngine.Debug.Log ("Photon Multiplayer - Retrieved Initial Access Token: " + photonAccessToken.PhotonAccessToken);
 
-	public void photonConnect(string photonAccessToken)
-	{
-		PhotonNetwork.AuthValues.UserId = m_chilliConnectId;
+		PhotonNetwork.AuthValues = new AuthenticationValues();
 
 		UnityEngine.Debug.Log ("Photon Multiplayer - Photon UserID set: " + m_chilliConnectId);
 
-		PhotonNetwork.AuthValues = new AuthenticationValues();
 		PhotonNetwork.AuthValues.AuthType = CustomAuthenticationType.Custom;
-		PhotonNetwork.AuthValues.AddAuthParameter("PhotonAccessToken", photonAccessToken);
-		PhotonNetwork.ConnectUsingSettings("1.0");
+		PhotonNetwork.AuthValues.AddAuthParameter("PhotonAccessToken", photonAccessToken.PhotonAccessToken);
+		PhotonNetwork.ConnectUsingSettings("1.0");	
+	}
 
-		// this way we can force timeouts by pausing the client (in editor)
-		PhotonHandler.StopFallbackSendAckThread();
+	void OnConnectedToMaster ()
+	{
+		UnityEngine.Debug.Log ("Photon Multiplayer - Connected: " + PhotonNetwork.connected);
+
+		// else: join a random room
+		PhotonNetwork.JoinRandomRoom();
+
+		//this currently does not work
+		OnPhotonConnect();
+	}
+
+	void OnJoinedRoom()
+	{
+		Debug.Log("Photon Multiplayer - Successfully joined room: " + PhotonNetwork.room.Name);
+	}
+
+	void OnPhotonRandomJoinFailed(object[] codeAndMsg)
+	{
+		Debug.Log("Photon Multiplayer - No Rooms Available, Creating New Room");
+		PhotonNetwork.CreateRoom(null, new RoomOptions() { MaxPlayers = 2, PlayerTtl = 20000 }, null);
 	}
 }

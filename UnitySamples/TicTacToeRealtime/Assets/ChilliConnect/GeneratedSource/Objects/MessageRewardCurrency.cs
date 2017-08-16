@@ -105,14 +105,6 @@ namespace ChilliConnect
                     ReleaseAssert.IsTrue(entry.Value is long, "Invalid serialised type.");
                     Amount = (int)(long)entry.Value;
 				}
-	
-				// An error has occurred.
-				else
-				{
-#if DEBUG
-					throw new ArgumentException("Input Json contains an invalid field.");
-#endif
-				}
 			}
 		}
 

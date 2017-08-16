@@ -33,15 +33,15 @@ namespace ChilliConnect
 {
 	/// <summary>
 	/// <para>A container for information on any errors that occur during a 
-	/// GetDlcUsingTagRequest.</para>
+	/// GetEconomyVersionRequest.</para>
 	///
 	/// <para>This is immutable after construction and is therefore thread safe.</para>
 	/// </summary>
-	public sealed class GetDlcUsingTagError
+	public sealed class GetEconomyVersionError
 	{
 		/// <summary>
 		/// An enum describing each of the possible error codes that can be returned from a
-		/// CCGetDlcUsingTagRequest.
+		/// CCGetEconomyVersionRequest.
 		/// </summary>
 		public enum Error
 		{
@@ -64,6 +64,11 @@ namespace ChilliConnect
 			InvalidRequest = 1007,
 	
 			/// <summary>
+			/// Rate Limit Reached. Too many requests. Player has been rate limited.
+			/// </summary>
+			RateLimitReached = 10002,
+	
+			/// <summary>
 			/// Expired Connect Access Token. The Connect Access Token used to authenticate with
 			/// the server has expired and should be renewed.
 			/// </summary>
@@ -73,7 +78,19 @@ namespace ChilliConnect
 			/// Invalid Connect Access Token. The Connect Access Token was not valid and cannot
 			/// be used to authenticate requests.
 			/// </summary>
-			InvalidConnectAccessToken = 1004
+			InvalidConnectAccessToken = 1004,
+	
+			/// <summary>
+			/// Player Context Not Set. Only applicable to Cloud Code Scripts. Attempted to call
+			/// a method that required a player context, but none was set. Note that the AsPlayer
+			/// method can be used to select a specific player context.
+			/// </summary>
+			PlayerContextNotSet = 6002,
+	
+			/// <summary>
+			/// Economy Not Published. The game has no published Economy.
+			/// </summary>
+			EconomyNotPublished = 10105
 		}
 		
 		private const int SuccessHttpResponseCode = 200;
@@ -101,7 +118,7 @@ namespace ChilliConnect
 		///
 		/// <param name="serverResponse">The server response from which to initialise this error.
 		/// The response must describe an error state.</param>
-		public GetDlcUsingTagError(ServerResponse serverResponse)
+		public GetEconomyVersionError(ServerResponse serverResponse)
 		{
 			ReleaseAssert.IsNotNull(serverResponse, "A server response must be supplied.");
 			ReleaseAssert.IsTrue(serverResponse.Result != HttpResult.Success || serverResponse.HttpResponseCode != SuccessHttpResponseCode, "Input server response must describe an error.");
@@ -136,7 +153,7 @@ namespace ChilliConnect
 		/// </summary>
 		///
 		/// <param name="errorCode">The error code.</param>
-		public GetDlcUsingTagError(Error errorCode)
+		public GetEconomyVersionError(Error errorCode)
 		{
 			ErrorCode = errorCode;
             ErrorData = MultiTypeValue.Null;
@@ -171,12 +188,21 @@ namespace ChilliConnect
 				case 1007:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 422, @"Invalid HTTP response code for error code.");
 					return Error.InvalidRequest;		
+				case 10002:
+					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 429, @"Invalid HTTP response code for error code.");
+					return Error.RateLimitReached;		
 				case 1003:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
 					return Error.ExpiredConnectAccessToken;		
 				case 1004:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
 					return Error.InvalidConnectAccessToken;		
+				case 6002:
+					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
+					return Error.PlayerContextNotSet;		
+				case 10105:
+					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
+					return Error.EconomyNotPublished;		
 				default:
 					return Error.UnexpectedError;
 			}
@@ -220,12 +246,20 @@ namespace ChilliConnect
 					return "Invalid Request. One of more of the provided fields were not correctly formatted."
 						+ " The data property of the response body will contain specific error messages for"
 						+ " each field.";
+				case Error.RateLimitReached:
+					return "Rate Limit Reached. Too many requests. Player has been rate limited.";
 				case Error.ExpiredConnectAccessToken:
 					return "Expired Connect Access Token. The Connect Access Token used to authenticate with"
 						+ " the server has expired and should be renewed.";
 				case Error.InvalidConnectAccessToken:
 					return "Invalid Connect Access Token. The Connect Access Token was not valid and cannot"
 						+ " be used to authenticate requests.";
+				case Error.PlayerContextNotSet:
+					return "Player Context Not Set. Only applicable to Cloud Code Scripts. Attempted to call"
+						+ " a method that required a player context, but none was set. Note that the AsPlayer"
+						+ " method can be used to select a specific player context.";
+				case Error.EconomyNotPublished:
+					return "Economy Not Published. The game has no published Economy.";
 				case Error.UnexpectedError:
 				default:
 					return "An unexpected server error occurred.";

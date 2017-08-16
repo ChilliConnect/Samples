@@ -78,12 +78,12 @@ namespace ChilliConnect
 		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
 		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
 		/// a container with information on what went wrong.</param>
-		public void GetDlcUsingTag(IList<string> tags, Action<GetDlcUsingTagRequest, GetDlcUsingTagResponse> successCallback, Action<GetDlcUsingTagRequest, GetDlcUsingTagError> errorCallback)
+		public void GetDlcUsingTags(IList<string> tags, Action<GetDlcUsingTagsRequest, GetDlcUsingTagsResponse> successCallback, Action<GetDlcUsingTagsRequest, GetDlcUsingTagsError> errorCallback)
 		{
-			m_logging.LogVerboseMessage("Sending Get Dlc Using Tag request.");
+			m_logging.LogVerboseMessage("Sending Get Dlc Using Tags request.");
 			
             var connectAccessToken = m_dataStore.GetString("UserAccessToken");
-			var request = new GetDlcUsingTagRequest(tags, connectAccessToken);
+			var request = new GetDlcUsingTagsRequest(tags, connectAccessToken);
 	
 			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
 			{
@@ -91,30 +91,30 @@ namespace ChilliConnect
 				
 				if (serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode)
 				{
-					NotifyGetDlcUsingTagSuccess(serverResponse, request, successCallback);
+					NotifyGetDlcUsingTagsSuccess(serverResponse, request, successCallback);
 				} 
 				else 
 				{
-					NotifyGetDlcUsingTagError(serverResponse, request, errorCallback);
+					NotifyGetDlcUsingTagsError(serverResponse, request, errorCallback);
 				}
 			});
 		}
 		
 		/// <summary>
-		/// Notifies the user that a Get Dlc Using Tag request was successful.
+		/// Notifies the user that a Get Dlc Using Tags request was successful.
 		/// </summary>
 		///
 		/// <param name="serverResponse">A container for information on the response from the server. Only 
 		/// successful responses can be passed into this method.</param>
 		/// <param name="request"> The request that was sent to the server.</param>
 		/// <param name="callback">The success callback.</param>
-		private void NotifyGetDlcUsingTagSuccess(ServerResponse serverResponse, GetDlcUsingTagRequest request, Action<GetDlcUsingTagRequest, GetDlcUsingTagResponse> successCallback)
+		private void NotifyGetDlcUsingTagsSuccess(ServerResponse serverResponse, GetDlcUsingTagsRequest request, Action<GetDlcUsingTagsRequest, GetDlcUsingTagsResponse> successCallback)
 		{
 			ReleaseAssert.IsTrue(serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode, "Input server request must describe a success.");
 			
-			m_logging.LogVerboseMessage("GetDlcUsingTag request succeeded.");
+			m_logging.LogVerboseMessage("GetDlcUsingTags request succeeded.");
 	
-			GetDlcUsingTagResponse outputResponse = new GetDlcUsingTagResponse(serverResponse.Body);
+			GetDlcUsingTagsResponse outputResponse = new GetDlcUsingTagsResponse(serverResponse.Body);
 			m_taskScheduler.ScheduleMainThreadTask(() =>
 			{
 				successCallback(request, outputResponse);
@@ -122,31 +122,31 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
-		/// Notifies the user that a Get Dlc Using Tag request has failed.
+		/// Notifies the user that a Get Dlc Using Tags request has failed.
 		/// </summary>
 		///
 		/// <param name="serverResponse">A container for information on the response from the server. Only 
 		/// failed responses can be passed into this method.</param>
 		/// <param name="request"> The request that was sent to the server.</param>
 		/// <param name="callback">The error callback.</param>
-		private void NotifyGetDlcUsingTagError(ServerResponse serverResponse, GetDlcUsingTagRequest request, Action<GetDlcUsingTagRequest, GetDlcUsingTagError> errorCallback)
+		private void NotifyGetDlcUsingTagsError(ServerResponse serverResponse, GetDlcUsingTagsRequest request, Action<GetDlcUsingTagsRequest, GetDlcUsingTagsError> errorCallback)
 		{
 			ReleaseAssert.IsTrue(serverResponse.Result != HttpResult.Success || serverResponse.HttpResponseCode != SuccessHttpResponseCode, "Input server request must describe an error.");
 			
 			switch (serverResponse.Result) 
 			{
 				case HttpResult.Success:
-					m_logging.LogVerboseMessage("Get Dlc Using Tag request failed with http response code: " + serverResponse.HttpResponseCode);
+					m_logging.LogVerboseMessage("Get Dlc Using Tags request failed with http response code: " + serverResponse.HttpResponseCode);
 					break;
 				case HttpResult.CouldNotConnect:
-					m_logging.LogVerboseMessage("Get Dlc Using Tag request failed becuase a connection could be established.");
+					m_logging.LogVerboseMessage("Get Dlc Using Tags request failed becuase a connection could be established.");
 					break;
 				default:
-					m_logging.LogVerboseMessage("Get Dlc Using Tag request failed for an unknown reason.");
+					m_logging.LogVerboseMessage("Get Dlc Using Tags request failed for an unknown reason.");
 					throw new ArgumentException("Invalid value for server response result.");
 			}
 			
-			GetDlcUsingTagError error = new GetDlcUsingTagError(serverResponse);	
+			GetDlcUsingTagsError error = new GetDlcUsingTagsError(serverResponse);	
 			m_taskScheduler.ScheduleMainThreadTask(() =>
 			{
 				errorCallback(request, error);

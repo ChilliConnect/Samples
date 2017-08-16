@@ -66,7 +66,7 @@ namespace ChilliConnect
 	
             GameToken = gameToken;
 			
-			Url = "https://metrics.chilliconnect.com/1.0/uuid/generate";
+			Url = "https://test-metrics.chilliconnect.com/1.0/uuid/generate";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

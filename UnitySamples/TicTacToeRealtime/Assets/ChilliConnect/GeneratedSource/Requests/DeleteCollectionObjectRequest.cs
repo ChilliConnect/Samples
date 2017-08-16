@@ -93,7 +93,7 @@ namespace ChilliConnect
             WriteLock = desc.WriteLock;
             ConnectAccessToken = connectAccessToken;
 	
-			Url = "https://connect.chilliconnect.com/1.0/data/collection/object/delete";
+			Url = "https://test-connect.chilliconnect.com/1.0/data/collection/object/delete";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

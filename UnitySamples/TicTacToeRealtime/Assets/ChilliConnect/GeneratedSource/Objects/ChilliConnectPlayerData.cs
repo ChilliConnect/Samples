@@ -56,6 +56,11 @@ namespace ChilliConnect
         public MultiTypeValue Value { get; private set; }
 	
 		/// <summary>
+		/// True if the Key has Attachment data associated with it.
+		/// </summary>
+        public bool? HasAttachment { get; private set; }
+	
+		/// <summary>
 		/// The player's UserName.
 		/// </summary>
         public string UserName { get; private set; }
@@ -86,13 +91,13 @@ namespace ChilliConnect
 			
 			ReleaseAssert.IsNotNull(desc.ChilliConnectId, "ChilliConnectId cannot be null.");
 			ReleaseAssert.IsNotNull(desc.Key, "Key cannot be null.");
-			ReleaseAssert.IsNotNull(desc.Value, "Value cannot be null.");
 			ReleaseAssert.IsNotNull(desc.DateCreated, "DateCreated cannot be null.");
 			ReleaseAssert.IsNotNull(desc.DateModified, "DateModified cannot be null.");
 	
             ChilliConnectId = desc.ChilliConnectId;
             Key = desc.Key;
             Value = desc.Value;
+            HasAttachment = desc.HasAttachment;
             UserName = desc.UserName;
             DisplayName = desc.DisplayName;
             DateCreated = desc.DateCreated;
@@ -109,7 +114,6 @@ namespace ChilliConnect
 			ReleaseAssert.IsNotNull(jsonDictionary, "JSON dictionary cannot be null.");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("ChilliConnectID"), "Json is missing required field 'ChilliConnectID'");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("Key"), "Json is missing required field 'Key'");
-			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("Value"), "Json is missing required field 'Value'");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("DateCreated"), "Json is missing required field 'DateCreated'");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("DateModified"), "Json is missing required field 'DateModified'");
 	
@@ -132,8 +136,21 @@ namespace ChilliConnect
 				// Value
 				else if (entry.Key == "Value")
 				{
-                    ReleaseAssert.IsTrue(entry.Value is object, "Invalid serialised type.");
-                    Value = new MultiTypeValue((object)entry.Value);	
+					if (entry.Value != null)
+					{
+                        ReleaseAssert.IsTrue(entry.Value is object, "Invalid serialised type.");
+                        Value = new MultiTypeValue((object)entry.Value);	
+                    }
+				}
+		
+				// Has Attachment
+				else if (entry.Key == "HasAttachment")
+				{
+					if (entry.Value != null)
+					{
+                        ReleaseAssert.IsTrue(entry.Value is bool, "Invalid serialised type.");
+                        HasAttachment = (bool)entry.Value;
+                    }
 				}
 		
 				// User Name
@@ -169,14 +186,6 @@ namespace ChilliConnect
                     ReleaseAssert.IsTrue(entry.Value is string, "Invalid serialised type.");
                     DateModified = JsonSerialisation.DeserialiseDate((string)entry.Value);
 				}
-	
-				// An error has occurred.
-				else
-				{
-#if DEBUG
-					throw new ArgumentException("Input Json contains an invalid field.");
-#endif
-				}
 			}
 		}
 
@@ -197,7 +206,16 @@ namespace ChilliConnect
 			dictionary.Add("Key", Key);
 			
 			// Value
-            dictionary.Add("Value", Value.Serialise());
+            if (Value != null)
+			{
+                dictionary.Add("Value", Value.Serialise());
+            }
+			
+			// Has Attachment
+            if (HasAttachment != null)
+			{
+				dictionary.Add("HasAttachment", HasAttachment);
+            }
 			
 			// User Name
             if (UserName != null)

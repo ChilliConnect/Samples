@@ -33,44 +33,32 @@ using SdkCore;
 namespace ChilliConnect 
 {
 	/// <summary>
-	/// A container for information on the response from a GetDlcUsingTagRequest.
+	/// A container for information on the response from a GetPlayerDataAttachmentForChilliConnectIdRequest.
 	/// </summary>
-	public sealed class GetDlcUsingTagResponse
+	public sealed class GetPlayerDataAttachmentForChilliConnectIdResponse
 	{
 		/// <summary>
-		/// An array of DLC Packages.
+		/// The attachment data requested.
 		/// </summary>
-        public ReadOnlyCollection<DlcPackage> Packages { get; private set; }
+        public string Attachment { get; private set; }
 
 		/// <summary>
 		/// Initialises the response with the given json dictionary.
 		/// </summary>
 		///
 		/// <param name="jsonDictionary">The dictionary containing the JSON data.</param>
-		public GetDlcUsingTagResponse(IDictionary<string, object> jsonDictionary)
+		public GetPlayerDataAttachmentForChilliConnectIdResponse(IDictionary<string, object> jsonDictionary)
 		{
 			ReleaseAssert.IsNotNull(jsonDictionary, "JSON dictionary cannot be null.");
-			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("Packages"), "Json is missing required field 'Packages'");
+			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("Attachment"), "Json is missing required field 'Attachment'");
 	
 			foreach (KeyValuePair<string, object> entry in jsonDictionary)
 			{
-				// Packages
-				if (entry.Key == "Packages")
+				// Attachment
+				if (entry.Key == "Attachment")
 				{
-                    ReleaseAssert.IsTrue(entry.Value is IList<object>, "Invalid serialised type.");
-                    Packages = JsonSerialisation.DeserialiseList((IList<object>)entry.Value, (object element) =>
-                    {
-                        ReleaseAssert.IsTrue(element is IDictionary<string, object>, "Invalid element type.");
-                        return new DlcPackage((IDictionary<string, object>)element);	
-                    });
-				}
-	
-				// An error has occurred.
-				else
-				{
-#if DEBUG
-					throw new ArgumentException("Input Json contains an invalid field.");
-#endif
+                    ReleaseAssert.IsTrue(entry.Value is string, "Invalid serialised type.");
+                    Attachment = (string)entry.Value;
 				}
 			}
 		}

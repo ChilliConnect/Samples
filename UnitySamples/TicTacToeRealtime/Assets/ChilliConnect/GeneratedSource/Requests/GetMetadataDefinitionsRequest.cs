@@ -91,7 +91,7 @@ namespace ChilliConnect
             Page = desc.Page;
             ConnectAccessToken = connectAccessToken;
 	
-			Url = "https://connect.chilliconnect.com/1.0/economy/definitions/metadata";
+			Url = "https://test-connect.chilliconnect.com/1.0/economy/definitions/metadata";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

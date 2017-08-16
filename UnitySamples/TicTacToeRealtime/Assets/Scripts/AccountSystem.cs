@@ -111,8 +111,10 @@ public class AccountSystem
 	/// 
 	private void Login(string chilliConnectId, string chilliConnectSecret)
 	{
-		m_chilliConnect.PlayerAccounts.LogInUsingChilliConnect(chilliConnectId, chilliConnectSecret, 
-			(loginRequest) => OnChilliConnectLoggedIn( chilliConnectId, chilliConnectSecret), 
+		var requestDesc = new LogInUsingChilliConnectRequestDesc(chilliConnectId, chilliConnectSecret);
+
+		m_chilliConnect.PlayerAccounts.LogInUsingChilliConnect(requestDesc, 
+			(loginRequest, loginResponse) => OnChilliConnectLoggedIn(chilliConnectId, chilliConnectSecret), 
 			(loginRequest, error) => Debug.LogError(error.ErrorDescription));
 	}
 }

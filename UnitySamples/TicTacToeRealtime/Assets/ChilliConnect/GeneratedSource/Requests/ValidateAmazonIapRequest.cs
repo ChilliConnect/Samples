@@ -95,7 +95,7 @@ namespace ChilliConnect
             UserId = userId;
             ConnectAccessToken = connectAccessToken;
 			
-			Url = "https://connect.chilliconnect.com/1.0/iap/validate/amazon";
+			Url = "https://test-connect.chilliconnect.com/1.0/iap/validate/amazon";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

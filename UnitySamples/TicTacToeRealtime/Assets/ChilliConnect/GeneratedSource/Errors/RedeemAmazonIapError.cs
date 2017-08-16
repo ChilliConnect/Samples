@@ -64,6 +64,11 @@ namespace ChilliConnect
 			InvalidRequest = 1007,
 	
 			/// <summary>
+			/// Rate Limit Reached. Too many requests. Player has been rate limited.
+			/// </summary>
+			RateLimitReached = 10002,
+	
+			/// <summary>
 			/// Expired Connect Access Token. The Connect Access Token used to authenticate with
 			/// the server has expired and should be renewed.
 			/// </summary>
@@ -110,7 +115,12 @@ namespace ChilliConnect
 			/// application store product identifier. Details of the Expected and Actual
 			/// identifiers will be available in the response data attribute.
 			/// </summary>
-			ProductIdMismatch = 10502
+			ProductIdMismatch = 10502,
+	
+			/// <summary>
+			/// Economy Not Published. The game has no published Economy.
+			/// </summary>
+			EconomyNotPublished = 10105
 		}
 		
 		private const int SuccessHttpResponseCode = 200;
@@ -208,6 +218,9 @@ namespace ChilliConnect
 				case 1007:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 422, @"Invalid HTTP response code for error code.");
 					return Error.InvalidRequest;		
+				case 10002:
+					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 429, @"Invalid HTTP response code for error code.");
+					return Error.RateLimitReached;		
 				case 1003:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
 					return Error.ExpiredConnectAccessToken;		
@@ -232,6 +245,9 @@ namespace ChilliConnect
 				case 10502:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
 					return Error.ProductIdMismatch;		
+				case 10105:
+					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
+					return Error.EconomyNotPublished;		
 				default:
 					return Error.UnexpectedError;
 			}
@@ -275,6 +291,8 @@ namespace ChilliConnect
 					return "Invalid Request. One of more of the provided fields were not correctly formatted."
 						+ " The data property of the response body will contain specific error messages for"
 						+ " each field.";
+				case Error.RateLimitReached:
+					return "Rate Limit Reached. Too many requests. Player has been rate limited.";
 				case Error.ExpiredConnectAccessToken:
 					return "Expired Connect Access Token. The Connect Access Token used to authenticate with"
 						+ " the server has expired and should be renewed.";
@@ -300,6 +318,8 @@ namespace ChilliConnect
 					return "Product Id Mismatch. The Purchase Item used in this request contains a different"
 						+ " application store product identifier. Details of the Expected and Actual"
 						+ " identifiers will be available in the response data attribute.";
+				case Error.EconomyNotPublished:
+					return "Economy Not Published. The game has no published Economy.";
 				case Error.UnexpectedError:
 				default:
 					return "An unexpected server error occurred.";

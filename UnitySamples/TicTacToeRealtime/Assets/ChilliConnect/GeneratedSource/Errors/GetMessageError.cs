@@ -64,6 +64,11 @@ namespace ChilliConnect
 			InvalidRequest = 1007,
 	
 			/// <summary>
+			/// Rate Limit Reached. Too many requests. Player has been rate limited.
+			/// </summary>
+			RateLimitReached = 10002,
+	
+			/// <summary>
 			/// Expired Connect Access Token. The Connect Access Token used to authenticate with
 			/// the server has expired and should be renewed.
 			/// </summary>
@@ -84,7 +89,14 @@ namespace ChilliConnect
 			/// <summary>
 			/// Message Not Found. The message specified was not found.
 			/// </summary>
-			MessageNotFound = 11001
+			MessageNotFound = 11001,
+	
+			/// <summary>
+			/// Player Context Not Set. Only applicable to Cloud Code Scripts. Attempted to call
+			/// a method that required a player context, but none was set. Note that the AsPlayer
+			/// method can be used to select a specific player context.
+			/// </summary>
+			PlayerContextNotSet = 6002
 		}
 		
 		private const int SuccessHttpResponseCode = 200;
@@ -182,6 +194,9 @@ namespace ChilliConnect
 				case 1007:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 422, @"Invalid HTTP response code for error code.");
 					return Error.InvalidRequest;		
+				case 10002:
+					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 429, @"Invalid HTTP response code for error code.");
+					return Error.RateLimitReached;		
 				case 1003:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
 					return Error.ExpiredConnectAccessToken;		
@@ -194,6 +209,9 @@ namespace ChilliConnect
 				case 11001:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
 					return Error.MessageNotFound;		
+				case 6002:
+					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
+					return Error.PlayerContextNotSet;		
 				default:
 					return Error.UnexpectedError;
 			}
@@ -237,6 +255,8 @@ namespace ChilliConnect
 					return "Invalid Request. One of more of the provided fields were not correctly formatted."
 						+ " The data property of the response body will contain specific error messages for"
 						+ " each field.";
+				case Error.RateLimitReached:
+					return "Rate Limit Reached. Too many requests. Player has been rate limited.";
 				case Error.ExpiredConnectAccessToken:
 					return "Expired Connect Access Token. The Connect Access Token used to authenticate with"
 						+ " the server has expired and should be renewed.";
@@ -248,6 +268,10 @@ namespace ChilliConnect
 						+ " ChilliConnect Dashboard.";
 				case Error.MessageNotFound:
 					return "Message Not Found. The message specified was not found.";
+				case Error.PlayerContextNotSet:
+					return "Player Context Not Set. Only applicable to Cloud Code Scripts. Attempted to call"
+						+ " a method that required a player context, but none was set. Note that the AsPlayer"
+						+ " method can be used to select a specific player context.";
 				case Error.UnexpectedError:
 				default:
 					return "An unexpected server error occurred.";

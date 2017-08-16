@@ -65,6 +65,29 @@ namespace ChilliConnect
 		/// than 3 and less than 50 characters in length.
 		/// </summary>
         public string Password { get; set; }
+	
+		/// <summary>
+		/// Country of the player. Must be two letter country code ISO 3166-1 alpha-2. E.g.
+		/// GB. If not provided, will be automatically populated.
+		/// </summary>
+        public string Country { get; set; }
+	
+		/// <summary>
+		/// Model of device being used by the player. E.g. SamsungABC123.
+		/// </summary>
+        public string DeviceModel { get; set; }
+	
+		/// <summary>
+		/// Type of device being used by the player. Accepted values: PHONE, TABLET, BROWSER,
+		/// DESKTOP, OTHER.
+		/// </summary>
+        public string DeviceType { get; set; }
+	
+		/// <summary>
+		/// Platform of the device being used by the player. Accepted values: ANDROID, IOS,
+		/// KINDLE, WINDOWS, MACOS, LINUX, OTHER.
+		/// </summary>
+        public string Platform { get; set; }
 
 		/// <summary>
 		/// Initialises a new instance of the description with the given required properties.

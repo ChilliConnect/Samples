@@ -75,7 +75,7 @@ namespace ChilliConnect
             MessageId = messageId;
             ConnectAccessToken = connectAccessToken;
 			
-			Url = "https://connect.chilliconnect.com/1.0/message/player/delete";
+			Url = "https://test-connect.chilliconnect.com/1.0/message/player/delete";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

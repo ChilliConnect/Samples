@@ -131,7 +131,7 @@ namespace ChilliConnect
             Transfer = desc.Transfer;
             ConnectAccessToken = connectAccessToken;
 	
-			Url = "https://connect.chilliconnect.com/1.0/message/send";
+			Url = "https://test-connect.chilliconnect.com/1.0/message/send";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

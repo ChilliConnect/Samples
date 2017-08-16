@@ -56,6 +56,11 @@ namespace ChilliConnect
         public MultiTypeValue Value { get; set; }
 	
 		/// <summary>
+		/// True if the Key has Attachment data associated with it.
+		/// </summary>
+        public bool? HasAttachment { get; set; }
+	
+		/// <summary>
 		/// The player's UserName.
 		/// </summary>
         public string UserName { get; set; }

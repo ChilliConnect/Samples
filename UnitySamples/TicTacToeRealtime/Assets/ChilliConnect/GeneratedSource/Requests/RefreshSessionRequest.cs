@@ -34,11 +34,11 @@ namespace ChilliConnect
 {
 	/// <summary>
 	/// <para>A container for all information that will be sent to the server during a
- 	/// Get Dlc Using Tag api call.</para>
+ 	/// Refresh Session api call.</para>
 	///
 	/// <para>This is immutable after construction and is therefore thread safe.</para>
 	/// </summary>
-	public sealed class GetDlcUsingTagRequest : IImmediateServerRequest
+	public sealed class RefreshSessionRequest : IImmediateServerRequest
 	{
 		/// <summary>
 		/// The url the request will be sent to.
@@ -51,31 +51,28 @@ namespace ChilliConnect
 		public HttpRequestMethod HttpRequestMethod { get; private set; }
 		
 		/// <summary>
-		/// A valid session ConnectAccessToken obtained through one of the login endpoints.
+		/// The current MetricsAccessToken as returned from a call to SessionStart.
 		/// </summary>
-        public string ConnectAccessToken { get; private set; }
+        public string MetricsAccessToken { get; private set; }
 	
 		/// <summary>
-		/// An array list of Tags for the player to search for.
+		/// The local device time of the refresh. Format: ISO8601 e.g. 2016-01-12T11:08:23.
 		/// </summary>
-        public ReadOnlyCollection<string> Tags { get; private set; }
+        public DateTime Date { get; private set; }
 
 		/// <summary>
 		/// Initialises a new instance of the request with the given properties.
 		/// </summary>
 		///
-		/// <param name="tags">An array list of Tags for the player to search for.</param>
-		/// <param name="connectAccessToken">A valid session ConnectAccessToken obtained through one of the login endpoints.</param>
-		public GetDlcUsingTagRequest(IList<string> tags, string connectAccessToken)
+		/// <param name="metricsAccessToken">The current MetricsAccessToken as returned from a call to SessionStart.</param>
+		public RefreshSessionRequest(string metricsAccessToken)
 		{
-			ReleaseAssert.IsNotNull(tags, "Tags cannot be null.");
+			ReleaseAssert.IsNotNull(metricsAccessToken, "Metrics Access Token cannot be null.");
 	
-			ReleaseAssert.IsNotNull(connectAccessToken, "Connect Access Token cannot be null.");
-	
-            Tags = Mutability.ToImmutable(tags);
-            ConnectAccessToken = connectAccessToken;
+            MetricsAccessToken = metricsAccessToken;
+			Date = DateTime.Now;
 			
-			Url = "https://connect.chilliconnect.com/1.0/dlc/tag";
+			Url = "https://test-metrics.chilliconnect.com/1.0/session/refresh";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 
@@ -90,8 +87,8 @@ namespace ChilliConnect
 		{
 			var dictionary = new Dictionary<string, string>();
 			
-			// Connect Access Token
-			dictionary.Add("Connect-Access-Token", ConnectAccessToken.ToString());
+			// Metrics Access Token
+			dictionary.Add("Metrics-Access-Token", MetricsAccessToken.ToString());
 		
 			return dictionary;
 		}
@@ -107,12 +104,8 @@ namespace ChilliConnect
 		{
             var dictionary = new Dictionary<string, object>();
 			
-			// Tags
-            var serialisedTags = JsonSerialisation.Serialise(Tags, (string element) =>
-            {
-                return element;
-            });
-            dictionary.Add("Tags", serialisedTags);
+			// Date
+            dictionary.Add("Date", JsonSerialisation.Serialise(Date));
 	
 			return dictionary;
 		}
