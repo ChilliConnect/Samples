@@ -5,7 +5,7 @@ using UnityEngine;
 
 using ChilliConnect;
 
-public class SceneController : MonoBehaviour
+public class SceneController : Photon.PunBehaviour
 {
 	private const int POLL_WAIT_SECONDS = 5;
 	private const string MESSAGE_STARTUP = "Starting Up";
@@ -21,16 +21,18 @@ public class SceneController : MonoBehaviour
 
     private ChilliConnectSdk m_chilliConnect = null;
 	private MatchSystem m_matchSystem = new MatchSystem ();
-	private AccountSystem m_accountSystem = new AccountSystem();
-	private PhotonSystem m_photonSystem = new PhotonSystem();
+	private AccountSystem m_accountSystem = new AccountSystem ();
 
 	private string m_chilliConnectId = string.Empty;
 
 	public GameController gameController = null;
+	public PhotonController photonController = null;
 
     private void Awake()
     {
-		m_chilliConnect = new ChilliConnectSdk(GAME_TOKEN,false);
+		m_chilliConnect = new ChilliConnectSdk (GAME_TOKEN, false);
+
+		PhotonNetwork.OnEventCall += this.OnEvent;
 
 		m_matchSystem.Initialise (m_chilliConnect);
 		m_matchSystem.OnMatchUpdated += OnMatchUpdated;
@@ -40,11 +42,11 @@ public class SceneController : MonoBehaviour
 		m_matchSystem.OnNewMatchCreated += OnNewMatchCreated;
 		m_matchSystem.OnMatchSavedOnServer += OnMatchSavedOnServer;
 
-		m_photonSystem.Initialise (m_chilliConnect);
-		m_photonSystem.OnPhotonConnect += OnPhotonConnect;
-
 		m_accountSystem.Initialise (m_chilliConnect);
 		m_accountSystem.OnPlayerLoggedIn += OnPlayerLoggedIn;
+		 
+		photonController.Initialise (m_chilliConnect);
+		photonController.OnPhotonConnect += OnPhotonConnect;
 			
 		gameController.ShowChilliInfoPanel (MESSAGE_LOGGING_IN);
 		gameController.OnSideSelected += OnSideSelected;
@@ -56,12 +58,21 @@ public class SceneController : MonoBehaviour
 	{
 		m_chilliConnectId = chilliConnectId;
 		gameController.ShowChilliInfoPanel (MESSAGE_LOADING_DATA);
-		m_photonSystem.LoadPhotonInstance (m_chilliConnectId);
+		photonController.LoadPhotonInstance (m_chilliConnectId);
+	}
+
+	private void OnEvent(byte EventCode, object BoardState, int reliable)
+	{
+		if (EventCode == (byte)0) {
+			UnityEngine.Debug.Log ("Player Has just taken a turn! Board: " + (string)BoardState);
+			gameController.SetBoardState ((string)BoardState);
+			gameController.StartGame ();
+		}
 	}
 
 	private void OnPhotonConnect()
 	{
-		UnityEngine.Debug.Log("DEBUGDEBUGDBEUGUBEUBUBEUBFUBE");
+		//TODO: Rename this to just load the chilliId
 		m_matchSystem.LoadExistingOrFindNewGame (m_chilliConnectId);
 	}
 
@@ -75,8 +86,8 @@ public class SceneController : MonoBehaviour
 
 	public void OnNewMatchCreated(Match state)
 	{
+		UnityEngine.Debug.Log ("Match state: " + state.MatchState);
 		UpdateGameController (state);
-		WaitThenRefreshMatchFromServer();
 	}
 
 	public void OnMatchSavedOnServer(Match state)
@@ -93,7 +104,7 @@ public class SceneController : MonoBehaviour
 
 	public void OnMatchMakingFailed()
 	{
-		gameController.ShowChilliInfoPanel (MESSAGE_CHOOSE_SIDE, false);
+		gameController.ShowChilliInfoPanel (MESSAGE_WAITING_OPPONENT, false);
 	}
 
 	public void OnMatchMakingSuceeded(Match state)
@@ -101,21 +112,30 @@ public class SceneController : MonoBehaviour
 		UpdateGameController (state);
 	}
 
-	public void OnTurnEnded(string nextPlayer, string boardState)
+	public void OnTurnEnded(string boardState)
 	{
 		var matchState = m_matchSystem.CurrentMatch;
+
 		matchState.Board = boardState;
+
 		if (!gameController.IsGameOver())
 		{
-			matchState.SwitchTurn (nextPlayer);
 			gameController.ShowChilliInfoPanel(MESSAGE_OPPONENT_TURN);
+
+			byte evCode = 0;    // my event 0. could be used as "group units"
+			string content = boardState;    
+			bool reliable = true;
+			PhotonNetwork.RaiseEvent(evCode, content, reliable, null);
 		}
 		else 
 		{
+			byte evCode = 1;    // my event 0. could be used as "group units"
+			string content = m_chilliConnectId;    
+			bool reliable = true;
+			PhotonNetwork.RaiseEvent(evCode, content, reliable, new RaiseEventOptions() { ForwardToWebhook = true });
+
 			matchState.MatchState = Match.MATCHSTATE_GAMEOVER;
 		}
-
-		m_matchSystem.SaveMatchOnServer();
 	}
 
 	public void OnMatchUpdated(Match updated, Match previous)
@@ -177,4 +197,39 @@ public class SceneController : MonoBehaviour
         yield return new WaitForSeconds(wait);
 		callBack.Invoke();
     }
+
+	public override void OnJoinedRoom()
+	{
+		UnityEngine.Debug.Log ("Current Player Count: " + PhotonNetwork.room.PlayerCount);
+		if (PhotonNetwork.room.PlayerCount == 2)
+		{
+			Debug.Log("Room Found, Connected.");
+
+			//I should be circle and second to go
+			gameController.ShowChilliInfoPanel(MESSAGE_OPPONENT_TURN);
+			m_matchSystem.OccupyVacantPlayerPosition ();
+			gameController.SetLocalPlayerSide ("O");
+		}
+		else
+		{
+			gameController.ShowChilliInfoPanel(MESSAGE_WAITING_OPPONENT);
+			Debug.Log("Waiting for another player");
+		}
+	}
+
+	public override void OnPhotonPlayerConnected(PhotonPlayer newPlayer)
+	{
+		Debug.Log("Other player arrived");
+		UnityEngine.Debug.Log ("Current Player Count: " + PhotonNetwork.room.PlayerCount);
+
+		if (PhotonNetwork.room.PlayerCount == 2)
+		{
+			Debug.Log("Player has joined. Start Turns.");
+			//I should be cross and first to go
+
+			gameController.SetLocalPlayerSide ("X");
+			m_matchSystem.CreateNewGame ("X");
+
+		}
+	}
 }

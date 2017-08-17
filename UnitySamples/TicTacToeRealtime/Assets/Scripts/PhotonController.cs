@@ -6,7 +6,7 @@ using UnityEngine;
 
 using ChilliConnect;
 
-public class PhotonSystem : MonoBehaviour {
+public class PhotonController : MonoBehaviour {
 
 	private string m_chilliConnectId;
 
@@ -46,9 +46,6 @@ public class PhotonSystem : MonoBehaviour {
 		UnityEngine.Debug.Log ("Photon Multiplayer - Retrieved Initial Access Token: " + photonAccessToken.PhotonAccessToken);
 
 		PhotonNetwork.AuthValues = new AuthenticationValues();
-
-		UnityEngine.Debug.Log ("Photon Multiplayer - Photon UserID set: " + m_chilliConnectId);
-
 		PhotonNetwork.AuthValues.AuthType = CustomAuthenticationType.Custom;
 		PhotonNetwork.AuthValues.AddAuthParameter("PhotonAccessToken", photonAccessToken.PhotonAccessToken);
 		PhotonNetwork.ConnectUsingSettings("1.0");	
@@ -61,13 +58,7 @@ public class PhotonSystem : MonoBehaviour {
 		// else: join a random room
 		PhotonNetwork.JoinRandomRoom();
 
-		//this currently does not work
 		OnPhotonConnect();
-	}
-
-	void OnJoinedRoom()
-	{
-		Debug.Log("Photon Multiplayer - Successfully joined room: " + PhotonNetwork.room.Name);
 	}
 
 	void OnPhotonRandomJoinFailed(object[] codeAndMsg)

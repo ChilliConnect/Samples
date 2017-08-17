@@ -49,10 +49,9 @@ public class RpsDemoConnect : PunBehaviour
 
 		Debug.Log("Nickname: " + nickName + " userID: " + this.UserId,this);
 
-
         PhotonNetwork.playerName = nickName;
 		PhotonNetwork.AuthValues.AuthType = CustomAuthenticationType.Custom;
-		PhotonNetwork.AuthValues.AddAuthParameter("PhotonAccessToken", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjY2lkIjoiZ3VZMWdlUlA2UlNYN0d4TUpVTm9ITnFQeWM5alcyRUsiLCJjY2FwcHQiOiJFVFM2YTBDeWRxVmlOdk9XcWxIOFUzZnRjcm15ZWl4NyIsInBob2FwcGlkIjoiNjc3NDZiMzItNDJmNy00N2ZlLTk0NTktMDU3ZGNjYzRkODg0IiwiZXhwIjoxNTAyODkzMDMzfQ.wkpv2XXlNpy8Sh5QzPvkNcHrh2tFfXJhbqDcVcPIE3E");
+		PhotonNetwork.AuthValues.AddAuthParameter("PhotonAccessToken", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjY2lkIjoibFJwTDk4SkF0NEduOURhRTdnSWdJVjNGeE9hang3SUYiLCJjY2FwcHQiOiJFVFM2YTBDeWRxVmlOdk9XcWxIOFUzZnRjcm15ZWl4NyIsInBob2FwcGlkIjoiNjc3NDZiMzItNDJmNy00N2ZlLTk0NTktMDU3ZGNjYzRkODg0IiwiZXhwIjoxNTAzMDU0NjM4fQ.j14KxoYuHy0Se4Ih0lD6LpEk5DqSq9dyGu-0coO6H8o");
 		PhotonNetwork.ConnectUsingSettings("0.5");
         
         // this way we can force timeouts by pausing the client (in editor)
@@ -62,8 +61,6 @@ public class RpsDemoConnect : PunBehaviour
 
     public override void OnConnectedToMaster()
     {
-
-		Debug.Log("steeeeeeeeeeeeeeeeeeeeeeeeeeeve: ");
         // after connect 
         this.UserId = PhotonNetwork.player.UserId;
         ////Debug.Log("UserID " + this.UserId);

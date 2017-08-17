@@ -42,6 +42,7 @@
 
 	public void SetNewGame(string selectedSide, string chilliConnectId)
 	{
+		
 		if (selectedSide.Equals(PLAYER_X)) 
 		{
 			PlayerX = chilliConnectId;
@@ -53,11 +54,32 @@
 			PlayerX = string.Empty;
 		}
 
-		MatchState = MATCHSTATE_WAITING;
+		MatchState = MATCHSTATE_XPLAYER;
 		Board = BOARD_STARTING_STATE;
 		MatchId = string.Empty;
-
 	}
+
+
+
+	public void Set(string selectedSide, string chilliConnectId)
+	{
+
+		if (selectedSide.Equals(PLAYER_X)) 
+		{
+			PlayerX = chilliConnectId;
+			PlayerO = string.Empty;
+		} 
+		else 
+		{
+			PlayerO = chilliConnectId;
+			PlayerX = string.Empty;
+		}
+
+		MatchState = MATCHSTATE_XPLAYER;
+		Board = BOARD_STARTING_STATE;
+		MatchId = string.Empty;
+	}
+
 
 	public void SwitchTurn (string nextPlayer)
 	{
@@ -66,6 +88,7 @@
 
 	public bool IsPlayersTurn(string chilliConnectId)
 	{
+		
 		if (MatchState == Match.MATCHSTATE_OPLAYER) {
 			return chilliConnectId == PlayerO;
 		}
@@ -91,6 +114,13 @@
 		MatchState = multiTypeDictionary.GetString("MatchState");
 		Board = multiTypeDictionary.GetString("Board");
 	}
+
+	/// Update the match state from the provided dictionary
+	/// 
+	public void UpdateBoard(string BoardState)
+	{
+		Board = BoardState;
+	}
 		
 	/// puts the given playerID player into an empty player position in the data
 	/// 
@@ -101,12 +131,10 @@
 		if (PlayerO == string.Empty) 
 		{
 			PlayerO = chilliId;
-			MatchState = MATCHSTATE_OPLAYER;
 			return PLAYER_O;
 		}
 
 		PlayerX = chilliId;
-		MatchState = MATCHSTATE_XPLAYER;
 		return PLAYER_X;
 	}
 

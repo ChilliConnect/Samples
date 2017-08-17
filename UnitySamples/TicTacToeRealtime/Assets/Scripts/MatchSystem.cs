@@ -45,17 +45,6 @@ public class MatchSystem
 	public void LoadExistingOrFindNewGame(string chilliConnectId)
 	{
 		m_chilliConnectId = chilliConnectId;
-
-		var existingMatchId = LoadMatchId ();
-		if (existingMatchId.Length == 0 ) {
-			UnityEngine.Debug.Log("No existing game, looking for a new match");
-			StartMatchmaking ();
-		}
-		else {
-			UnityEngine.Debug.Log("Found existing game [" +  existingMatchId + "], refreshing from server");
-			CurrentMatch.MatchId = existingMatchId;
-			RefreshMatchFromServer ();
-		}
 	}
 
 	private void SaveMatchId(string matchId)
@@ -112,10 +101,17 @@ public class MatchSystem
 		}
 	}
 
+	public void OccupyVacantPlayerPosition ()
+	{
+		CurrentMatch.OccupyEmptyPlayerPosition (m_chilliConnectId);
+	}
+
 	public void CreateNewGame (string selectedSide)
 	{
+		UnityEngine.Debug.Log("New Game Created On Server");
 		CurrentMatch.SetNewGame (selectedSide, m_chilliConnectId);
-		AddCollectionObject (CurrentMatch);
+
+		OnNewMatchCreated(CurrentMatch);
 	}
 
 	/// Uses AddCollectionObject to add a new game to the existing collection

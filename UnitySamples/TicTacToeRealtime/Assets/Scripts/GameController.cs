@@ -18,7 +18,7 @@ public class PlayerColor {
 public class GameController : MonoBehaviour {
 
 	public event System.Action<string> OnSideSelected = delegate {};
-	public event System.Action<string, string> OnTurnEnded = delegate {};
+	public event System.Action<string> OnTurnEnded = delegate {};
 	public event System.Action OnNewGameSelected = delegate {};
 
 	public Text[] buttonList;
@@ -202,13 +202,8 @@ public class GameController : MonoBehaviour {
 	public void EndTurn ()
 	{
         moveCount++;
-		
-        if (IsGameOver() == false)
-		{
-			ChangeSides();
-        }
 
-        OnTurnEnded(playerSide, CreateBoardString());
+        OnTurnEnded(CreateBoardString());
 	}
 
 	void ChangeSides ()
