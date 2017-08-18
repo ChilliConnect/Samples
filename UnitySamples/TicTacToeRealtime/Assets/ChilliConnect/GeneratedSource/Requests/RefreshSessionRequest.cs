@@ -72,7 +72,7 @@ namespace ChilliConnect
             MetricsAccessToken = metricsAccessToken;
 			Date = DateTime.Now;
 			
-			Url = "https://test-metrics.chilliconnect.com/1.0/session/refresh";
+			Url = "https://metrics.chilliconnect.com/1.0/session/refresh";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

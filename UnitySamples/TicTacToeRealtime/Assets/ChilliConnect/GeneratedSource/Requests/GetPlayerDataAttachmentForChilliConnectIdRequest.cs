@@ -83,7 +83,7 @@ namespace ChilliConnect
             Key = key;
             ConnectAccessToken = connectAccessToken;
 			
-			Url = "https://test-connect.chilliconnect.com/1.0/data/player/attachment/get/chilli";
+			Url = "https://connect.chilliconnect.com/1.0/data/player/attachment/get/chilli";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

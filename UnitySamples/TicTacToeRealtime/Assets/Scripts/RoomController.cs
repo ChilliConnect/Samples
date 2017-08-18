@@ -46,6 +46,7 @@ public class RoomController : MonoBehaviour {
 	{
 		UnityEngine.Debug.Log ("Photon Multiplayer - Other PLayer has Left");
 		UnityEngine.Debug.Log ("Photon Multiplayer - New Room Count: " + PhotonNetwork.room.PlayerCount);
+
 		OnPlayerQuit ();
 	}
 

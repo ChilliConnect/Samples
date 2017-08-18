@@ -116,7 +116,7 @@ namespace ChilliConnect
             MetricsAccessToken = metricsAccessToken;
 			Date = DateTime.Now;
 	
-			Url = "https://test-metrics.chilliconnect.com/1.0/events/add";
+			Url = "https://metrics.chilliconnect.com/1.0/events/add";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

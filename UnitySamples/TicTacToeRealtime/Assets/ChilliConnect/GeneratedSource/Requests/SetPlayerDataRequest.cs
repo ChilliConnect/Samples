@@ -101,7 +101,7 @@ namespace ChilliConnect
             Attachment = desc.Attachment;
             ConnectAccessToken = connectAccessToken;
 	
-			Url = "https://test-connect.chilliconnect.com/1.0/data/player/set";
+			Url = "https://connect.chilliconnect.com/1.0/data/player/set";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

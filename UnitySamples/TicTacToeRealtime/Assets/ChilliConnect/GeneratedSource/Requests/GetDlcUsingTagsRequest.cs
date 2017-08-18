@@ -75,7 +75,7 @@ namespace ChilliConnect
             Tags = Mutability.ToImmutable(tags);
             ConnectAccessToken = connectAccessToken;
 			
-			Url = "https://test-connect.chilliconnect.com/1.0/dlc/tag";
+			Url = "https://connect.chilliconnect.com/1.0/dlc/tag";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

@@ -83,7 +83,7 @@ namespace ChilliConnect
             ObjectIds = Mutability.ToImmutable(objectIds);
             ConnectAccessToken = connectAccessToken;
 			
-			Url = "https://test-connect.chilliconnect.com/1.0/data/collection/object/get";
+			Url = "https://connect.chilliconnect.com/1.0/data/collection/object/get";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

@@ -112,7 +112,7 @@ namespace ChilliConnect
             Page = desc.Page;
             ConnectAccessToken = connectAccessToken;
 	
-			Url = "https://test-connect.chilliconnect.com/1.0/data/collection/query";
+			Url = "https://connect.chilliconnect.com/1.0/data/collection/query";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

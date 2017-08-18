@@ -117,7 +117,7 @@ namespace ChilliConnect
             ToWriteLock = desc.ToWriteLock;
             ConnectAccessToken = connectAccessToken;
 	
-			Url = "https://test-connect.chilliconnect.com/1.0/economy/currency/convert";
+			Url = "https://connect.chilliconnect.com/1.0/economy/currency/convert";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

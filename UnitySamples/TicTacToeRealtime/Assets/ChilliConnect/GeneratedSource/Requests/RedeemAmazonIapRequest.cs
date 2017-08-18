@@ -109,7 +109,7 @@ namespace ChilliConnect
             UserId = userId;
             ConnectAccessToken = connectAccessToken;
 			
-			Url = "https://test-connect.chilliconnect.com/1.0/economy/purchase/redeem/amazon";
+			Url = "https://connect.chilliconnect.com/1.0/economy/purchase/redeem/amazon";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

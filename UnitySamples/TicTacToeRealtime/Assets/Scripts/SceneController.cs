@@ -18,7 +18,7 @@ public class SceneController : MonoBehaviour
 	private const string MESSAGE_OPPONENT_TURN = "Opponent's Turn";
 	private const string MESSAGE_OPPONENT_LEFT = "Opponent Has Left";
 
-	private const string GAME_TOKEN = "ETS6a0CydqViNvOWqlH8U3ftcrmyeix7";
+	private const string GAME_TOKEN = "CHILLI_CONNECT_GAME_TOKEN";
 
     private ChilliConnectSdk m_chilliConnect = null;
 	private AccountSystem m_accountSystem = new AccountSystem ();

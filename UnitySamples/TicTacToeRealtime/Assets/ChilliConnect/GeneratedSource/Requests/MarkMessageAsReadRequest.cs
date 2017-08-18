@@ -75,7 +75,7 @@ namespace ChilliConnect
             MessageId = messageId;
             ConnectAccessToken = connectAccessToken;
 			
-			Url = "https://test-connect.chilliconnect.com/1.0/message/player/read";
+			Url = "https://connect.chilliconnect.com/1.0/message/player/read";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

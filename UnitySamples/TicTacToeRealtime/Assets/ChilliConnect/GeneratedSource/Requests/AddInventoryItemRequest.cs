@@ -91,7 +91,7 @@ namespace ChilliConnect
             ItemId = desc.ItemId;
             ConnectAccessToken = connectAccessToken;
 	
-			Url = "https://test-connect.chilliconnect.com/1.0/economy/inventory/add";
+			Url = "https://connect.chilliconnect.com/1.0/economy/inventory/add";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

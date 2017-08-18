@@ -95,7 +95,7 @@ namespace ChilliConnect
             PurchaseDataSignature = purchaseDataSignature;
             ConnectAccessToken = connectAccessToken;
 			
-			Url = "https://test-connect.chilliconnect.com/1.0/iap/validate/google";
+			Url = "https://connect.chilliconnect.com/1.0/iap/validate/google";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

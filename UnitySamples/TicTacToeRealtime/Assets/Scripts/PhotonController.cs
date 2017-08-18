@@ -8,7 +8,7 @@ using ChilliConnect;
 
 public class PhotonController : MonoBehaviour {
 
-	private string m_photonApplicationId = "67746b32-42f7-47fe-9459-057dccc4d884";
+	private string m_photonApplicationId = "PHOTON_APPLICATION_ID";
 
 	private ChilliConnectSdk m_chilliConnect;
 

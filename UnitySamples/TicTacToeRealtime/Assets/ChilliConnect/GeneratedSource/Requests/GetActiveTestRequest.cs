@@ -66,7 +66,7 @@ namespace ChilliConnect
 	
             ConnectAccessToken = connectAccessToken;
 			
-			Url = "https://test-connect.chilliconnect.com/1.0/liveops/tests/player/active";
+			Url = "https://connect.chilliconnect.com/1.0/liveops/tests/player/active";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

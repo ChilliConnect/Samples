@@ -66,7 +66,7 @@ namespace ChilliConnect
 	
             ConnectAccessToken = connectAccessToken;
 			
-			Url = "https://test-connect.chilliconnect.com/1.0/economy/version";
+			Url = "https://connect.chilliconnect.com/1.0/economy/version";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

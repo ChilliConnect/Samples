@@ -84,7 +84,7 @@ namespace ChilliConnect
             Page = desc.Page;
             ConnectAccessToken = connectAccessToken;
 	
-			Url = "https://test-connect.chilliconnect.com/1.0/leaderboard/scores/get";
+			Url = "https://connect.chilliconnect.com/1.0/leaderboard/scores/get";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

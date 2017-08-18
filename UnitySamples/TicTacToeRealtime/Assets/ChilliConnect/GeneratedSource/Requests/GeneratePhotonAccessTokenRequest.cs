@@ -75,7 +75,7 @@ namespace ChilliConnect
             PhotonApplicationId = photonApplicationId;
             ConnectAccessToken = connectAccessToken;
 			
-			Url = "https://test-connect.chilliconnect.com/1.0/multiplayer/photon/token";
+			Url = "https://connect.chilliconnect.com/1.0/multiplayer/photon/token";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

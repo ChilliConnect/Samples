@@ -93,7 +93,7 @@ namespace ChilliConnect
             Overwrite = desc.Overwrite;
             ConnectAccessToken = connectAccessToken;
 	
-			Url = "https://test-connect.chilliconnect.com/1.0/push/register";
+			Url = "https://connect.chilliconnect.com/1.0/push/register";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

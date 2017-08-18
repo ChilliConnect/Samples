@@ -92,7 +92,7 @@ namespace ChilliConnect
             Update = desc.Update;
             ConnectAccessToken = connectAccessToken;
 	
-			Url = "https://test-connect.chilliconnect.com/1.0/player/link/gamecenter";
+			Url = "https://connect.chilliconnect.com/1.0/player/link/gamecenter";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 
