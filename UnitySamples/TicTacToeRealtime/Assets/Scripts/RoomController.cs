@@ -9,6 +9,7 @@ public class RoomController : MonoBehaviour {
 	public event System.Action OnGameStart = delegate {};
 	public event System.Action<string> OnNextTurn = delegate {};
 	public event System.Action<string> OnGameEnded = delegate {};
+	public event System.Action OnPlayerQuit = delegate {};
 
 	private static RoomController s_singletonInstance = null;
 
@@ -36,7 +37,7 @@ public class RoomController : MonoBehaviour {
 		string boardState = (string)BoardState;
 
 		if (EventCode == (byte) 0) {
-			UnityEngine.Debug.Log ("Photon Multiplayer -Player Has just taken a turn, New Board: " + boardState);
+			UnityEngine.Debug.Log ("Photon Multiplayer - Player Has just taken a turn, New Board: " + boardState);
 
 			OnNextTurn (boardState);
 		} else if (EventCode == (byte) 1) {
@@ -55,6 +56,13 @@ public class RoomController : MonoBehaviour {
 
 			OnRoomJoin ();
 		}
+	}
+
+	void OnPhotonPlayerDisconnected(PhotonPlayer newPlayer)
+	{
+		UnityEngine.Debug.Log ("Photon Multiplayer - Other PLayer has Left");
+		UnityEngine.Debug.Log ("Photon Multiplayer - New Room Count: " + PhotonNetwork.room.PlayerCount);
+		OnPlayerQuit ();
 	}
 
 	void OnPhotonPlayerConnected(PhotonPlayer newPlayer)

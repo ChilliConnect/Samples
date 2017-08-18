@@ -16,6 +16,7 @@ public class SceneController : MonoBehaviour
 	private const string MESSAGE_CHOOSE_SIDE = "Choose A Side";
 	private const string MESSAGE_WAITING_OPPONENT = "Finding Opponent";
 	private const string MESSAGE_OPPONENT_TURN = "Opponent's Turn";
+	private const string MESSAGE_OPPONENT_LEFT = "Opponent Has Left";
 
 	private const string GAME_TOKEN = "ETS6a0CydqViNvOWqlH8U3ftcrmyeix7";
 
@@ -46,6 +47,7 @@ public class SceneController : MonoBehaviour
 		roomController.OnRoomJoin += OnRoomJoin;
 		roomController.OnNextTurn += OnNextTurn;
 		roomController.OnGameEnded += OnGameEnded;
+		roomController.OnPlayerQuit += OnPlayerQuit;
 			
 		gameController.ShowChilliInfoPanel (MESSAGE_LOGGING_IN);
 		gameController.OnTurnEnded += OnTurnEnded;
@@ -64,7 +66,7 @@ public class SceneController : MonoBehaviour
 
 	public void NewMatchCreated()
 	{
-		UnityEngine.Debug.Log ("Match state: " + CurrentMatch.MatchState);
+		UnityEngine.Debug.Log ("Match state: New Match Created");
 
 		UpdateGameController (CurrentMatch);
 	}
@@ -76,13 +78,11 @@ public class SceneController : MonoBehaviour
 		if (!gameController.IsGameOver())
 		{
 			gameController.ShowChilliInfoPanel(MESSAGE_OPPONENT_TURN);
-		
 			roomController.TriggerEvent (0, boardState, false);
 		}
 		else 
 		{
 			roomController.TriggerEvent (1, boardState, true);
-
 			CurrentMatch.MatchState = Match.MATCHSTATE_GAMEOVER;
 		}
 	}
@@ -142,4 +142,10 @@ public class SceneController : MonoBehaviour
 
 		CurrentMatch.MatchState = Match.MATCHSTATE_GAMEOVER;
 	}	
+
+	public void OnPlayerQuit()
+	{
+		gameController.RestartGame ();
+		gameController.ShowChilliInfoPanel(MESSAGE_OPPONENT_LEFT);
+	}
 }
