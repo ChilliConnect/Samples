@@ -11,18 +11,6 @@ public class RoomController : MonoBehaviour {
 	public event System.Action<string> OnGameEnded = delegate {};
 	public event System.Action OnPlayerQuit = delegate {};
 
-	private static RoomController s_singletonInstance = null;
-
-	public static RoomController Get()
-	{
-		return s_singletonInstance;
-	}
-
-	public RoomController()
-	{
-		s_singletonInstance = this;
-	}
-
 	public void Initialise()
 	{
 		PhotonNetwork.OnEventCall += this.OnEvent;
