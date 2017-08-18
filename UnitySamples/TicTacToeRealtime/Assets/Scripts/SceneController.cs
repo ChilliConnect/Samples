@@ -5,7 +5,7 @@ using UnityEngine;
 
 using ChilliConnect;
 
-public class SceneController : Photon.PunBehaviour
+public class SceneController : MonoBehaviour
 {
 	private const int POLL_WAIT_SECONDS = 5;
 	private const string MESSAGE_STARTUP = "Starting Up";
@@ -28,18 +28,24 @@ public class SceneController : Photon.PunBehaviour
 
 	public GameController gameController = null;
 	public PhotonController photonController = null;
+	public RoomController roomController = null;
 
     private void Awake()
     {
 		m_chilliConnect = new ChilliConnectSdk (GAME_TOKEN, false);
 
-		PhotonNetwork.OnEventCall += this.OnEvent;
-
 		CurrentMatch = new Match ();
+
 		m_accountSystem.Initialise (m_chilliConnect);
 		m_accountSystem.OnPlayerLoggedIn += OnPlayerLoggedIn;
 		 
 		photonController.Initialise (m_chilliConnect);
+
+		roomController.Initialise (m_chilliConnect);
+		roomController.OnGameStart += OnGameStart;
+		roomController.OnRoomJoin += OnRoomJoin;
+		roomController.OnNextTurn += OnNextTurn;
+		roomController.OnGameEnded += OnGameEnded;
 			
 		gameController.ShowChilliInfoPanel (MESSAGE_LOGGING_IN);
 		gameController.OnTurnEnded += OnTurnEnded;
@@ -48,30 +54,12 @@ public class SceneController : Photon.PunBehaviour
 	private void OnPlayerLoggedIn(string chilliConnectId)
 	{
 		m_chilliConnectId = chilliConnectId;
+
 		gameController.ShowChilliInfoPanel (MESSAGE_LOADING_DATA);
 
 		photonController.LoadPhotonInstance ();
-	}
 
-	private void OnEvent(byte EventCode, object BoardState, int reliable)
-	{
-		if (EventCode == (byte) 0) {
-			
-			UnityEngine.Debug.Log ("Player Has just taken a turn! Board: " + (string)BoardState);
-			gameController.SetBoardState ((string)BoardState);
-
-			gameController.StartGame ();
-
-		} else if (EventCode == (byte) 1) {
-			
-			UnityEngine.Debug.Log ("Other player has won, update board and display loss message: " + (string)BoardState);
-			gameController.SetBoardState ((string)BoardState);
-
-			gameController.IsGameOver ();
-			gameController.HideChilliInfoPanel();
-
-			CurrentMatch.MatchState = Match.MATCHSTATE_GAMEOVER;
-		}
+		gameController.ShowChilliInfoPanel (MESSAGE_WAITING_OPPONENT);
 	}
 
 	public void NewMatchCreated()
@@ -87,21 +75,13 @@ public class SceneController : Photon.PunBehaviour
 
 		if (!gameController.IsGameOver())
 		{
-			
 			gameController.ShowChilliInfoPanel(MESSAGE_OPPONENT_TURN);
-	
-			byte evCode = 0;    //eventCode = 0 means that the player has taken a turn and the game continues
-			string content = boardState;    
-			bool reliable = true;
-			PhotonNetwork.RaiseEvent(evCode, content, reliable, null);
+		
+			roomController.TriggerEvent (0, boardState, false);
 		}
 		else 
 		{
-			byte evCode = 1;    //eventCode = 1 means that the player has taken a turn and the game has ended, 
-								//so forward to a webhook and notify other player
-			string content = boardState;    
-			bool reliable = true;
-			PhotonNetwork.RaiseEvent(evCode, content, reliable, new RaiseEventOptions() { ForwardToWebhook = true });
+			roomController.TriggerEvent (1, boardState, true);
 
 			CurrentMatch.MatchState = Match.MATCHSTATE_GAMEOVER;
 		}
@@ -131,41 +111,35 @@ public class SceneController : Photon.PunBehaviour
 			}
         }
 	}
+
+	public void OnGameStart()
+	{
+		gameController.SetLocalPlayerSide ("X");
+		CurrentMatch.SetNewGame ("X", m_chilliConnectId);
+		NewMatchCreated ();
+	}
+
+	public void OnRoomJoin()
+	{
+		gameController.ShowChilliInfoPanel(MESSAGE_OPPONENT_TURN);
+		gameController.SetLocalPlayerSide ("O");
+
+		CurrentMatch.OccupyEmptyPlayerPosition (m_chilliConnectId);
+	}	
 		
-	public override void OnJoinedRoom()
+	public void OnNextTurn(string boardState)
 	{
-		UnityEngine.Debug.Log ("Current Player Count: " + PhotonNetwork.room.PlayerCount);
-		if (PhotonNetwork.room.PlayerCount == 2)
-		{
+		gameController.SetBoardState (boardState);
+		gameController.StartGame ();
+	}	
 
-			Debug.Log("Photon Multiplayer - Room Found, Connected.");
-
-			gameController.ShowChilliInfoPanel(MESSAGE_OPPONENT_TURN);
-			gameController.SetLocalPlayerSide ("O");
-
-			CurrentMatch.OccupyEmptyPlayerPosition (m_chilliConnectId);
-		}
-		else
-		{
-			Debug.Log("Waiting for another player");
-			gameController.ShowChilliInfoPanel(MESSAGE_WAITING_OPPONENT);
-		}
-	}
-
-	public override void OnPhotonPlayerConnected(PhotonPlayer newPlayer)
+	public void OnGameEnded(string boardState)
 	{
-		Debug.Log("Photon Multiplayer - Player 2 has entered.");
+		gameController.SetBoardState (boardState);
 
-		UnityEngine.Debug.Log ("Current Player Count: " + PhotonNetwork.room.PlayerCount);
+		gameController.IsGameOver ();
+		gameController.HideChilliInfoPanel();
 
-		if (PhotonNetwork.room.PlayerCount == 2)
-		{
-
-			Debug.Log("Photon Multiplayer - Starting Turn for player X");
-
-			gameController.SetLocalPlayerSide ("X");
-			CurrentMatch.SetNewGame ("X", m_chilliConnectId);
-			NewMatchCreated ();
-		}
-	}
+		CurrentMatch.MatchState = Match.MATCHSTATE_GAMEOVER;
+	}	
 }
