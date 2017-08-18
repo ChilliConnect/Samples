@@ -42,7 +42,7 @@ public class SceneController : MonoBehaviour
 		 
 		photonController.Initialise (m_chilliConnect);
 
-		roomController.Initialise (m_chilliConnect);
+		roomController.Initialise ();
 		roomController.OnGameStart += OnGameStart;
 		roomController.OnRoomJoin += OnRoomJoin;
 		roomController.OnNextTurn += OnNextTurn;

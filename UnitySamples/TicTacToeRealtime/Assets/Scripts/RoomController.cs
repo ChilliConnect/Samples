@@ -13,8 +13,6 @@ public class RoomController : MonoBehaviour {
 
 	private static RoomController s_singletonInstance = null;
 
-	private ChilliConnectSdk m_chilliConnect;
-
 	public static RoomController Get()
 	{
 		return s_singletonInstance;
@@ -25,10 +23,8 @@ public class RoomController : MonoBehaviour {
 		s_singletonInstance = this;
 	}
 
-	public void Initialise(ChilliConnectSdk chilliConnect)
+	public void Initialise()
 	{
-		m_chilliConnect = chilliConnect;
-
 		PhotonNetwork.OnEventCall += this.OnEvent;
 	}
 
