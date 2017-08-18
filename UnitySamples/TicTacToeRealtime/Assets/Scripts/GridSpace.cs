@@ -4,7 +4,6 @@ using UnityEngine.UI;
 
 public class GridSpace : MonoBehaviour
 {
-
     public Button button;
     public Text buttonText;
 

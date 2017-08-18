@@ -8,13 +8,9 @@ using ChilliConnect;
 
 public class PhotonController : MonoBehaviour {
 
-	private string m_chilliConnectId;
-
 	private string m_photonApplicationId = "67746b32-42f7-47fe-9459-057dccc4d884";
 
 	private ChilliConnectSdk m_chilliConnect;
-
-	public event System.Action OnPhotonConnect = delegate {};
 
 	/// Make instance of ChilliConnectId.
 	/// 
@@ -29,10 +25,8 @@ public class PhotonController : MonoBehaviour {
 	/// Gets a new access token for use with connecting to Photon Multiplayer 
 	/// Token lasts for 5 minutes
 	/// 
-	public void LoadPhotonInstance(string chilliConnectId)
+	public void LoadPhotonInstance()
 	{
-		m_chilliConnectId = chilliConnectId;
-
 		UnityEngine.Debug.Log ("Photon Multiplayer - Starting Photon Access Token Generation");
 
 		m_chilliConnect.Multiplayer.GeneratePhotonAccessToken(m_photonApplicationId, (request, response) => OnPhotonAccessTokenRetrieved(response), (request, createError) => Debug.LogError(createError.ErrorDescription));
@@ -57,8 +51,6 @@ public class PhotonController : MonoBehaviour {
 
 		// else: join a random room
 		PhotonNetwork.JoinRandomRoom();
-
-		OnPhotonConnect();
 	}
 
 	void OnPhotonRandomJoinFailed(object[] codeAndMsg)

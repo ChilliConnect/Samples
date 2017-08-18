@@ -17,22 +17,16 @@ public class PlayerColor {
 
 public class GameController : MonoBehaviour {
 
-	public event System.Action<string> OnSideSelected = delegate {};
 	public event System.Action<string> OnTurnEnded = delegate {};
-	public event System.Action OnNewGameSelected = delegate {};
 
 	public Text[] buttonList;
 	public GameObject gameOverPanel;
 
-	public GameObject newGame;
-
-	public GameObject restartButton;
 	public Text gameOverText;
 	public Player playerX;
 	public Player playerO;
 	public PlayerColor activePlayerColor;
 	public PlayerColor inactivePlayerColor;
-	public GameObject startInfo;
 	public GameObject inputBlockingPanel;
 	public Image blockingImage;
 	public Text chilliInfoText;
@@ -45,12 +39,6 @@ public class GameController : MonoBehaviour {
 		SetGameControllerReferenceOnButtons();
 		gameOverPanel.SetActive(false);
 		moveCount = 0;
-		restartButton.SetActive(false);
-	}
-
-	public void StartNewGame()
-	{
-		OnNewGameSelected ();
 	}
 
 	void SetGameControllerReferenceOnButtons ()
@@ -60,12 +48,7 @@ public class GameController : MonoBehaviour {
 			buttonList[i].GetComponentInParent<GridSpace>().SetGameControllerReference(this);
 		}
 	}
-
-	public void SetStartingSide (string startingSide)
-	{
-		OnSideSelected (startingSide);
-	}
-
+		
 	/// Sets the local player's side, X or O
 	/// 
 	public void SetLocalPlayerSide (string side)
@@ -85,8 +68,6 @@ public class GameController : MonoBehaviour {
 	{
 		SetBoardInteractable(true);
 		SetPlayerButtons (false);
-		SetNewGameButton (false);
-		startInfo.SetActive(false);
 		HideChilliInfoPanel ();
 	}
 
@@ -206,20 +187,6 @@ public class GameController : MonoBehaviour {
         OnTurnEnded(CreateBoardString());
 	}
 
-	void ChangeSides ()
-	{
-		playerSide = (playerSide == "X") ? "O" : "X";
-		if (playerSide == "X")
-		{
-			SetPlayerColors(playerX, playerO);
-		} 
-		else
-		{
-			SetPlayerColors(playerO, playerX);
-		}
-
-	}
-
 	void SetPlayerColors (Player newPlayer, Player oldPlayer)
 	{
 		newPlayer.panel.color = activePlayerColor.panelColor;
@@ -231,7 +198,7 @@ public class GameController : MonoBehaviour {
 	void GameOver (string winningPlayer)
 	{
 		SetBoardInteractable(false);
-		SetNewGameButton (true);
+		//SetNewGameButton (true);
 		if (winningPlayer == "draw")
 		{
 			SetGameOverText("It's a Draw!");
@@ -269,10 +236,8 @@ public class GameController : MonoBehaviour {
 	{
 		moveCount = 0;
 		gameOverPanel.SetActive(false);
-		restartButton.SetActive(false);
 		SetPlayerButtons (true);
 		SetPlayerColorsInactive();
-		startInfo.SetActive(true);
 
 		for (int i = 0; i < buttonList.Length; i++)
 		{
@@ -292,11 +257,6 @@ public class GameController : MonoBehaviour {
 	{
 		playerX.button.interactable = toggle;
 		playerO.button.interactable = toggle;  
-	}
-
-	public void SetNewGameButton (bool toggle)
-	{
-		newGame.SetActive (toggle);
 	}
 
 	void SetPlayerColorsInactive ()
