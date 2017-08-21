@@ -34,13 +34,13 @@ public class PhotonController : MonoBehaviour {
 
 	/// Handler for successful PhotonAccessToken retrieval, will connect to Photon Services
 	/// 
-	private void OnPhotonAccessTokenRetrieved(GeneratePhotonAccessTokenResponse photonAccessToken)
+	private void OnPhotonAccessTokenRetrieved(GeneratePhotonAccessTokenResponse photonAccessTokenResponse)
 	{
-		UnityEngine.Debug.Log ("Photon Multiplayer - Retrieved Initial Access Token: " + photonAccessToken.PhotonAccessToken);
+		UnityEngine.Debug.Log ("Photon Multiplayer - Retrieved Initial Access Token: " + photonAccessTokenResponse.PhotonAccessToken);
 
 		PhotonNetwork.AuthValues = new AuthenticationValues();
 		PhotonNetwork.AuthValues.AuthType = CustomAuthenticationType.Custom;
-		PhotonNetwork.AuthValues.AddAuthParameter("PhotonAccessToken", photonAccessToken.PhotonAccessToken);
+		PhotonNetwork.AuthValues.AddAuthParameter("PhotonAccessToken", photonAccessTokenResponse.PhotonAccessToken);
 		PhotonNetwork.ConnectUsingSettings("1.0");	
 	}
 
