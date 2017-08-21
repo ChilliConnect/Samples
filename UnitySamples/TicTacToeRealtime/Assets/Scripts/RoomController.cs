@@ -36,7 +36,7 @@ public class RoomController : MonoBehaviour {
 		UnityEngine.Debug.Log ("Photon Multiplayer - Current Player Count: " + PhotonNetwork.room.PlayerCount);
 
 		if (PhotonNetwork.room.PlayerCount == 2) {
-			Debug.Log ("Photon Multiplayer - Room Found, Connected.");
+			UnityEngine.Debug.Log ("Photon Multiplayer - Room Found, Connected.");
 
 			OnRoomJoin ();
 		}
@@ -44,7 +44,7 @@ public class RoomController : MonoBehaviour {
 
 	void OnPhotonPlayerDisconnected(PhotonPlayer newPlayer)
 	{
-		UnityEngine.Debug.Log ("Photon Multiplayer - Other PLayer has Left");
+		UnityEngine.Debug.Log ("Photon Multiplayer - Other Player has Left");
 		UnityEngine.Debug.Log ("Photon Multiplayer - New Room Count: " + PhotonNetwork.room.PlayerCount);
 
 		OnPlayerQuit ();
@@ -52,13 +52,11 @@ public class RoomController : MonoBehaviour {
 
 	void OnPhotonPlayerConnected(PhotonPlayer newPlayer)
 	{
-		Debug.Log("Photon Multiplayer - Player 2 has entered.");
-
 		UnityEngine.Debug.Log ("Photon Multiplayer - Current Player Count: " + PhotonNetwork.room.PlayerCount);
 
 		if (PhotonNetwork.room.PlayerCount == 2)
 		{
-			Debug.Log("Photon Multiplayer - Starting Turn for player X");
+			UnityEngine.Debug.Log("Photon Multiplayer - Starting Turn for player X");
 
 			OnGameStart ();
 		}

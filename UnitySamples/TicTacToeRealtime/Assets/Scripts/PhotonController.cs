@@ -36,7 +36,6 @@ public class PhotonController : MonoBehaviour {
 	/// 
 	private void OnPhotonAccessTokenRetrieved(GeneratePhotonAccessTokenResponse photonAccessToken)
 	{
-		// #Critical, we must first and foremost connect to Photon Online Server.
 		UnityEngine.Debug.Log ("Photon Multiplayer - Retrieved Initial Access Token: " + photonAccessToken.PhotonAccessToken);
 
 		PhotonNetwork.AuthValues = new AuthenticationValues();
@@ -49,7 +48,6 @@ public class PhotonController : MonoBehaviour {
 	{
 		UnityEngine.Debug.Log ("Photon Multiplayer - Connected: " + PhotonNetwork.connected);
 
-		// else: join a random room
 		PhotonNetwork.JoinRandomRoom();
 	}
 
