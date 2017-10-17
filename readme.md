@@ -32,6 +32,14 @@ The IAPDemoScene accompanies the ChilliConnect [IAP tutorial](https://docs.chill
 
 *To run this project under your own account, you must enable the Unity IAP Plugin from the Services menu and configure the plugin with your own Google Play and App Store settings.* Full instructions are available on the [Unity website](https://unity3d.com/learn/tutorials/topics/analytics/integrating-unity-iap-your-game). You must also supply your own ChilliConnect Game Token in `IAPDemoSceneController.cs`.
 
+## Objective-C
+
+The `Objective-CSamples` directory contains XCode projects samples that use the iOS SDK.
+
+### PlayerMessaging 
+
+A XCode project that shows how to integrate the Player Messaging feature with Facebook to enable players to send currency to their friends. This code accompanies the [Player Message Tutorial](https://docs.chilliconnect.com/tutorial-messaging.md).
+
 ## C++
 
 The `CppSamples` directory contains a Visual Studio 2015 project showing a basic integration with ChilliConnect using WinHTTP and JsonCpp. <strong>Note that the example Http class is for an example only, uses a blocking API and is not intended for production usage.</strong>
