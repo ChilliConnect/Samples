@@ -40,6 +40,14 @@ The `Objective-CSamples` directory contains XCode projects samples that use the 
 
 A XCode project that shows how to integrate the Player Messaging feature with Facebook to enable players to send currency to their friends. This code accompanies the [Player Message Tutorial](https://docs.chilliconnect.com/tutorial-messaging.md).
 
+## Unreal
+
+The `UnrealSamples`directory contains separate Unreal Engine projects for each sample.
+
+### ChilliConnectExample
+
+ChilliConnectExample is a standalone project that shows how the built in Http and Json libraries provided by Unreal can be used to invoke the ChilliConnect API directly.
+
 ## C++
 
 The `CppSamples` directory contains a Visual Studio 2015 project showing a basic integration with ChilliConnect using WinHTTP and JsonCpp. <strong>Note that the example Http class is for an example only, uses a blocking API and is not intended for production usage.</strong>
