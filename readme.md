@@ -46,7 +46,8 @@ The `UnrealSamples`directory contains separate Unreal Engine projects for each s
 
 ### ChilliConnectExample
 
-ChilliConnectExample is a standalone project that shows how the built in Http and Json libraries provided by Unreal can be used to invoke the ChilliConnect API directly.
+ChilliConnectExample is a standalone project that shows how the built in Http and Json libraries provided by Unreal can be used to invoke the ChilliConnect API directly. To run the sample, add your own Game Token to the `ChilliConnect.cpp` file.
+
 
 ## C++
 
