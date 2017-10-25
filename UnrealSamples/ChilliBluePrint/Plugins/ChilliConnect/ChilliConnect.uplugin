@@ -1,0 +1,23 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1",
+	"FriendlyName": "ChilliConnectSDK",
+	"Description": "ChilliConnect SDK for Unreal",
+	"Category": "ChilliConnect",
+	"CreatedBy": "ChilliConnect",
+	"CreatedByURL": "http://www.chilliconnect.com/",
+	"DocsURL": "https://docs.chilliconnect.com/",
+	"MarketplaceURL": "",
+	"SupportURL": "http://www.chilliconnect.com/",
+	"CanContainContent": false,
+	"IsBetaVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "ChilliConnect",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault"
+		}
+	]
+}
