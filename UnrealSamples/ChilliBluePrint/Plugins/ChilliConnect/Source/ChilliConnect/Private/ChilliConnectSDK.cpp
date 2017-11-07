@@ -29,6 +29,7 @@ UChilliConnectSDK::CreatePlayer(FCreatePlayerRequest request, FDelegateOnCreateP
 	return RequestInstance;
 }
 
+
 UChilliConnectSDK* 
 UChilliConnectSDK::LoginUsingChilliConnect(FLoginUsingChilliConnectRequest Request, FDelegateOnLoginUsingChilliConnectSuccess onSuccess, FDelegateOnError onError)
 {
@@ -100,6 +101,236 @@ UChilliConnectSDK::GetPlayerData(FGetPlayerDataRequest Request, FDelegateOnGetPl
 	RequestInstance->OnError = onError;
 	RequestInstance->OnHttpRequestProcessed.BindUObject(RequestInstance, &UChilliConnectSDK::OnGetPlayerDataComplete);
 	RequestInstance->RequestUrl = TEXT("https://connect.chilliconnect.com/1.0/data/player/get");
+
+	return RequestInstance;
+}
+
+UChilliConnectSDK*
+UChilliConnectSDK::GetCurrencyBalance(FGetCurrencyBalanceRequest Request, FDelegateOnGetCurrencyBalanceSuccess onSuccess, FDelegateOnError onError)
+{
+	UChilliConnectSDK* RequestInstance = NewObject<UChilliConnectSDK>();
+	if (RequestInstance->IsSafeForRootSet()) {
+		RequestInstance->AddToRoot();
+	}
+
+	TSharedPtr<FJsonObject> Json = MakeShareable(new FJsonObject);
+
+	TArray <TSharedPtr<FJsonValue>> JsonKeys;
+	for (auto& Key : Request.Keys) {
+		JsonKeys.Add(MakeShareable(new FJsonValueString(Key)));
+	}
+
+	Json->SetArrayField("Keys", JsonKeys);
+
+	RequestInstance->RequestBody = GetJsonRequestBody(Json);
+	RequestInstance->OnGetCurrencyBalanceSuccess = onSuccess;
+	RequestInstance->OnError = onError;
+	RequestInstance->OnHttpRequestProcessed.BindUObject(RequestInstance, &UChilliConnectSDK::OnGetCurrencyBalanceComplete);
+	RequestInstance->RequestUrl = TEXT("https://connect.chilliconnect.com/1.0/economy/currency/balance/get");
+
+	return RequestInstance;
+}
+
+UChilliConnectSDK*
+UChilliConnectSDK::SetCurrencyBalance(FSetCurrencyBalanceRequest Request, FDelegateOnSetCurrencyBalanceSuccess onSuccess, FDelegateOnError onError)
+{
+	UChilliConnectSDK* RequestInstance = NewObject<UChilliConnectSDK>();
+	if (RequestInstance->IsSafeForRootSet()) {
+		RequestInstance->AddToRoot();
+	}
+
+	TSharedPtr<FJsonObject> Json = MakeShareable(new FJsonObject);
+	Json->SetStringField("Key", Request.Key);
+	Json->SetNumberField("Amount", Request.Amount);
+
+	RequestInstance->RequestBody = GetJsonRequestBody(Json);
+	RequestInstance->OnSetCurrencyBalanceSuccess = onSuccess;
+	RequestInstance->OnError = onError;
+	RequestInstance->OnHttpRequestProcessed.BindUObject(RequestInstance, &UChilliConnectSDK::OnSetCurrencyBalanceComplete);
+	RequestInstance->RequestUrl = TEXT("https://connect.chilliconnect.com/1.0/economy/currency/balance/set");
+
+	return RequestInstance;
+}
+
+UChilliConnectSDK*
+UChilliConnectSDK::GetInventory(FDelegateOnGetInventorySuccess onSuccess, FDelegateOnError onError)
+{
+	UChilliConnectSDK* RequestInstance = NewObject<UChilliConnectSDK>();
+	if (RequestInstance->IsSafeForRootSet()) {
+		RequestInstance->AddToRoot();
+	}
+
+	RequestInstance->OnGetInventorySuccess = onSuccess;
+	RequestInstance->OnError = onError;
+	RequestInstance->OnHttpRequestProcessed.BindUObject(RequestInstance, &UChilliConnectSDK::OnGetInventoryComplete);
+	RequestInstance->RequestUrl = TEXT("https://connect.chilliconnect.com/1.0/economy/inventory/get");
+
+	return RequestInstance;
+}
+
+UChilliConnectSDK*
+UChilliConnectSDK::AddInventoryItem(FAddInventoryItemRequest Request, FDelegateOnAddInventoryItemSuccess onSuccess, FDelegateOnError onError)
+{
+	UChilliConnectSDK* RequestInstance = NewObject<UChilliConnectSDK>();
+	if (RequestInstance->IsSafeForRootSet()) {
+		RequestInstance->AddToRoot();
+	}
+
+	TSharedPtr<FJsonObject> Json = MakeShareable(new FJsonObject);
+	Json->SetStringField("Key", Request.Key);
+	if (Request.InstanceData != nullptr) {
+		Json->SetObjectField("InstanceData", Request.InstanceData->GetJsonObject());
+	}
+
+	RequestInstance->RequestBody = GetJsonRequestBody(Json);
+	RequestInstance->OnAddInventoryItemSuccess = onSuccess;
+	RequestInstance->OnError = onError;
+	RequestInstance->OnHttpRequestProcessed.BindUObject(RequestInstance, &UChilliConnectSDK::OnAddInventoryItemComplete);
+	RequestInstance->RequestUrl = TEXT("https://connect.chilliconnect.com/1.0/economy/inventory/add");
+
+	return RequestInstance;
+}
+
+UChilliConnectSDK*
+UChilliConnectSDK::RemoveInventoryItem(FRemoveInventoryItemRequest Request, FDelegateOnRemoveInventoryItemSuccess onSuccess, FDelegateOnError onError)
+{
+	UChilliConnectSDK* RequestInstance = NewObject<UChilliConnectSDK>();
+	if (RequestInstance->IsSafeForRootSet()) {
+		RequestInstance->AddToRoot();
+	}
+
+	TSharedPtr<FJsonObject> Json = MakeShareable(new FJsonObject);
+	Json->SetStringField("ItemID", Request.ItemID);
+	
+	RequestInstance->RequestBody = GetJsonRequestBody(Json);
+	RequestInstance->OnRemoveInventoryItemSuccess = onSuccess;
+	RequestInstance->OnError = onError;
+	RequestInstance->OnHttpRequestProcessed.BindUObject(RequestInstance, &UChilliConnectSDK::OnRemoveInventoryItemComplete);
+	RequestInstance->RequestUrl = TEXT("https://connect.chilliconnect.com/1.0/economy/inventory/remove");
+
+	return RequestInstance;
+}
+
+UChilliConnectSDK*
+UChilliConnectSDK::RedeemGoogleIap(FRedeemGoogleIapRequest Request, FDelegateOnRedeemGoogleIapSuccess onSuccess, FDelegateOnError onError)
+{
+	UChilliConnectSDK* RequestInstance = NewObject<UChilliConnectSDK>();
+	if (RequestInstance->IsSafeForRootSet()) {
+		RequestInstance->AddToRoot();
+	}
+
+	TSharedPtr<FJsonObject> Json = MakeShareable(new FJsonObject);
+	Json->SetStringField("Key", Request.Key);
+	Json->SetStringField("PurchaseData", Request.PurchaseData);
+	Json->SetStringField("PurchaseDataSignature", Request.PurchaseDataSignature);
+
+	RequestInstance->RequestBody = GetJsonRequestBody(Json);
+	RequestInstance->OnRedeemGoogleIapSuccess = onSuccess;
+	RequestInstance->OnError = onError;
+	RequestInstance->OnHttpRequestProcessed.BindUObject(RequestInstance, &UChilliConnectSDK::OnRedeemGoogleIapComplete);
+	RequestInstance->RequestUrl = TEXT("https://connect.chilliconnect.com/1.0/economy/purchase/redeem/google");
+
+	return RequestInstance;
+}
+
+UChilliConnectSDK*
+UChilliConnectSDK::RedeemAppleIap(FRedeemAppleIapRequest Request, FDelegateOnRedeemAppleIapSuccess onSuccess, FDelegateOnError onError)
+{
+	UChilliConnectSDK* RequestInstance = NewObject<UChilliConnectSDK>();
+	if (RequestInstance->IsSafeForRootSet()) {
+		RequestInstance->AddToRoot();
+	}
+
+	TSharedPtr<FJsonObject> Json = MakeShareable(new FJsonObject);
+	Json->SetStringField("Key", Request.Key);
+	Json->SetStringField("Receipt", Request.Receipt);
+	
+	RequestInstance->RequestBody = GetJsonRequestBody(Json);
+	RequestInstance->OnRedeemAppleIapSuccess = onSuccess;
+	RequestInstance->OnError = onError;
+	RequestInstance->OnHttpRequestProcessed.BindUObject(RequestInstance, &UChilliConnectSDK::OnRedeemAppleIapComplete);
+	RequestInstance->RequestUrl = TEXT("https://connect.chilliconnect.com/1.0/economy/purchase/redeem/apple");
+
+	return RequestInstance;
+}
+
+UChilliConnectSDK*
+UChilliConnectSDK::GetMetadataDefinitions(FGetMetadataDefinitionsRequest Request, FDelegateOnGetMetadataDefinitionsSuccess onSuccess, FDelegateOnError onError)
+{
+	UChilliConnectSDK* RequestInstance = NewObject<UChilliConnectSDK>();
+	if (RequestInstance->IsSafeForRootSet()) {
+		RequestInstance->AddToRoot();
+	}
+
+	TSharedPtr<FJsonObject> Json = MakeShareable(new FJsonObject);
+	if (Request.Key.Len() > 0) {
+		Json->SetStringField("Key", Request.Key);
+	}
+	
+	if (Request.Tags.Num() > 0) {
+		TArray <TSharedPtr<FJsonValue>> JsonTags;
+		for (auto& Tag : Request.Tags) {
+			JsonTags.Add(MakeShareable(new FJsonValueString(Tag)));
+		}
+
+		Json->SetArrayField("Tags", JsonTags);
+	}
+
+	Json->SetNumberField("Page", Request.Page);
+
+	RequestInstance->RequestBody = GetJsonRequestBody(Json);
+	RequestInstance->OnGetMetadataDefinitionsSuccess = onSuccess;
+	RequestInstance->OnError = onError;
+	RequestInstance->OnHttpRequestProcessed.BindUObject(RequestInstance, &UChilliConnectSDK::OnGetMetadataDefinitionsComplete);
+	RequestInstance->RequestUrl = TEXT("https://connect.chilliconnect.com/1.0/economy/definitions/metadata");
+
+	return RequestInstance;
+}
+
+
+UChilliConnectSDK*
+UChilliConnectSDK::RegisterPushToken(FRegisterPushTokenRequest Request, FDelegateOnRegisterPushTokenSuccess onSuccess, FDelegateOnError onError)
+{
+	UChilliConnectSDK* RequestInstance = NewObject<UChilliConnectSDK>();
+	if (RequestInstance->IsSafeForRootSet()) {
+		RequestInstance->AddToRoot();
+	}
+
+	TSharedPtr<FJsonObject> Json = MakeShareable(new FJsonObject);
+	Json->SetStringField("Service", Request.Service);
+	Json->SetStringField("DeviceToken", Request.DeviceToken);
+	Json->SetBoolField("Overwrite", Request.Overwrite);
+
+	RequestInstance->RequestBody = GetJsonRequestBody(Json);
+	RequestInstance->OnRegisterPushTokenSuccess = onSuccess;
+	RequestInstance->OnError = onError;
+	RequestInstance->OnHttpRequestProcessed.BindUObject(RequestInstance, &UChilliConnectSDK::OnRegisterPushTokenComplete);
+	RequestInstance->RequestUrl = TEXT("https://connect.chilliconnect.com/1.0/push/register");
+
+	return RequestInstance;
+}
+
+UChilliConnectSDK*
+UChilliConnectSDK::GetDlcUsingTags(FGetDlcUsingTagsRequest Request, FDelegateOnGetDlcUsingTagsSuccess onSuccess, FDelegateOnError onError)
+{
+	UChilliConnectSDK* RequestInstance = NewObject<UChilliConnectSDK>();
+	if (RequestInstance->IsSafeForRootSet()) {
+		RequestInstance->AddToRoot();
+	}
+
+	TSharedPtr<FJsonObject> Json = MakeShareable(new FJsonObject);
+	TArray <TSharedPtr<FJsonValue>> JsonTags;
+	for (auto& Tag : Request.Tags) {
+		JsonTags.Add(MakeShareable(new FJsonValueString(Tag)));
+	}
+
+	Json->SetArrayField("Tags", JsonTags);
+	
+	RequestInstance->RequestBody = GetJsonRequestBody(Json);
+	RequestInstance->OnGetDlcUsingTagsSuccess = onSuccess;
+	RequestInstance->OnError = onError;
+	RequestInstance->OnHttpRequestProcessed.BindUObject(RequestInstance, &UChilliConnectSDK::OnGetDlcUsingTagsComplete);
+	RequestInstance->RequestUrl = TEXT("https://connect.chilliconnect.com/1.0/dlc/tag");
 
 	return RequestInstance;
 }
@@ -279,6 +510,246 @@ UChilliConnectSDK::OnSetPlayerDataComplete(UChilliConnectJson* json)
 	}
 }
 
+void
+UChilliConnectSDK::OnGetCurrencyBalanceComplete(UChilliConnectJson* json)
+{
+	UE_LOG(LogChilliConnect, Log, TEXT("OnGetCurrencyBalanceComplete Processing Response"));
+
+	FGetCurrencyBalanceResponse Response;
+	TArray < TSharedPtr < FJsonValue > > Values = json->GetJsonObject()->GetArrayField("Balances");
+	for (auto& Value : Values) {
+		TSharedPtr < FJsonObject > JsonObjectValue = Value->AsObject();
+
+		FGetCurrencyBalanceResponseValue ResponseValue;
+		ResponseValue.Key = JsonObjectValue->GetStringField("Key");
+		ResponseValue.Name = JsonObjectValue->GetStringField("Name");
+		ResponseValue.Balance = JsonObjectValue->GetIntegerField("Balance");
+		ResponseValue.WriteLock = JsonObjectValue->GetStringField("WriteLock");
+
+		Response.Values.Add(ResponseValue);
+	}
+
+	if (!OnGetCurrencyBalanceSuccess.IsBound()) {
+		UE_LOG(LogChilliConnect, Log, TEXT("No OnGetCurrencyBalanceSuccess Handler Bound"));
+	}
+	else {
+		OnGetCurrencyBalanceSuccess.ExecuteIfBound(Response);
+	}
+}
+
+void
+UChilliConnectSDK::OnSetCurrencyBalanceComplete(UChilliConnectJson* json)
+{
+	UE_LOG(LogChilliConnect, Log, TEXT("OnSetCurrencyBalanceComplete Processing Response"));
+
+	FSetCurrencyBalanceResponse Response;
+	
+	Response.Key = json->GetJsonObject()->GetStringField("Key");
+	Response.Balance = json->GetJsonObject()->GetIntegerField("Balance");
+	
+	if (!OnSetCurrencyBalanceSuccess.IsBound()) {
+		UE_LOG(LogChilliConnect, Log, TEXT("No SetCurrencyBalanceSuccess Handler Bound"));
+	}
+	else {
+		OnSetCurrencyBalanceSuccess.ExecuteIfBound(Response);
+	}
+}
+
+void
+UChilliConnectSDK::OnGetInventoryComplete(UChilliConnectJson* json)
+{
+	UE_LOG(LogChilliConnect, Log, TEXT("OnGetInventoryComplete Processing Response"));
+
+	FGetInventoryResponse Response;
+	TArray < TSharedPtr < FJsonValue > > Values = json->GetJsonObject()->GetArrayField("Items");
+	for (auto& Value : Values) {
+		TSharedPtr < FJsonObject > JsonObjectValue = Value->AsObject();
+
+		FGetInventoryResponseItem ResponseItem;
+		ResponseItem.ItemID = JsonObjectValue->GetStringField("ItemID");
+		ResponseItem.Key = JsonObjectValue->GetStringField("Key");
+		ResponseItem.Name = JsonObjectValue->GetStringField("Name");
+		
+		if (JsonObjectValue->HasTypedField<EJson::Object>("InstanceData") ) {
+			UChilliConnectJson * ValueJson = NewObject<UChilliConnectJson>();
+			ValueJson->SetJsonObject(JsonObjectValue->GetObjectField("InstanceData"));
+			ResponseItem.InstanceData = ValueJson;
+		}
+		
+		Response.Items.Add(ResponseItem);
+	}
+
+	if (!OnGetInventorySuccess.IsBound()) {
+		UE_LOG(LogChilliConnect, Log, TEXT("No GetInventorySuccess Handler Bound"));
+	}
+	else {
+		OnGetInventorySuccess.ExecuteIfBound(Response);
+	}
+}
+
+void
+UChilliConnectSDK::OnAddInventoryItemComplete(UChilliConnectJson* json)
+{
+	UE_LOG(LogChilliConnect, Log, TEXT("OnAddInventoryItemComplete Processing Response"));
+
+	FAddInventoryItemResponse Response;
+	Response.ItemID = json->GetJsonObject()->GetStringField("ItemID");
+	
+	if (!OnAddInventoryItemSuccess.IsBound()) {
+		UE_LOG(LogChilliConnect, Log, TEXT("No OnAddInventoryItemSuccess Handler Bound"));
+	}
+	else {
+		OnAddInventoryItemSuccess.ExecuteIfBound(Response);
+	}
+}
+
+void
+UChilliConnectSDK::OnRemoveInventoryItemComplete(UChilliConnectJson* json)
+{
+	UE_LOG(LogChilliConnect, Log, TEXT("OnRemoveInventoryItemComplete Processing Response"));
+
+	if (!OnRemoveInventoryItemSuccess.IsBound()) {
+		UE_LOG(LogChilliConnect, Log, TEXT("No OnRemoveInventoryItemSuccess Handler Bound"));
+	}
+	else {
+		OnRemoveInventoryItemSuccess.ExecuteIfBound();
+	}
+}
+
+
+void
+UChilliConnectSDK::OnRedeemGoogleIapComplete(UChilliConnectJson* json)
+{
+	UE_LOG(LogChilliConnect, Log, TEXT("OnRedeemGoogleIapComplete Processing Response"));
+
+	FRedeemIapResponse Response = GetIapResponse(json->GetJsonObject());
+	
+	if (!OnRedeemGoogleIapSuccess.IsBound()) {
+		UE_LOG(LogChilliConnect, Log, TEXT("No OnRedeemGoogleIapComplete Handler Bound"));
+	}
+	else {
+		OnRedeemGoogleIapSuccess.ExecuteIfBound(Response);
+	}
+}
+
+void
+UChilliConnectSDK::OnRedeemAppleIapComplete(UChilliConnectJson* json)
+{
+	UE_LOG(LogChilliConnect, Log, TEXT("OnRedeemAppleIapComplete Processing Response"));
+
+	FRedeemIapResponse Response = GetIapResponse(json->GetJsonObject());
+
+	if (!OnRedeemAppleIapSuccess.IsBound()) {
+		UE_LOG(LogChilliConnect, Log, TEXT("No OnRedeemAppleIapSuccess Handler Bound"));
+	}
+	else {
+		OnRedeemAppleIapSuccess.ExecuteIfBound(Response);
+	}
+}
+
+void
+UChilliConnectSDK::OnRegisterPushTokenComplete(UChilliConnectJson* json)
+{
+	UE_LOG(LogChilliConnect, Log, TEXT("OnRegisterPushTokenComplete Processing Response"));
+
+	if (!OnRegisterPushTokenSuccess.IsBound()) {
+		UE_LOG(LogChilliConnect, Log, TEXT("No OnRegisterPushTokenSuccess Handler Bound"));
+	}
+	else {
+		OnRegisterPushTokenSuccess.ExecuteIfBound();
+	}
+}
+
+void
+UChilliConnectSDK::OnGetMetadataDefinitionsComplete(UChilliConnectJson* json)
+{
+	UE_LOG(LogChilliConnect, Log, TEXT("OnGetMetadataDefinitionsComplete Processing Response"));
+
+	FGetMetadataDefinitionsResponse Response;
+	Response.Total = json->GetJsonObject()->GetIntegerField("Total");
+	Response.Page = json->GetJsonObject()->GetIntegerField("Page");
+	Response.PageSize = json->GetJsonObject()->GetIntegerField("PageSize");
+	
+	TArray < TSharedPtr < FJsonValue > > ItemsJson = json->GetJsonObject()->GetArrayField("Items");
+	for (auto& ItemJson : ItemsJson) {
+
+		TSharedPtr < FJsonObject > JsonMetadataResponseItem = ItemJson->AsObject();
+
+		FGetMetadataDefinitionsResponseItem ResponseItem;
+		ResponseItem.Key = JsonMetadataResponseItem->GetStringField("Key");
+		ResponseItem.Name = JsonMetadataResponseItem->GetStringField("Name");
+
+		if (JsonMetadataResponseItem->HasField("Tags")) {
+			TArray < TSharedPtr < FJsonValue > > TagsJson = JsonMetadataResponseItem->GetArrayField("Tags");
+			for (auto& TagJson : TagsJson) {
+				ResponseItem.Tags.Add(TagJson->AsString());
+			}
+		}
+
+		if (JsonMetadataResponseItem->HasTypedField<EJson::Object>("CustomData")) {
+			UChilliConnectJson * ValueJson = NewObject<UChilliConnectJson>();
+			ValueJson->SetJsonObject(JsonMetadataResponseItem->GetObjectField("CustomData"));
+			ResponseItem.CustomData = ValueJson;
+		}
+
+		Response.Items.Add(ResponseItem);
+	}
+
+	if (!OnGetMetadataDefinitionsSuccess.IsBound()) {
+		UE_LOG(LogChilliConnect, Log, TEXT("No OnGetMetadataDefinitionsSuccess Handler Bound"));
+	}
+	else {
+		OnGetMetadataDefinitionsSuccess.ExecuteIfBound(Response);
+	}
+}
+
+void
+UChilliConnectSDK::OnGetDlcUsingTagsComplete(UChilliConnectJson* json)
+{
+	UE_LOG(LogChilliConnect, Log, TEXT("OnGetDlcUsingTagsComplete Processing Response"));
+
+	FGetDlcUsingTagsResponse Response;
+	
+
+	TArray < TSharedPtr < FJsonValue > > PackagesJson = json->GetJsonObject()->GetArrayField("Packages");
+	for (auto& PackageJson : PackagesJson) {
+
+		TSharedPtr < FJsonObject > PackageJsonItem = PackageJson->AsObject();
+
+		FGetDlcUsingTagsPackageResponse PackageResponseItem;
+		PackageResponseItem.Type = PackageJsonItem->GetStringField("Type");
+		PackageResponseItem.Name = PackageJsonItem->GetStringField("Name");
+		PackageResponseItem.Checksum = PackageJsonItem->GetStringField("Checksum");
+		PackageResponseItem.DateUploaded = PackageJsonItem->GetStringField("DateUploaded");
+		PackageResponseItem.Url = PackageJsonItem->GetStringField("Url");
+		PackageResponseItem.Size = PackageJsonItem->GetIntegerField("Size");
+		
+		if (PackageJsonItem->HasField("Files")) {
+			TArray < TSharedPtr < FJsonValue > > FilesJson = PackageJsonItem->GetArrayField("Files");
+			for (auto& FileJson : FilesJson) {
+
+				TSharedPtr < FJsonObject > FileJsonItem = FileJson->AsObject();
+
+				FGetDlcUsingTagsFileResponse FileResponseItem;
+				FileResponseItem.Name = FileJsonItem->GetStringField("Name");
+				FileResponseItem.Checksum = FileJsonItem->GetStringField("Checksum");
+				FileResponseItem.Size = FileJsonItem->GetIntegerField("Size");
+
+				PackageResponseItem.Files.Add(FileResponseItem);
+			}
+		}
+
+		Response.Packages.Add(PackageResponseItem);
+	}
+
+	if (!OnGetDlcUsingTagsSuccess.IsBound()) {
+		UE_LOG(LogChilliConnect, Log, TEXT("No OnGetDlcUsingTagsSuccess Handler Bound"));
+	}
+	else {
+		OnGetDlcUsingTagsSuccess.ExecuteIfBound(Response);
+	}
+}
+
 TSharedPtr<FJsonObject> 
 UChilliConnectSDK::DeserialiseHttpResponse(FHttpResponsePtr HttpResponse)
 {
@@ -290,4 +761,51 @@ UChilliConnectSDK::DeserialiseHttpResponse(FHttpResponsePtr HttpResponse)
 	}
 
 	return nullptr;
+}
+
+FRedeemIapResponse 
+UChilliConnectSDK::GetIapResponse(TSharedPtr<FJsonObject> Json)
+{
+	FRedeemIapResponse Response;
+	Response.Redeemed = Json->GetBoolField("Redeemed");
+	Response.Status = Json->GetStringField("Status");
+
+	if (Json->HasField("Rewards")) {
+		TSharedPtr < FJsonObject > RewardsJson = Json->GetObjectField("Rewards");
+
+		if (RewardsJson->HasField("Currencies")) {
+			TArray < TSharedPtr < FJsonValue > > CurrencyRewardsJson = RewardsJson->GetArrayField("Currencies");
+			for (auto& CurrencyRewardJson : CurrencyRewardsJson) {
+				TSharedPtr < FJsonObject > JsonObjectValue = CurrencyRewardJson->AsObject();
+
+				FRedeemIapResponseCurrencyReward CurrencyReward;
+				CurrencyReward.Key = JsonObjectValue->GetStringField("Key");
+				CurrencyReward.Name = JsonObjectValue->GetStringField("Name");
+				CurrencyReward.Amount = JsonObjectValue->GetNumberField("Amount");
+
+				Response.Rewards.Currencies.Add(CurrencyReward);
+			}
+		}
+
+		if (RewardsJson->HasField("Items")) {
+			TArray < TSharedPtr < FJsonValue > > InventoryRewardsJson = RewardsJson->GetArrayField("Items");
+			for (auto& InventoryRewardJson : InventoryRewardsJson) {
+				TSharedPtr < FJsonObject > JsonObjectValue = InventoryRewardJson->AsObject();
+
+				FRedeemIapResponseInventoryItemReward InventoryReward;
+				InventoryReward.Key = JsonObjectValue->GetStringField("Key");
+				InventoryReward.Name = JsonObjectValue->GetStringField("Name");
+				InventoryReward.Amount = JsonObjectValue->GetNumberField("Amount");
+
+				TArray < TSharedPtr < FJsonValue > > ItemIDsJson = RewardsJson->GetArrayField("ItemIDs");
+				for (auto& ItemIDJson : ItemIDsJson) {
+					InventoryReward.ItemIDs.Add(ItemIDJson->AsString());
+				}
+
+				Response.Rewards.Items.Add(InventoryReward);
+			}
+		}
+	}
+
+	return Response;
 }
