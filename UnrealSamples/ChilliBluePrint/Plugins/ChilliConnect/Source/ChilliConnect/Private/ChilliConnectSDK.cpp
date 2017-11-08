@@ -407,7 +407,7 @@ UChilliConnectSDK::OnHttpRequestComplete(FHttpRequestPtr Request, FHttpResponseP
 		
 		UE_LOG(LogChilliConnect, Log, TEXT("Request Completed Ok"));
 
-		UChilliConnectJson * ChilliConnectJson = NewObject<UChilliConnectJson>();
+		UChilliConnectJson * ChilliConnectJson = NewObject<UChilliConnectJson>(this);
 		ChilliConnectJson->SetJsonObject(JsonObject);
 
 		if (!OnHttpRequestProcessed.IsBound()) {
