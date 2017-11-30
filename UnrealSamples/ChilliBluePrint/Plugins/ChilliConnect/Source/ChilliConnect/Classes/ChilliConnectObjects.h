@@ -477,3 +477,241 @@ struct FGetDlcUsingTagsResponse
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
 		TArray<FGetDlcUsingTagsPackageResponse> Packages;
 };
+
+
+USTRUCT(BlueprintType)
+struct FGetVirtualPurchaseDefinitionsRequest
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		FString Key;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		TArray<FString> Tags;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		int Page = 1;
+};
+
+USTRUCT(BlueprintType)
+struct FCurrencyDefinition
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		FString Key;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		TArray<FString> Tags;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		FString Name;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		UChilliConnectJson * CustomData;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		int Initial;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		int Max;
+};
+
+USTRUCT(BlueprintType)
+struct FInventoryItemDefinition
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		FString Key;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		TArray<FString> Tags;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		FString Name;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		UChilliConnectJson * CustomData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		int InitialAllocation;
+};
+
+USTRUCT(BlueprintType)
+struct FGetVirtualPurchaseDefinitionsResponseCurrencyExchange
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		FCurrencyDefinition Item;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		int Amount;
+
+};
+
+USTRUCT(BlueprintType)
+struct FGetVirtualPurchaseDefinitionsResponseItemExchange
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		FInventoryItemDefinition Item;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		int Amount;
+};
+
+
+USTRUCT(BlueprintType)
+struct FGetVirtualPurchaseDefinitionExchange
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		TArray<FGetVirtualPurchaseDefinitionsResponseCurrencyExchange> Currencies;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		TArray<FGetVirtualPurchaseDefinitionsResponseItemExchange> Items;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		UChilliConnectJson * CustomData;
+};
+
+
+USTRUCT(BlueprintType)
+struct FGetVirtualPurchaseDefinitionsResponseItem
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		FString Key;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		TArray<FString> Tags;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		FString Name;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		FGetVirtualPurchaseDefinitionExchange Costs;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		FGetVirtualPurchaseDefinitionExchange Rewards;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		UChilliConnectJson * CustomData;
+};
+
+USTRUCT(BlueprintType)
+struct FGetVirtualPurchaseDefinitionsResponse
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+	FString EconomyVersion;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		TArray<FGetVirtualPurchaseDefinitionsResponseItem> Items;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		int Total;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		int Page;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		int PageSize;
+};
+
+USTRUCT(BlueprintType)
+struct FMakeVirtualPurchaseRequest
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		FString Key;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		TArray<FString> ItemIDs;
+};
+
+USTRUCT(BlueprintType)
+struct FMakeVirtualPurchaseCurrencyExchange
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		FString Name;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		FString Key;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		int Amount;
+};
+
+USTRUCT(BlueprintType)
+struct FMakeVirtualPurchaseItemExchange
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		FString Name;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		FString Key;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		int Amount;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+		TArray<FString> ItemIDs;
+};
+
+USTRUCT(BlueprintType)
+struct FMakeVirtualPurchaseExchange
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+	TArray<FMakeVirtualPurchaseCurrencyExchange> Currencies;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+	TArray<FMakeVirtualPurchaseItemExchange> Items;
+};
+
+USTRUCT(BlueprintType)
+struct FMakeVirtualPurchaseResponse
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+	FMakeVirtualPurchaseExchange Costs;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+	FMakeVirtualPurchaseExchange Rewards;
+};
+
+USTRUCT(BlueprintType)
+struct FAddCollectionObjectRequest
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+	FString Key;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+	UChilliConnectJson * Value;
+};
+
+USTRUCT(BlueprintType)
+struct FAddCollectionObjectResponse
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ChilliConnect")
+	FString ObjectID;
+};

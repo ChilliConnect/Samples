@@ -55,8 +55,17 @@ class UChilliConnectSDK : public UOnlineBlueprintCallProxyBase
 	/** Register Push Token */
 	DECLARE_DYNAMIC_DELEGATE(FDelegateOnRegisterPushTokenSuccess);
 
-	/** Get Metadata Definitions */
+	/** Get Dlc */
 	DECLARE_DYNAMIC_DELEGATE_OneParam(FDelegateOnGetDlcUsingTagsSuccess, FGetDlcUsingTagsResponse, onSuccess);
+
+	/** Get Virtual Purchase Definitions */
+	DECLARE_DYNAMIC_DELEGATE_OneParam(FDelegateOnGetVirtualPurchaseDefinitionsSuccess, FGetVirtualPurchaseDefinitionsResponse, onSuccess);
+
+	/** Make Virtual Purchase */
+	DECLARE_DYNAMIC_DELEGATE_OneParam(FDelegateOnMakeVirtualPurchaseSuccess, FMakeVirtualPurchaseResponse, onSuccess);
+
+	/** Add Collection Object */
+	DECLARE_DYNAMIC_DELEGATE_OneParam(FDelegateOnAddCollectionObjectSuccess, FAddCollectionObjectResponse, onSuccess);
 
 	UFUNCTION(BlueprintCallable, Category = "ChilliConnect")
 		static UChilliConnectSDK* CreatePlayer(FCreatePlayerRequest request, FDelegateOnCreatePlayerSuccess onSuccess, FDelegateOnError onError);
@@ -101,6 +110,15 @@ class UChilliConnectSDK : public UOnlineBlueprintCallProxyBase
 		static UChilliConnectSDK* GetDlcUsingTags(FGetDlcUsingTagsRequest Request, FDelegateOnGetDlcUsingTagsSuccess onSuccess, FDelegateOnError onError);
 
 	UFUNCTION(BlueprintCallable, Category = "ChilliConnect")
+		static UChilliConnectSDK* GetVirtualPurchaseDefinitions(FGetVirtualPurchaseDefinitionsRequest Request, FDelegateOnGetVirtualPurchaseDefinitionsSuccess onSuccess, FDelegateOnError onError);
+
+	UFUNCTION(BlueprintCallable, Category = "ChilliConnect")
+		static UChilliConnectSDK* MakeVirtualPurchase(FMakeVirtualPurchaseRequest Request, FDelegateOnMakeVirtualPurchaseSuccess onSuccess, FDelegateOnError onError);
+
+	UFUNCTION(BlueprintCallable, Category = "ChilliConnect")
+		static UChilliConnectSDK* AddCollectionObject(FAddCollectionObjectRequest Request, FDelegateOnAddCollectionObjectSuccess onSuccess, FDelegateOnError onError);
+
+	UFUNCTION(BlueprintCallable, Category = "ChilliConnect")
 		static void SetGameToken(FString GameToken);
 
 	private:
@@ -124,6 +142,9 @@ class UChilliConnectSDK : public UOnlineBlueprintCallProxyBase
 	FDelegateOnGetMetadataDefinitionsSuccess OnGetMetadataDefinitionsSuccess;
 	FDelegateOnRegisterPushTokenSuccess OnRegisterPushTokenSuccess;
 	FDelegateOnGetDlcUsingTagsSuccess OnGetDlcUsingTagsSuccess;
+	FDelegateOnGetVirtualPurchaseDefinitionsSuccess OnGetVirtualPurchaseDefinitionsSuccess;
+	FDelegateOnMakeVirtualPurchaseSuccess OnMakeVirtualPurchaseSuccess;
+	FDelegateOnAddCollectionObjectSuccess OnAddCollectionObjectSuccess;
 
 	FDelegateOnError OnError;
 	
@@ -154,5 +175,8 @@ class UChilliConnectSDK : public UOnlineBlueprintCallProxyBase
 	void OnGetMetadataDefinitionsComplete(UChilliConnectJson* response);
 	void OnRegisterPushTokenComplete(UChilliConnectJson* response);
 	void OnGetDlcUsingTagsComplete(UChilliConnectJson* response);
+	void OnGetVirtualPurchaseDefinitionsComplete(UChilliConnectJson* response);
+	void OnMakeVirtualPurchaseComplete(UChilliConnectJson* response);
+	void OnAddCollectionObjectComplete(UChilliConnectJson* response);
 
 };

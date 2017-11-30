@@ -287,6 +287,38 @@ UChilliConnectSDK::GetMetadataDefinitions(FGetMetadataDefinitionsRequest Request
 	return RequestInstance;
 }
 
+UChilliConnectSDK*
+UChilliConnectSDK::GetVirtualPurchaseDefinitions(FGetVirtualPurchaseDefinitionsRequest Request, FDelegateOnGetVirtualPurchaseDefinitionsSuccess onSuccess, FDelegateOnError onError)
+{
+	UChilliConnectSDK* RequestInstance = NewObject<UChilliConnectSDK>();
+	if (RequestInstance->IsSafeForRootSet()) {
+		RequestInstance->AddToRoot();
+	}
+
+	TSharedPtr<FJsonObject> Json = MakeShareable(new FJsonObject);
+	if (Request.Key.Len() > 0) {
+		Json->SetStringField("Key", Request.Key);
+	}
+
+	if (Request.Tags.Num() > 0) {
+		TArray <TSharedPtr<FJsonValue>> JsonTags;
+		for (auto& Tag : Request.Tags) {
+			JsonTags.Add(MakeShareable(new FJsonValueString(Tag)));
+		}
+
+		Json->SetArrayField("Tags", JsonTags);
+	}
+
+	Json->SetNumberField("Page", Request.Page);
+
+	RequestInstance->RequestBody = GetJsonRequestBody(Json);
+	RequestInstance->OnGetVirtualPurchaseDefinitionsSuccess = onSuccess;
+	RequestInstance->OnError = onError;
+	RequestInstance->OnHttpRequestProcessed.BindUObject(RequestInstance, &UChilliConnectSDK::OnGetVirtualPurchaseDefinitionsComplete);
+	RequestInstance->RequestUrl = TEXT("https://connect.chilliconnect.com/1.0/economy/definitions/virtualpurchase");
+
+	return RequestInstance;
+}
 
 UChilliConnectSDK*
 UChilliConnectSDK::RegisterPushToken(FRegisterPushTokenRequest Request, FDelegateOnRegisterPushTokenSuccess onSuccess, FDelegateOnError onError)
@@ -331,6 +363,55 @@ UChilliConnectSDK::GetDlcUsingTags(FGetDlcUsingTagsRequest Request, FDelegateOnG
 	RequestInstance->OnError = onError;
 	RequestInstance->OnHttpRequestProcessed.BindUObject(RequestInstance, &UChilliConnectSDK::OnGetDlcUsingTagsComplete);
 	RequestInstance->RequestUrl = TEXT("https://connect.chilliconnect.com/1.0/dlc/tag");
+
+	return RequestInstance;
+}
+
+UChilliConnectSDK*
+UChilliConnectSDK::MakeVirtualPurchase(FMakeVirtualPurchaseRequest Request, FDelegateOnMakeVirtualPurchaseSuccess onSuccess, FDelegateOnError onError)
+{
+	UChilliConnectSDK* RequestInstance = NewObject<UChilliConnectSDK>();
+	if (RequestInstance->IsSafeForRootSet()) {
+		RequestInstance->AddToRoot();
+	}
+
+	TSharedPtr<FJsonObject> Json = MakeShareable(new FJsonObject);
+	Json->SetStringField("Key", *Request.Key);
+
+	TArray <TSharedPtr<FJsonValue>> JsonItemIDs;
+	for (auto& ItemId : Request.ItemIDs) {
+		JsonItemIDs.Add(MakeShareable(new FJsonValueString(ItemId)));
+	}
+
+	Json->SetArrayField("ItemIDs", JsonItemIDs);
+	
+	RequestInstance->RequestBody = GetJsonRequestBody(Json);
+	RequestInstance->OnMakeVirtualPurchaseSuccess = onSuccess;
+	RequestInstance->OnError = onError;
+	RequestInstance->OnHttpRequestProcessed.BindUObject(RequestInstance, &UChilliConnectSDK::OnMakeVirtualPurchaseComplete);
+	RequestInstance->RequestUrl = TEXT("https://connect.chilliconnect.com/1.0/economy/purchase/virtual");
+
+	return RequestInstance;
+}
+
+UChilliConnectSDK*
+UChilliConnectSDK::AddCollectionObject(FAddCollectionObjectRequest Request, FDelegateOnAddCollectionObjectSuccess onSuccess, FDelegateOnError onError)
+{
+	UChilliConnectSDK* RequestInstance = NewObject<UChilliConnectSDK>();
+	if (RequestInstance->IsSafeForRootSet()) {
+		RequestInstance->AddToRoot();
+	}
+
+	TSharedPtr<FJsonObject> Json = MakeShareable(new FJsonObject);
+	
+	Json->SetStringField("Key", Request.Key);
+	Json->SetObjectField("Value", Request.Value->GetJsonObject());
+
+	RequestInstance->RequestBody = GetJsonRequestBody(Json);
+	RequestInstance->OnAddCollectionObjectSuccess = onSuccess;
+	RequestInstance->OnError = onError;
+	RequestInstance->OnHttpRequestProcessed.BindUObject(RequestInstance, &UChilliConnectSDK::OnAddCollectionObjectComplete);
+	RequestInstance->RequestUrl = TEXT("https://connect.chilliconnect.com/1.0/data/collection/object/add");
 
 	return RequestInstance;
 }
@@ -648,6 +729,22 @@ UChilliConnectSDK::OnRedeemAppleIapComplete(UChilliConnectJson* json)
 }
 
 void
+UChilliConnectSDK::OnAddCollectionObjectComplete(UChilliConnectJson* json)
+{
+	UE_LOG(LogChilliConnect, Log, TEXT("OnAddCollectionObjectComplete Processing Response"));
+
+	FAddCollectionObjectResponse Response;
+	Response.ObjectID = json->GetString("ObjectID");
+
+	if (!OnAddCollectionObjectSuccess.IsBound()) {
+		UE_LOG(LogChilliConnect, Log, TEXT("No OnAddCollectionObjectSuccess Handler Bound"));
+	}
+	else {
+		OnAddCollectionObjectSuccess.ExecuteIfBound(Response);
+	}
+}
+
+void
 UChilliConnectSDK::OnRegisterPushTokenComplete(UChilliConnectJson* json)
 {
 	UE_LOG(LogChilliConnect, Log, TEXT("OnRegisterPushTokenComplete Processing Response"));
@@ -700,6 +797,263 @@ UChilliConnectSDK::OnGetMetadataDefinitionsComplete(UChilliConnectJson* json)
 	}
 	else {
 		OnGetMetadataDefinitionsSuccess.ExecuteIfBound(Response);
+	}
+}
+
+void
+UChilliConnectSDK::OnGetVirtualPurchaseDefinitionsComplete(UChilliConnectJson* json)
+{
+	UE_LOG(LogChilliConnect, Log, TEXT("OnGetVirtualPurchaseDefinitionsComplete Processing Response"));
+
+	FGetVirtualPurchaseDefinitionsResponse Response;
+	Response.Total = json->GetJsonObject()->GetIntegerField("Total");
+	Response.Page = json->GetJsonObject()->GetIntegerField("Page");
+	Response.PageSize = json->GetJsonObject()->GetIntegerField("PageSize");
+
+	TArray < TSharedPtr < FJsonValue > > ItemsJson = json->GetJsonObject()->GetArrayField("Items");
+	for (auto& ItemJson : ItemsJson) {
+
+		TSharedPtr < FJsonObject > JsonVirtualPurcahseResponseItem = ItemJson->AsObject();
+
+		FGetVirtualPurchaseDefinitionsResponseItem ResponseItem;
+		ResponseItem.Key = JsonVirtualPurcahseResponseItem->GetStringField("Key");
+		ResponseItem.Name = JsonVirtualPurcahseResponseItem->GetStringField("Name");
+
+		if (JsonVirtualPurcahseResponseItem->HasField("Tags")) {
+			TArray < TSharedPtr < FJsonValue > > TagsJson = JsonVirtualPurcahseResponseItem->GetArrayField("Tags");
+			for (auto& TagJson : TagsJson) {
+				ResponseItem.Tags.Add(TagJson->AsString());
+			}
+		}
+
+		if (JsonVirtualPurcahseResponseItem->HasTypedField<EJson::Object>("CustomData")) {
+			UChilliConnectJson * ValueJson = NewObject<UChilliConnectJson>();
+			ValueJson->SetJsonObject(JsonVirtualPurcahseResponseItem->GetObjectField("CustomData"));
+			ResponseItem.CustomData = ValueJson;
+		}
+
+
+		TSharedPtr < FJsonObject > CostsJson = JsonVirtualPurcahseResponseItem->GetObjectField("Costs");
+		
+		// Currency Costs
+		TArray < TSharedPtr < FJsonValue > > CurrencyCosts = CostsJson->GetArrayField("Currencies");
+		for (auto& CurrencyCostsJson : CurrencyCosts) {
+			TSharedPtr < FJsonObject > JsonObjectValue = CurrencyCostsJson->AsObject();
+				
+			FGetVirtualPurchaseDefinitionsResponseCurrencyExchange CurrencyCost;
+
+			CurrencyCost.Amount = JsonObjectValue->GetIntegerField("Amount");
+
+			TSharedPtr < FJsonObject > ItemJson = JsonObjectValue->GetObjectField("Item");
+
+			CurrencyCost.Item.Key = ItemJson->GetStringField("Key");
+			CurrencyCost.Item.Name = ItemJson->GetStringField("Name");
+			CurrencyCost.Item.Initial = ItemJson->GetNumberField("Initial");
+			CurrencyCost.Item.Max = ItemJson->GetNumberField("Max");
+
+
+			if (ItemJson->HasField("Tags")) {
+				TArray < TSharedPtr < FJsonValue > > TagsJson = ItemJson->GetArrayField("Tags");
+				for (auto& TagJson : TagsJson) {
+					CurrencyCost.Item.Tags.Add(TagJson->AsString());
+				}
+			}
+
+			if (ItemJson->HasTypedField<EJson::Object>("CustomData")) {
+				UChilliConnectJson * ValueJson = NewObject<UChilliConnectJson>();
+				ValueJson->SetJsonObject(ItemJson->GetObjectField("CustomData"));
+				ResponseItem.CustomData = ValueJson;
+			}
+
+			ResponseItem.Costs.Currencies.Add(CurrencyCost);
+		}
+		
+		// Item Costs
+		TArray < TSharedPtr < FJsonValue > > ItemCosts = CostsJson->GetArrayField("Items");
+		for (auto& ItemCostsJson : ItemCosts) {
+			TSharedPtr < FJsonObject > JsonObjectValue = ItemCostsJson->AsObject();
+
+			FGetVirtualPurchaseDefinitionsResponseItemExchange ItemCost;
+
+			ItemCost.Amount = JsonObjectValue->GetIntegerField("Amount");
+
+			TSharedPtr < FJsonObject > ItemJson = JsonObjectValue->GetObjectField("Item");
+
+			ItemCost.Item.Key = ItemJson->GetStringField("Key");
+			ItemCost.Item.Name = ItemJson->GetStringField("Name");
+			ItemCost.Item.InitialAllocation = ItemJson->GetNumberField("InitialAllocation");
+			
+			if (ItemJson->HasField("Tags")) {
+				TArray < TSharedPtr < FJsonValue > > TagsJson = ItemJson->GetArrayField("Tags");
+				for (auto& TagJson : TagsJson) {
+					ItemCost.Item.Tags.Add(TagJson->AsString());
+				}
+			}
+
+			if (ItemJson->HasTypedField<EJson::Object>("CustomData")) {
+				UChilliConnectJson * ValueJson = NewObject<UChilliConnectJson>();
+				ValueJson->SetJsonObject(ItemJson->GetObjectField("CustomData"));
+				ResponseItem.CustomData = ValueJson;
+			}
+
+			ResponseItem.Costs.Items.Add(ItemCost);
+		}
+
+		TSharedPtr < FJsonObject > RewardsJson = JsonVirtualPurcahseResponseItem->GetObjectField("Rewards");
+
+		// Currency Rewards
+		TArray < TSharedPtr < FJsonValue > > CurrencyRewards = RewardsJson->GetArrayField("Currencies");
+		for (auto& CurrencyRewardsJson : CurrencyRewards) {
+			TSharedPtr < FJsonObject > JsonObjectValue = CurrencyRewardsJson->AsObject();
+
+			FGetVirtualPurchaseDefinitionsResponseCurrencyExchange CurrencyReward;
+
+			CurrencyReward.Amount = JsonObjectValue->GetIntegerField("Amount");
+
+			TSharedPtr < FJsonObject > ItemJson = JsonObjectValue->GetObjectField("Item");
+
+			CurrencyReward.Item.Key = ItemJson->GetStringField("Key");
+			CurrencyReward.Item.Name = ItemJson->GetStringField("Name");
+			CurrencyReward.Item.Initial = ItemJson->GetNumberField("Initial");
+			CurrencyReward.Item.Max = ItemJson->GetNumberField("Max");
+
+			if (ItemJson->HasField("Tags")) {
+				TArray < TSharedPtr < FJsonValue > > TagsJson = ItemJson->GetArrayField("Tags");
+				for (auto& TagJson : TagsJson) {
+					CurrencyReward.Item.Tags.Add(TagJson->AsString());
+				}
+			}
+
+			if (ItemJson->HasTypedField<EJson::Object>("CustomData")) {
+				UChilliConnectJson * ValueJson = NewObject<UChilliConnectJson>();
+				ValueJson->SetJsonObject(ItemJson->GetObjectField("CustomData"));
+				CurrencyReward.Item.CustomData = ValueJson;
+			}
+
+			ResponseItem.Rewards.Currencies.Add(CurrencyReward);
+		}
+
+		// Item Rewards
+		TArray < TSharedPtr < FJsonValue > > ItemRewards = RewardsJson->GetArrayField("Items");
+		for (auto& ItemRewardsJson : ItemRewards) {
+			TSharedPtr < FJsonObject > JsonObjectValue = ItemRewardsJson->AsObject();
+
+			FGetVirtualPurchaseDefinitionsResponseItemExchange ItemReward;
+
+			ItemReward.Amount = JsonObjectValue->GetIntegerField("Amount");
+
+			TSharedPtr < FJsonObject > ItemJson = JsonObjectValue->GetObjectField("Item");
+
+			ItemReward.Item.Key = ItemJson->GetStringField("Key");
+			ItemReward.Item.Name = ItemJson->GetStringField("Name");
+			ItemReward.Item.InitialAllocation = ItemJson->GetNumberField("InitialAllocation");
+
+			if (ItemJson->HasField("Tags")) {
+				TArray < TSharedPtr < FJsonValue > > TagsJson = ItemJson->GetArrayField("Tags");
+				for (auto& TagJson : TagsJson) {
+					ItemReward.Item.Tags.Add(TagJson->AsString());
+				}
+			}
+
+			if (ItemJson->HasTypedField<EJson::Object>("CustomData")) {
+				UChilliConnectJson * ValueJson = NewObject<UChilliConnectJson>();
+				ValueJson->SetJsonObject(ItemJson->GetObjectField("CustomData"));
+				ResponseItem.CustomData = ValueJson;
+			}
+
+			ResponseItem.Rewards.Items.Add(ItemReward);
+		}
+
+		Response.Items.Add(ResponseItem);
+	}
+
+	if (!OnGetVirtualPurchaseDefinitionsSuccess.IsBound()) {
+		UE_LOG(LogChilliConnect, Log, TEXT("No OnGetVirtualPurchaseDefinitionsSuccess Handler Bound"));
+	}
+	else {
+		OnGetVirtualPurchaseDefinitionsSuccess.ExecuteIfBound(Response);
+	}
+}
+
+void
+UChilliConnectSDK::OnMakeVirtualPurchaseComplete(UChilliConnectJson* json)
+{
+	UE_LOG(LogChilliConnect, Log, TEXT("OnMakeVirtualPurchaseComplete Processing Response"));
+
+	FMakeVirtualPurchaseResponse Response;
+	
+	TSharedPtr < FJsonObject > CostsJson = json->GetJsonObject()->GetObjectField("Costs");
+	TSharedPtr < FJsonObject > RewardsJson = json->GetJsonObject()->GetObjectField("Rewards");
+
+	// Currency costs
+	TArray < TSharedPtr < FJsonValue > > CurrencyCosts = CostsJson->GetArrayField("Currencies");
+	for (auto& CurrencyCostsJson : CurrencyCosts) {
+		TSharedPtr < FJsonObject > JsonObjectValue = CurrencyCostsJson->AsObject();
+		
+		FMakeVirtualPurchaseCurrencyExchange CurrencyCost;
+		CurrencyCost.Key = JsonObjectValue->GetStringField("Key");
+		CurrencyCost.Name = JsonObjectValue->GetStringField("Name");
+		CurrencyCost.Amount = JsonObjectValue->GetNumberField("Amount");
+
+		Response.Costs.Currencies.Add(CurrencyCost);
+	}
+
+	// Item costs
+	TArray < TSharedPtr < FJsonValue > > ItemCosts = CostsJson->GetArrayField("Items");
+	for (auto& ItemCostJson : ItemCosts) {
+		TSharedPtr < FJsonObject > JsonObjectValue = ItemCostJson->AsObject();
+
+		FMakeVirtualPurchaseItemExchange ItemCost;
+		ItemCost.Key = JsonObjectValue->GetStringField("Key");
+		ItemCost.Name = JsonObjectValue->GetStringField("Name");
+		ItemCost.Amount = JsonObjectValue->GetNumberField("Amount");
+		if (JsonObjectValue->HasField("ItemIDs")) {
+			TArray < TSharedPtr < FJsonValue > > ItemIdsJson = JsonObjectValue->GetArrayField("ItemIDs");
+			for (auto& ItemIdJson : ItemIdsJson) {
+				ItemCost.ItemIDs.Add(ItemIdJson->AsString());
+			}
+		}
+		Response.Costs.Items.Add(ItemCost);
+	}
+
+
+	// Currency Rewards
+	TArray < TSharedPtr < FJsonValue > > CurrencyRewards = RewardsJson->GetArrayField("Currencies");
+	for (auto& CurrencyRewardsJson : CurrencyRewards) {
+		TSharedPtr < FJsonObject > JsonObjectValue = CurrencyRewardsJson->AsObject();
+
+		FMakeVirtualPurchaseCurrencyExchange CurrencyReward;
+		CurrencyReward.Key = JsonObjectValue->GetStringField("Key");
+		CurrencyReward.Name = JsonObjectValue->GetStringField("Name");
+		CurrencyReward.Amount = JsonObjectValue->GetNumberField("Amount");
+
+		Response.Rewards.Currencies.Add(CurrencyReward);
+	}
+
+	// Item Rewards
+	TArray < TSharedPtr < FJsonValue > > ItemRewards = RewardsJson->GetArrayField("Items");
+	for (auto& ItemRewardsJson : ItemRewards) {
+		TSharedPtr < FJsonObject > JsonObjectValue = ItemRewardsJson->AsObject();
+
+		FMakeVirtualPurchaseItemExchange ItemReward;
+		ItemReward.Key = JsonObjectValue->GetStringField("Key");
+		ItemReward.Name = JsonObjectValue->GetStringField("Name");
+		ItemReward.Amount = JsonObjectValue->GetNumberField("Amount");
+		if (JsonObjectValue->HasField("ItemIDs")) {
+			TArray < TSharedPtr < FJsonValue > > ItemIdsJson = JsonObjectValue->GetArrayField("ItemIDs");
+			for (auto& ItemIdJson : ItemIdsJson) {
+				ItemReward.ItemIDs.Add(ItemIdJson->AsString());
+			}
+		}
+		Response.Rewards.Items.Add(ItemReward);
+	}
+
+
+	if (!OnMakeVirtualPurchaseSuccess.IsBound()) {
+		UE_LOG(LogChilliConnect, Log, TEXT("No OnMakeVirtualPurchaseSuccess Handler Bound"));
+	}
+	else {
+		OnMakeVirtualPurchaseSuccess.ExecuteIfBound(Response);
 	}
 }
 
