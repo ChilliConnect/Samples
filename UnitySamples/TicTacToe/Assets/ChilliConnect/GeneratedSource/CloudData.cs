@@ -223,6 +223,67 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
+		/// Returns the Attachment data for a specified identifier.
+		/// </summary>
+		///
+		/// <param name="key">The Custom Data Key to get the Attachment for.</param>
+		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
+		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
+		/// a container with information on what went wrong.</param>
+		public void GetPlayerDataAttachment(string key, Action<GetPlayerDataAttachmentRequest, GetPlayerDataAttachmentResponse> successCallback, Action<GetPlayerDataAttachmentRequest, GetPlayerDataAttachmentError> errorCallback)
+		{
+			m_logging.LogVerboseMessage("Sending Get Player Data Attachment request.");
+			
+            var connectAccessToken = m_dataStore.GetString("UserAccessToken");
+			var request = new GetPlayerDataAttachmentRequest(key, connectAccessToken);
+	
+			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
+			{
+				ReleaseAssert.IsTrue(request == sentRequest, "Received request is not the same as the one sent!");
+				
+				if (serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode)
+				{
+					NotifyGetPlayerDataAttachmentSuccess(serverResponse, request, successCallback);
+				} 
+				else 
+				{
+					NotifyGetPlayerDataAttachmentError(serverResponse, request, errorCallback);
+				}
+			});
+		}
+		
+		/// <summary>
+		/// Returns the Attachment data for an identifier, or a specified Player.
+		/// </summary>
+		///
+		/// <param name="chilliConnectId">ChillIConnectID for the player.</param>
+		/// <param name="key">The Custom Data Key to get the Attachment for.</param>
+		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
+		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
+		/// a container with information on what went wrong.</param>
+		public void GetPlayerDataAttachmentForChilliConnectId(string chilliConnectId, string key, Action<GetPlayerDataAttachmentForChilliConnectIdRequest, GetPlayerDataAttachmentForChilliConnectIdResponse> successCallback, Action<GetPlayerDataAttachmentForChilliConnectIdRequest, GetPlayerDataAttachmentForChilliConnectIdError> errorCallback)
+		{
+			m_logging.LogVerboseMessage("Sending Get Player Data Attachment For Chilli Connect Id request.");
+			
+            var connectAccessToken = m_dataStore.GetString("UserAccessToken");
+			var request = new GetPlayerDataAttachmentForChilliConnectIdRequest(chilliConnectId, key, connectAccessToken);
+	
+			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
+			{
+				ReleaseAssert.IsTrue(request == sentRequest, "Received request is not the same as the one sent!");
+				
+				if (serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode)
+				{
+					NotifyGetPlayerDataAttachmentForChilliConnectIdSuccess(serverResponse, request, successCallback);
+				} 
+				else 
+				{
+					NotifyGetPlayerDataAttachmentForChilliConnectIdError(serverResponse, request, errorCallback);
+				}
+			});
+		}
+		
+		/// <summary>
 		/// Returns a list of Collection Objects identified by their ObjectID.
 		/// </summary>
 		///
@@ -475,6 +536,48 @@ namespace ChilliConnect
 			m_taskScheduler.ScheduleMainThreadTask(() =>
 			{
 				successCallback(request);
+			});
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Get Player Data Attachment request was successful.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// successful responses can be passed into this method.</param>
+		/// <param name="request"> The request that was sent to the server.</param>
+		/// <param name="callback">The success callback.</param>
+		private void NotifyGetPlayerDataAttachmentSuccess(ServerResponse serverResponse, GetPlayerDataAttachmentRequest request, Action<GetPlayerDataAttachmentRequest, GetPlayerDataAttachmentResponse> successCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode, "Input server request must describe a success.");
+			
+			m_logging.LogVerboseMessage("GetPlayerDataAttachment request succeeded.");
+	
+			GetPlayerDataAttachmentResponse outputResponse = new GetPlayerDataAttachmentResponse(serverResponse.Body);
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				successCallback(request, outputResponse);
+			});
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Get Player Data Attachment For Chilli Connect Id request was successful.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// successful responses can be passed into this method.</param>
+		/// <param name="request"> The request that was sent to the server.</param>
+		/// <param name="callback">The success callback.</param>
+		private void NotifyGetPlayerDataAttachmentForChilliConnectIdSuccess(ServerResponse serverResponse, GetPlayerDataAttachmentForChilliConnectIdRequest request, Action<GetPlayerDataAttachmentForChilliConnectIdRequest, GetPlayerDataAttachmentForChilliConnectIdResponse> successCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode, "Input server request must describe a success.");
+			
+			m_logging.LogVerboseMessage("GetPlayerDataAttachmentForChilliConnectId request succeeded.");
+	
+			GetPlayerDataAttachmentForChilliConnectIdResponse outputResponse = new GetPlayerDataAttachmentForChilliConnectIdResponse(serverResponse.Body);
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				successCallback(request, outputResponse);
 			});
 		}
 		
@@ -736,6 +839,70 @@ namespace ChilliConnect
 			}
 			
 			DeletePlayerDataError error = new DeletePlayerDataError(serverResponse);	
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				errorCallback(request, error);
+			});	
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Get Player Data Attachment request has failed.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// failed responses can be passed into this method.</param>
+		/// <param name="request"> The request that was sent to the server.</param>
+		/// <param name="callback">The error callback.</param>
+		private void NotifyGetPlayerDataAttachmentError(ServerResponse serverResponse, GetPlayerDataAttachmentRequest request, Action<GetPlayerDataAttachmentRequest, GetPlayerDataAttachmentError> errorCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result != HttpResult.Success || serverResponse.HttpResponseCode != SuccessHttpResponseCode, "Input server request must describe an error.");
+			
+			switch (serverResponse.Result) 
+			{
+				case HttpResult.Success:
+					m_logging.LogVerboseMessage("Get Player Data Attachment request failed with http response code: " + serverResponse.HttpResponseCode);
+					break;
+				case HttpResult.CouldNotConnect:
+					m_logging.LogVerboseMessage("Get Player Data Attachment request failed becuase a connection could be established.");
+					break;
+				default:
+					m_logging.LogVerboseMessage("Get Player Data Attachment request failed for an unknown reason.");
+					throw new ArgumentException("Invalid value for server response result.");
+			}
+			
+			GetPlayerDataAttachmentError error = new GetPlayerDataAttachmentError(serverResponse);	
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				errorCallback(request, error);
+			});	
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Get Player Data Attachment For Chilli Connect Id request has failed.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// failed responses can be passed into this method.</param>
+		/// <param name="request"> The request that was sent to the server.</param>
+		/// <param name="callback">The error callback.</param>
+		private void NotifyGetPlayerDataAttachmentForChilliConnectIdError(ServerResponse serverResponse, GetPlayerDataAttachmentForChilliConnectIdRequest request, Action<GetPlayerDataAttachmentForChilliConnectIdRequest, GetPlayerDataAttachmentForChilliConnectIdError> errorCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result != HttpResult.Success || serverResponse.HttpResponseCode != SuccessHttpResponseCode, "Input server request must describe an error.");
+			
+			switch (serverResponse.Result) 
+			{
+				case HttpResult.Success:
+					m_logging.LogVerboseMessage("Get Player Data Attachment For Chilli Connect Id request failed with http response code: " + serverResponse.HttpResponseCode);
+					break;
+				case HttpResult.CouldNotConnect:
+					m_logging.LogVerboseMessage("Get Player Data Attachment For Chilli Connect Id request failed becuase a connection could be established.");
+					break;
+				default:
+					m_logging.LogVerboseMessage("Get Player Data Attachment For Chilli Connect Id request failed for an unknown reason.");
+					throw new ArgumentException("Invalid value for server response result.");
+			}
+			
+			GetPlayerDataAttachmentForChilliConnectIdError error = new GetPlayerDataAttachmentForChilliConnectIdError(serverResponse);	
 			m_taskScheduler.ScheduleMainThreadTask(() =>
 			{
 				errorCallback(request, error);

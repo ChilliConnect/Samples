@@ -61,6 +61,11 @@ namespace ChilliConnect
         public string FacebookName { get; set; }
 	
 		/// <summary>
+		/// The player's Facebook profile image URL.
+		/// </summary>
+        public string FacebookProfileImage { get; set; }
+	
+		/// <summary>
 		/// Date that indicates when the score was recorded (UTC). Format: ISO8601 e.g.
 		/// 2016-01-12T11:08:23.
 		/// </summary>
@@ -97,20 +102,23 @@ namespace ChilliConnect
 		///
 		/// <param name="chilliConnectId">The ChilliConnectID of the player.</param>
 		/// <param name="facebookName">The player's FacebookName.</param>
+		/// <param name="facebookProfileImage">The player's Facebook profile image URL.</param>
 		/// <param name="date">Date that indicates when the score was recorded (UTC). Format: ISO8601 e.g.
 		/// 2016-01-12T11:08:23.</param>
 		/// <param name="score">The player's score.</param>
 		/// <param name="globalRank">The player's rank within the global leaderboard.</param>
 		/// <param name="globalTotal">The total number of scores within the the global leaderboard.</param>
 		/// <param name="localRank">The player's rank within the results returned.</param>
-		public FacebookScoreDesc(string chilliConnectId, string facebookName, DateTime date, int score, int globalRank, int globalTotal, int localRank)
+		public FacebookScoreDesc(string chilliConnectId, string facebookName, string facebookProfileImage, DateTime date, int score, int globalRank, int globalTotal, int localRank)
 		{
 			ReleaseAssert.IsNotNull(chilliConnectId, "Chilli Connect Id cannot be null.");
 			ReleaseAssert.IsNotNull(facebookName, "Facebook Name cannot be null.");
+			ReleaseAssert.IsNotNull(facebookProfileImage, "Facebook Profile Image cannot be null.");
 			ReleaseAssert.IsNotNull(date, "Date cannot be null.");
 	
             ChilliConnectId = chilliConnectId;
             FacebookName = facebookName;
+            FacebookProfileImage = facebookProfileImage;
             Date = date;
             Score = score;
             GlobalRank = globalRank;

@@ -272,14 +272,6 @@ namespace ChilliConnect
                         Rewards = new MessageReward((IDictionary<string, object>)entry.Value);	
                     }
 				}
-	
-				// An error has occurred.
-				else
-				{
-#if DEBUG
-					throw new ArgumentException("Input Json contains an invalid field.");
-#endif
-				}
 			}
 		}
 

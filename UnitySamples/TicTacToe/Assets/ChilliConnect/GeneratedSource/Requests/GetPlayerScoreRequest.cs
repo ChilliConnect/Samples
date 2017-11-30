@@ -75,7 +75,7 @@ namespace ChilliConnect
             Key = key;
             ConnectAccessToken = connectAccessToken;
 			
-			Url = "https://connect.chilliconnect.com/1.0/leaderboard/scores/player";
+			Url = "https://test-connect.chilliconnect.com/1.0/leaderboard/scores/player";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

@@ -62,7 +62,7 @@ namespace ChilliConnect
         public string Type { get; private set; }
 	
 		/// <summary>
-		/// Date that indicates the local, device time that the event occurred. Format:
+		/// Date that indicates the local device time that the event occurred. Format:
 		/// ISO8601 e.g. 2016-01-12T11:08:23.
 		/// </summary>
         public DateTime Date { get; private set; }
@@ -116,7 +116,7 @@ namespace ChilliConnect
             MetricsAccessToken = metricsAccessToken;
 			Date = DateTime.Now;
 	
-			Url = "https://metrics.chilliconnect.com/1.0/events/add";
+			Url = "https://test-metrics.chilliconnect.com/1.0/events/add";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

@@ -86,7 +86,7 @@ namespace ChilliConnect
             WriteLock = desc.WriteLock;
             ConnectAccessToken = connectAccessToken;
 	
-			Url = "https://connect.chilliconnect.com/1.0/economy/inventory/remove";
+			Url = "https://test-connect.chilliconnect.com/1.0/economy/inventory/remove";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

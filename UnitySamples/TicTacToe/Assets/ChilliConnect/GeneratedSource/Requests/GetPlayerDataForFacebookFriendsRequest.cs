@@ -84,7 +84,7 @@ namespace ChilliConnect
             IncludeMe = desc.IncludeMe;
             ConnectAccessToken = connectAccessToken;
 	
-			Url = "https://connect.chilliconnect.com/1.0/data/player/get/facebook";
+			Url = "https://test-connect.chilliconnect.com/1.0/data/player/get/facebook";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

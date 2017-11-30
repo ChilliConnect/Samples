@@ -109,7 +109,7 @@ namespace ChilliConnect
             PurchaseDataSignature = purchaseDataSignature;
             ConnectAccessToken = connectAccessToken;
 			
-			Url = "https://connect.chilliconnect.com/1.0/economy/purchase/redeem/google";
+			Url = "https://test-connect.chilliconnect.com/1.0/economy/purchase/redeem/google";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

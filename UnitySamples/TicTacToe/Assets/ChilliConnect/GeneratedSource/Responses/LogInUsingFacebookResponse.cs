@@ -48,6 +48,11 @@ namespace ChilliConnect
         public string ChilliConnectSecret { get; private set; }
 	
 		/// <summary>
+		/// The Economy Version.
+		/// </summary>
+        public string EconomyVersion { get; private set; }
+	
+		/// <summary>
 		/// The player's Facebook account ID.
 		/// </summary>
         public string FacebookId { get; private set; }
@@ -86,6 +91,16 @@ namespace ChilliConnect
                     ChilliConnectSecret = (string)entry.Value;
 				}
 		
+				// Economy Version
+				else if (entry.Key == "EconomyVersion")
+				{
+					if (entry.Value != null)
+					{
+                        ReleaseAssert.IsTrue(entry.Value is string, "Invalid serialised type.");
+                        EconomyVersion = (string)entry.Value;
+                    }
+				}
+		
 				// Facebook Id
 				else if (entry.Key == "FacebookID")
 				{
@@ -106,12 +121,10 @@ namespace ChilliConnect
 					//Do nothing
 				}
 	
-				// An error has occurred.
-				else
+				// Metrics Access Token
+				else if (entry.Key == "MetricsAccessToken")
 				{
-#if DEBUG
-					throw new ArgumentException("Input Json contains an invalid field.");
-#endif
+					//Do nothing
 				}
 			}
 		}

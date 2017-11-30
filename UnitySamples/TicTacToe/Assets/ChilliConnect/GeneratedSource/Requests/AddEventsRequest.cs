@@ -75,7 +75,7 @@ namespace ChilliConnect
             Events = Mutability.ToImmutable(events);
             MetricsAccessToken = metricsAccessToken;
 			
-			Url = "https://metrics.chilliconnect.com/1.0/events/batch";
+			Url = "https://test-metrics.chilliconnect.com/1.0/events/batch";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

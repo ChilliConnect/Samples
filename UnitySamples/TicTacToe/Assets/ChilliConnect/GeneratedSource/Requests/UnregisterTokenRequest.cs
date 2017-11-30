@@ -87,7 +87,7 @@ namespace ChilliConnect
             DeviceToken = deviceToken;
             ConnectAccessToken = connectAccessToken;
 			
-			Url = "https://connect.chilliconnect.com/1.0/push/unregister";
+			Url = "https://test-connect.chilliconnect.com/1.0/push/unregister";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

@@ -91,7 +91,7 @@ namespace ChilliConnect
             IncludeMe = desc.IncludeMe;
             ConnectAccessToken = connectAccessToken;
 	
-			Url = "https://connect.chilliconnect.com/1.0/data/player/get/chilli";
+			Url = "https://test-connect.chilliconnect.com/1.0/data/player/get/chilli";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

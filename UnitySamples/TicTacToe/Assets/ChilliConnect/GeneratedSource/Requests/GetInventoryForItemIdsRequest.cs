@@ -75,7 +75,7 @@ namespace ChilliConnect
             ItemIds = Mutability.ToImmutable(itemIds);
             ConnectAccessToken = connectAccessToken;
 			
-			Url = "https://connect.chilliconnect.com/1.0/economy/inventory/get/items";
+			Url = "https://test-connect.chilliconnect.com/1.0/economy/inventory/get/items";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

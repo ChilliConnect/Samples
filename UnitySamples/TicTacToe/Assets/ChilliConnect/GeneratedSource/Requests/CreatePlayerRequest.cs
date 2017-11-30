@@ -77,9 +77,32 @@ namespace ChilliConnect
 	
 		/// <summary>
 		/// Password to be assigned to the new player account. If provided must be greater
-		/// than 3 and less than 50 characters in length.
+		/// than 6 and less than 50 characters in length.
 		/// </summary>
         public string Password { get; private set; }
+	
+		/// <summary>
+		/// Country of the player. Must be two letter country code ISO 3166-1 alpha-2. E.g.
+		/// GB. If not provided, will be automatically populated.
+		/// </summary>
+        public string Country { get; private set; }
+	
+		/// <summary>
+		/// Model of device being used by the player. E.g. SamsungABC123.
+		/// </summary>
+        public string DeviceModel { get; private set; }
+	
+		/// <summary>
+		/// Type of device being used by the player. Accepted values: PHONE, TABLET, BROWSER,
+		/// DESKTOP, OTHER.
+		/// </summary>
+        public string DeviceType { get; private set; }
+	
+		/// <summary>
+		/// Platform of the device being used by the player. Accepted values: ANDROID, IOS,
+		/// KINDLE, WINDOWS, MACOS, LINUX, OTHER.
+		/// </summary>
+        public string Platform { get; private set; }
 
 		/// <summary>
 		/// Initialises a new instance of the request with the given description.
@@ -98,9 +121,23 @@ namespace ChilliConnect
             DisplayName = desc.DisplayName;
             Email = desc.Email;
             Password = desc.Password;
+            Country = desc.Country;
+            DeviceModel = desc.DeviceModel;
+            if (desc.DeviceType == null)
+			{
+                DeviceType = DeviceTypeDefaultProvider.GetDefault();
+            } else {
+            	DeviceType = desc.DeviceType;
+            }
+            if (desc.Platform == null)
+			{
+                Platform = PlatformDefaultProvider.GetDefault();
+            } else {
+            	Platform = desc.Platform;
+            }
             GameToken = gameToken;
 	
-			Url = "https://connect.chilliconnect.com/1.0/player/create";
+			Url = "https://test-connect.chilliconnect.com/1.0/player/create";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 
@@ -154,6 +191,30 @@ namespace ChilliConnect
             if (Password != null)
 			{
 				dictionary.Add("Password", Password);
+            }
+			
+			// Country
+            if (Country != null)
+			{
+				dictionary.Add("Country", Country);
+            }
+			
+			// Device Model
+            if (DeviceModel != null)
+			{
+				dictionary.Add("DeviceModel", DeviceModel);
+            }
+			
+			// Device Type
+            if (DeviceType != null)
+			{
+				dictionary.Add("DeviceType", DeviceType);
+            }
+			
+			// Platform
+            if (Platform != null)
+			{
+				dictionary.Add("Platform", Platform);
             }
 	
 			return dictionary;

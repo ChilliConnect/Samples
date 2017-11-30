@@ -62,6 +62,11 @@ namespace ChilliConnect
 			InvalidGameToken = 1001,
 	
 			/// <summary>
+			/// Trial Expired. Trial Period Expired
+			/// </summary>
+			TrialExpired = 1013,
+	
+			/// <summary>
 			/// Invalid Request. One of more of the provided fields were not correctly formatted.
 			/// The data property of the response body will contain specific error messages for
 			/// each field.
@@ -169,6 +174,9 @@ namespace ChilliConnect
 				case 1001:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
 					return Error.InvalidGameToken;		
+				case 1013:
+					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
+					return Error.TrialExpired;		
 				case 1007:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 422, @"Invalid HTTP response code for error code.");
 					return Error.InvalidRequest;		
@@ -216,6 +224,8 @@ namespace ChilliConnect
 					return "A connection could not be established.";
 				case Error.InvalidGameToken:
 					return "Invalid Game Token. The provided Game-Token was not recognised.";
+				case Error.TrialExpired:
+					return "Trial Expired. Trial Period Expired";
 				case Error.InvalidRequest:
 					return "Invalid Request. One of more of the provided fields were not correctly formatted."
 						+ " The data property of the response body will contain specific error messages for"

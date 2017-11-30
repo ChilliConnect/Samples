@@ -80,7 +80,7 @@ namespace ChilliConnect
 			}
             ConnectAccessToken = connectAccessToken;
 	
-			Url = "https://connect.chilliconnect.com/1.0/economy/currency/balance/get";
+			Url = "https://test-connect.chilliconnect.com/1.0/economy/currency/balance/get";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

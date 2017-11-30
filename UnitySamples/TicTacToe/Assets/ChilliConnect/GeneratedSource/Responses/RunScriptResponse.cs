@@ -62,14 +62,6 @@ namespace ChilliConnect
                         Output = new MultiTypeValue((object)entry.Value);	
                     }
 				}
-	
-				// An error has occurred.
-				else
-				{
-#if DEBUG
-					throw new ArgumentException("Input Json contains an invalid field.");
-#endif
-				}
 			}
 		}
 	}

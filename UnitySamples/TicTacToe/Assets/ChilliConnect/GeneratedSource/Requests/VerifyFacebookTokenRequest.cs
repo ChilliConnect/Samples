@@ -66,7 +66,7 @@ namespace ChilliConnect
 	
             ConnectAccessToken = connectAccessToken;
 			
-			Url = "https://connect.chilliconnect.com/1.0/player/verify/facebook";
+			Url = "https://test-connect.chilliconnect.com/1.0/player/verify/facebook";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

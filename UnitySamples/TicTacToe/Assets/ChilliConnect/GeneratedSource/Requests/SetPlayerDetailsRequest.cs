@@ -77,7 +77,7 @@ namespace ChilliConnect
 	
 		/// <summary>
 		/// Password to be assigned to the new player account. If provided must be greater
-		/// than 3 and less than 50 characters in length.
+		/// than 6 and less than 50 characters in length.
 		/// </summary>
         public string Password { get; private set; }
 
@@ -100,7 +100,7 @@ namespace ChilliConnect
             Password = desc.Password;
             ConnectAccessToken = connectAccessToken;
 	
-			Url = "https://connect.chilliconnect.com/1.0/player/update";
+			Url = "https://test-connect.chilliconnect.com/1.0/player/update";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

@@ -89,7 +89,7 @@ namespace ChilliConnect
             Receipt = receipt;
             ConnectAccessToken = connectAccessToken;
 			
-			Url = "https://connect.chilliconnect.com/1.0/economy/purchase/redeem/apple";
+			Url = "https://test-connect.chilliconnect.com/1.0/economy/purchase/redeem/apple";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

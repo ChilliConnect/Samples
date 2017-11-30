@@ -58,6 +58,12 @@ namespace ChilliConnect
 		/// checking don't provide this parameter - data will be written with no checking.
 		/// </summary>
         public string WriteLock { get; set; }
+	
+		/// <summary>
+		/// The attachment data to be saved to the Custom Data Key. The maximum size is 2mb.
+		/// To remove Attachment Data set to empty string.
+		/// </summary>
+        public string Attachment { get; set; }
 
 		/// <summary>
 		/// Initialises a new instance of the description with the given required properties.

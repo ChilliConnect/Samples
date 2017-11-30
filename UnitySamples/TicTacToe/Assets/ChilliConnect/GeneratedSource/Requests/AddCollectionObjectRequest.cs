@@ -83,7 +83,7 @@ namespace ChilliConnect
             Value = value;
             ConnectAccessToken = connectAccessToken;
 			
-			Url = "https://connect.chilliconnect.com/1.0/data/collection/object/add";
+			Url = "https://test-connect.chilliconnect.com/1.0/data/collection/object/add";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

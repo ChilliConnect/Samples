@@ -94,7 +94,7 @@ namespace ChilliConnect
             WriteLock = desc.WriteLock;
             ConnectAccessToken = connectAccessToken;
 	
-			Url = "https://connect.chilliconnect.com/1.0/economy/inventory/update";
+			Url = "https://test-connect.chilliconnect.com/1.0/economy/inventory/update";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

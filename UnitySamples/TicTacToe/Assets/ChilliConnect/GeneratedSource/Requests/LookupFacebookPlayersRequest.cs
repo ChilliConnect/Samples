@@ -75,7 +75,7 @@ namespace ChilliConnect
             FacebookIds = Mutability.ToImmutable(facebookIds);
             ConnectAccessToken = connectAccessToken;
 			
-			Url = "https://connect.chilliconnect.com/1.0/player/lookup/facebook";
+			Url = "https://test-connect.chilliconnect.com/1.0/player/lookup/facebook";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 
