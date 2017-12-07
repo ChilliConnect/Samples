@@ -862,7 +862,7 @@ UChilliConnectSDK::OnGetVirtualPurchaseDefinitionsComplete(UChilliConnectJson* j
 			if (ItemJson->HasTypedField<EJson::Object>("CustomData")) {
 				UChilliConnectJson * ValueJson = NewObject<UChilliConnectJson>();
 				ValueJson->SetJsonObject(ItemJson->GetObjectField("CustomData"));
-				ResponseItem.CustomData = ValueJson;
+				CurrencyCost.Item.CustomData = ValueJson;
 			}
 
 			ResponseItem.Costs.Currencies.Add(CurrencyCost);
@@ -893,7 +893,7 @@ UChilliConnectSDK::OnGetVirtualPurchaseDefinitionsComplete(UChilliConnectJson* j
 			if (ItemJson->HasTypedField<EJson::Object>("CustomData")) {
 				UChilliConnectJson * ValueJson = NewObject<UChilliConnectJson>();
 				ValueJson->SetJsonObject(ItemJson->GetObjectField("CustomData"));
-				ResponseItem.CustomData = ValueJson;
+				ItemCost.Item.CustomData = ValueJson;
 			}
 
 			ResponseItem.Costs.Items.Add(ItemCost);
@@ -958,7 +958,7 @@ UChilliConnectSDK::OnGetVirtualPurchaseDefinitionsComplete(UChilliConnectJson* j
 			if (ItemJson->HasTypedField<EJson::Object>("CustomData")) {
 				UChilliConnectJson * ValueJson = NewObject<UChilliConnectJson>();
 				ValueJson->SetJsonObject(ItemJson->GetObjectField("CustomData"));
-				ResponseItem.CustomData = ValueJson;
+				ItemReward.Item.CustomData = ValueJson;
 			}
 
 			ResponseItem.Rewards.Items.Add(ItemReward);
