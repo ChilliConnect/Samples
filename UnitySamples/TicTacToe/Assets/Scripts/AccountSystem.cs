@@ -2,6 +2,7 @@
 using System.Collections;
 using ChilliConnect;
 using System.IO;
+using System.Collections.Generic;
 
 /// 
 /// Handles login and creation of anonymous ChilliConnect account if none
@@ -16,11 +17,14 @@ public class AccountSystem
 		public string ChilliConnectSecret { get; set; }
 	}
 
+	public int SkillLevel { get; set; }
+
 	public event System.Action<string> OnPlayerLoggedIn = delegate {};
 
 	private static AccountSystem s_singletonInstance = null;
 
 	private ChilliConnectSdk m_chilliConnect;
+	private string m_loggedInChilliConnectId;
 
 	public static AccountSystem Get()
 	{
@@ -67,6 +71,27 @@ public class AccountSystem
 		return playerCredentials;
 	}
 
+	private void LoadSkillLevel() {
+
+		UnityEngine.Debug.Log ("Loading Skill Level");
+
+		m_chilliConnect.CloudData.GetPlayerData (new List<string>{"SkillLevel"},
+			(request, response) => OnPlayerDataLoaded (response),
+			(request, error) => Debug.LogError (error.ErrorDescription));
+	}
+
+	private void OnPlayerDataLoaded(GetPlayerDataResponse response) {
+		if (response.Values.Count == 0) {
+			SkillLevel = 0;
+		} else {
+			SkillLevel = response.Values [0].Value.AsInt ();
+		}
+
+		UnityEngine.Debug.Log ("Loaded Skill Level:" + SkillLevel);
+
+		OnPlayerLoggedIn(m_loggedInChilliConnectId);
+	}
+		
 	private void SavePlayer(string chilliConnectId, string chilliConnectSecret)
 	{
 		File.WriteAllLines(SAVE_FILE, new string[]{ chilliConnectId , chilliConnectSecret });
@@ -86,7 +111,8 @@ public class AccountSystem
 	private void OnChilliConnectLoggedIn(string chilliConnectId, string chilliConnectSecret)
 	{
 		UnityEngine.Debug.Log ("Logged in as player " + chilliConnectId);
-		OnPlayerLoggedIn(chilliConnectId);
+		m_loggedInChilliConnectId = chilliConnectId;
+		LoadSkillLevel ();
 	}
 
 	/// Handler for succesfull player account creation. Will persist the new 

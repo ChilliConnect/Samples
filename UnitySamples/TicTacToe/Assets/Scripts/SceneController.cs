@@ -10,12 +10,13 @@ public class SceneController : MonoBehaviour
 	private const int POLL_WAIT_SECONDS = 5;
 
 	private const string MESSAGE_STARTUP = "Starting Up";
-	private const string MESSAGE_LOADING_DATA = "Loading Player Data";
+	private const string MESSAGE_LOADING_DATA = "Loading Match Data";
 	private const string MESSAGE_CREATING_ACCOUNT = "Creating Chilli Account";
 	private const string MESSAGE_LOGGING_IN = "Logging In";
 	private const string MESSAGE_MATCHMAKING = "Matchmaking";
 	private const string MESSAGE_CHOOSE_SIDE = "Choose A Side";
 	private const string MESSAGE_WAITING_OPPONENT = "Finding Opponent";
+	private const string MESSAGE_TIMEOUT = "Match Timeout";
 	private const string MESSAGE_OPPONENT_TURN = "Opponent's Turn";
 
 	private const string GAME_TOKEN = "uKU6L4tB2c4AVusKPRddS2eAXASnWnfh";
@@ -30,7 +31,7 @@ public class SceneController : MonoBehaviour
 
     private void Awake()
     {
-		m_chilliConnect = new ChilliConnectSdk(GAME_TOKEN,false);
+		m_chilliConnect = new ChilliConnectSdk(GAME_TOKEN,true);
 
 		m_matchSystem.Initialise (m_chilliConnect);
 		m_matchSystem.OnMatchUpdated += OnMatchUpdated;
@@ -53,6 +54,7 @@ public class SceneController : MonoBehaviour
 	{
 		m_chilliConnectId = chilliConnectId;
 		gameController.ShowChilliInfoPanel (MESSAGE_LOADING_DATA);
+		m_matchSystem.SkillLevel = m_accountSystem.SkillLevel;
 		m_matchSystem.LoadExistingOrFindNewGame (m_chilliConnectId);
 	}
 
@@ -105,18 +107,15 @@ public class SceneController : MonoBehaviour
 			matchState.MatchState = GameState.MATCHSTATE_COMPLETE;
 		}
 
-		m_matchSystem.SubmitTurn ();
+		m_matchSystem.SubmitTurn();
 	}
 
 	public void OnMatchUpdated(GameState updated, GameState previous)
 	{
-		bool isWaitingOnOpponent = updated.MatchState == GameState.MATCHSTATE_IN_PROGRESS;
-		if (!updated.Board.Equals (previous.Board)|| isWaitingOnOpponent ) {
-			UpdateGameController (updated);
-		}
+		UpdateGameController (updated);
 
-		bool isWaitingOnOtherPlayer = !updated.IsPlayersTurn (m_chilliConnectId) && updated.IsWaitingForTurn ();
-		if ( isWaitingOnOtherPlayer || isWaitingOnOpponent ) {
+		bool isWaitingOnOtherPlayer = !updated.IsPlayersTurn (m_chilliConnectId);
+		if ( isWaitingOnOtherPlayer && !updated.IsFinished()) {
 			WaitThenRefreshMatchFromServer ();
 		}
 	}
@@ -141,14 +140,18 @@ public class SceneController : MonoBehaviour
         {
             gameController.HideChilliInfoPanel();
         }
-        else
-        {
-			if (state.MatchState == GameState.MATCHSTATE_WAITING) {
-				gameController.ShowChilliInfoPanel (MESSAGE_WAITING_OPPONENT);
-			} else {
-				gameController.ShowChilliInfoPanel (MESSAGE_OPPONENT_TURN);
-			}
-        }
+        else if (state.MatchState == GameState.MATCHSTATE_WAITING) 
+		{
+			gameController.ShowChilliInfoPanel (MESSAGE_WAITING_OPPONENT);
+		} 
+		else if (state.MatchState == GameState.MATCHSTATE_TIMEOUT)
+		{
+			gameController.Timeout();
+		}
+		else 
+		{
+			gameController.ShowChilliInfoPanel (MESSAGE_OPPONENT_TURN);
+		}
 	}
 
 	private void OnSideSelected(string selectedSide)

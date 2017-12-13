@@ -25,6 +25,11 @@ public class MatchSystem
 
 	public GameState CurrentGame { get; set; }
 
+	public int SkillLevel {
+		get;
+		set;
+	}
+
 	private ChilliConnectSdk m_chilliConnect;
 	private string m_chilliConnectId;
 
@@ -86,6 +91,18 @@ public class MatchSystem
 		OnMatchMakingStarted ();
 
 		var joinMatchRequest = new JoinAvailableMatchRequestDesc(MATCH_TYPE);
+		joinMatchRequest.Query = new List<string> () {
+			"Properties.SkillLevel = :skillLevel",
+			"Properties.SkillLevel > :skillLevelLower AND Properties.SkillLevel < :skillLevelUpper",
+		};
+
+		joinMatchRequest.Params = new Dictionary<string, SdkCore.MultiTypeValue> ();
+		joinMatchRequest.Params ["skillLevel"] = SkillLevel;
+		joinMatchRequest.Params ["skillLevelLower"] = SkillLevel - 5;
+		joinMatchRequest.Params ["skillLevelUpper"] = SkillLevel + 5;
+
+		joinMatchRequest.FallbackToAny = false;
+
 		m_chilliConnect.AsyncMultiplayer.JoinAvailableMatch(joinMatchRequest,
 			(request, response ) => JoinAvailableMatchCallBack(response),
 			(request, error) => Debug.Log(error.ErrorDescription) );
@@ -96,7 +113,7 @@ public class MatchSystem
 		if (response.Success)
 		{
 			var matchObject = response.Match;
-			if (matchObject.State != "READY") {
+			if (matchObject.State != GameState.MATCHSTATE_READY) {
 				UnityEngine.Debug.Log("INVALID MATCH STATE:" + matchObject.State);
 			}
 
@@ -106,7 +123,8 @@ public class MatchSystem
 			CurrentGame.Update(matchObject);
 			CurrentGame.OccupyEmptyPlayerPosition(m_chilliConnectId);
 
-			StartMatch (matchObject);
+			StartMatch (matchObject.MatchId);
+
 			OnMatchMakingSuceeded (CurrentGame);
 		}
 		else
@@ -115,9 +133,9 @@ public class MatchSystem
 		}
 	}
 
-	private void StartMatch(Match match)
+	private void StartMatch(String matchId)
 	{
-		var startMatchDesc = new StartMatchRequestDesc (match.MatchId);
+		var startMatchDesc = new StartMatchRequestDesc (matchId);
 		startMatchDesc.StateData = CurrentGame.AsMultiTypeDictionary ();
 
 		m_chilliConnect.AsyncMultiplayer.StartMatch (startMatchDesc,
@@ -129,7 +147,6 @@ public class MatchSystem
 	{
 		UnityEngine.Debug.Log("New Game Created On Server");
 
-		//TODO: Will return full match pbiect
 		var previous = CurrentGame.Copy ();
 		CurrentGame.Update (response.Match);
 
@@ -140,8 +157,14 @@ public class MatchSystem
 	{
 		CurrentGame.SetNewGame (selectedSide, m_chilliConnectId);
 
-		var createMatchRequest = new CreateMatchRequestDesc (MATCH_TYPE, TURN_TYPE_SEQUENTIAL, 2);
+		var maxPlayers = 2;
+		var createMatchRequest = new CreateMatchRequestDesc (MATCH_TYPE, TURN_TYPE_SEQUENTIAL, maxPlayers);
 		createMatchRequest.StateData = CurrentGame.AsMultiTypeDictionary ();
+		createMatchRequest.TurnOrderType = "RANDOM";
+		createMatchRequest.AutoStart = false;
+		createMatchRequest.Properties = new Dictionary<string, SdkCore.MultiTypeValue> ();
+		createMatchRequest.Properties ["SkillLevel"] = SkillLevel;
+
 		m_chilliConnect.AsyncMultiplayer.CreateMatch(createMatchRequest,
 			(request, response) => CreateMatchCallBack(response),
 			(request, error) => Debug.Log(error.ErrorDescription) );		
@@ -151,11 +174,11 @@ public class MatchSystem
 	{
 		UnityEngine.Debug.Log("New game created");
 
-		var newMatchId = response.MatchId;
+		var match = response.Match;
 
-		CurrentGame.MatchId = newMatchId;
-		CurrentGame.MatchState = GameState.MATCHSTATE_WAITING;
-		SaveMatchId(newMatchId);
+		CurrentGame.MatchId = match.MatchId;
+		CurrentGame.MatchState = match.State;
+		SaveMatchId(match.MatchId);
 		OnNewMatchCreated(CurrentGame);
 	}
 
@@ -166,10 +189,18 @@ public class MatchSystem
 		var submitTurnRequest = new SubmitTurnRequestDesc (CurrentGame.MatchId);
 		submitTurnRequest.StateData = CurrentGame.AsMultiTypeDictionary ();
 		if (CurrentGame.MatchState == GameState.MATCHSTATE_COMPLETE) {
+			var outcomeDataBuilder = new SdkCore.MultiTypeDictionaryBuilder ();
+			outcomeDataBuilder.Add ("Winner", m_chilliConnectId);
+			submitTurnRequest.OutcomeData = outcomeDataBuilder.Build ();
 			submitTurnRequest.Completed = true;
+
+			SkillLevel++;
+			var setPlayerDataRequest = new SetPlayerDataRequestDesc ("SkillLevel", SkillLevel);
+			m_chilliConnect.CloudData.SetPlayerData (setPlayerDataRequest, 
+				(request, response) => Debug.Log ("Player Data Updated"),
+				(request, error) => Debug.Log (error.ErrorDescription));
 		}
 
-		//TODO: Add outcome data
 		m_chilliConnect.AsyncMultiplayer.SubmitTurn(submitTurnRequest,
 			(request, response) => SubmitTurnCallBack(response),
 			(request, error) => Debug.Log(error.ErrorDescription) );
@@ -190,7 +221,7 @@ public class MatchSystem
 			(request, response) => GetMatchCallBack(response),
 			(request, error) => Debug.Log(error.ErrorDescription) );
 	}
-
+		
 	private void GetMatchCallBack(GetMatchResponse response)
 	{
 		var previous = CurrentGame.Copy ();
