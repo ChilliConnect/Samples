@@ -335,45 +335,6 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
-		/// Associate a player account with a Facebook account. Each player can only be
-		/// associated with a single Facebook account and a Facebook account can only be
-		/// associated with a single player per game. If the player is already associated
-		/// with a Facebook account an error will be returned, unless the Replace flag is
-		/// provided, in which case the association will be updated. If the Facebook account
-		/// is already associated with another player within this game, an error will be
-		/// returned along with the ChilliConnectID and ChilliConnectSecret for the
-		/// associated player within the data parameter of the response body. If the Update
-		/// flag is provided, the existing association will be removed and Facebook account
-		/// associated with the current ChilliConnect account.
-		/// </summary>
-		///
-		/// <param name="desc">The request description.</param>
-		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
-		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
-		/// a container with information on what went wrong.</param>
-		public void LinkFacebookAccount(LinkFacebookAccountRequestDesc desc, Action<LinkFacebookAccountRequest, LinkFacebookAccountResponse> successCallback, Action<LinkFacebookAccountRequest, LinkFacebookAccountError> errorCallback)
-		{
-			m_logging.LogVerboseMessage("Sending Link Facebook Account request.");
-			
-            var connectAccessToken = m_dataStore.GetString("UserAccessToken");
-			var request = new LinkFacebookAccountRequest(desc, connectAccessToken);
-	
-			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
-			{
-				ReleaseAssert.IsTrue(request == sentRequest, "Received request is not the same as the one sent!");
-				
-				if (serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode)
-				{
-					NotifyLinkFacebookAccountSuccess(serverResponse, request, successCallback);
-				} 
-				else 
-				{
-					NotifyLinkFacebookAccountError(serverResponse, request, errorCallback);
-				}
-			});
-		}
-		
-		/// <summary>
 		/// Associate a player account with a GameCenterID. Each player can only be
 		/// associated with a single GameCenterID and a GameCenterID can only be associated
 		/// with a single player per game. If the player is already associated with a
@@ -443,6 +404,75 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
+		/// Associate a player account with a Facebook account. Each player can only be
+		/// associated with a single Facebook account and a Facebook account can only be
+		/// associated with a single player per game. If the player is already associated
+		/// with a Facebook account an error will be returned, unless the Replace flag is
+		/// provided, in which case the association will be updated. If the Facebook account
+		/// is already associated with another player within this game, an error will be
+		/// returned along with the ChilliConnectID and ChilliConnectSecret for the
+		/// associated player within the data parameter of the response body. If the Update
+		/// flag is provided, the existing association will be removed and Facebook account
+		/// associated with the current ChilliConnect account.
+		/// </summary>
+		///
+		/// <param name="desc">The request description.</param>
+		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
+		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
+		/// a container with information on what went wrong.</param>
+		public void LinkFacebookAccount(LinkFacebookAccountRequestDesc desc, Action<LinkFacebookAccountRequest, LinkFacebookAccountResponse> successCallback, Action<LinkFacebookAccountRequest, LinkFacebookAccountError> errorCallback)
+		{
+			m_logging.LogVerboseMessage("Sending Link Facebook Account request.");
+			
+            var connectAccessToken = m_dataStore.GetString("UserAccessToken");
+			var request = new LinkFacebookAccountRequest(desc, connectAccessToken);
+	
+			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
+			{
+				ReleaseAssert.IsTrue(request == sentRequest, "Received request is not the same as the one sent!");
+				
+				if (serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode)
+				{
+					NotifyLinkFacebookAccountSuccess(serverResponse, request, successCallback);
+				} 
+				else 
+				{
+					NotifyLinkFacebookAccountError(serverResponse, request, errorCallback);
+				}
+			});
+		}
+		
+		/// <summary>
+		/// Remove an associate between a player and a Facebook account previously created
+		/// via the LinkFacebookAccount method.
+		/// </summary>
+		///
+		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
+		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
+		/// a container with information on what went wrong.</param>
+		public void UnlinkFacebookAccount(Action<UnlinkFacebookAccountResponse> successCallback, Action<UnlinkFacebookAccountError> errorCallback)
+		{
+			m_logging.LogVerboseMessage("Sending Unlink Facebook Account request.");
+			
+            var connectAccessToken = m_dataStore.GetString("UserAccessToken");
+			var request = new UnlinkFacebookAccountRequest(connectAccessToken);
+	
+			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
+			{
+				ReleaseAssert.IsTrue(request == sentRequest, "Received request is not the same as the one sent!");
+				
+				if (serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode)
+				{
+					NotifyUnlinkFacebookAccountSuccess(serverResponse, successCallback);
+				} 
+				else 
+				{
+					NotifyUnlinkFacebookAccountError(serverResponse, errorCallback);
+				}
+			});
+		}
+		
+		/// <summary>
 		/// Retrieve a boolean indicating if a player's Facebook Access Token is Valid or
 		/// not.
 		/// </summary>
@@ -505,38 +535,6 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
-		/// Find the ChilliConnectID's of players associated with provided UserName's.
-		/// Returns an array of objects for each UserName that was found providing the
-		/// ChilliConnectID, UserName and DisplayName of the associated player.
-		/// </summary>
-		///
-		/// <param name="userNames">An array of UserNames to look up. Maximum 10.</param>
-		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
-		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
-		/// a container with information on what went wrong.</param>
-		public void LookupUserNames(IList<string> userNames, Action<LookupUserNamesRequest, LookupUserNamesResponse> successCallback, Action<LookupUserNamesRequest, LookupUserNamesError> errorCallback)
-		{
-			m_logging.LogVerboseMessage("Sending Lookup User Names request.");
-			
-            var connectAccessToken = m_dataStore.GetString("UserAccessToken");
-			var request = new LookupUserNamesRequest(userNames, connectAccessToken);
-	
-			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
-			{
-				ReleaseAssert.IsTrue(request == sentRequest, "Received request is not the same as the one sent!");
-				
-				if (serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode)
-				{
-					NotifyLookupUserNamesSuccess(serverResponse, request, successCallback);
-				} 
-				else 
-				{
-					NotifyLookupUserNamesError(serverResponse, request, errorCallback);
-				}
-			});
-		}
-		
-		/// <summary>
 		/// Get back a players ChilliConnect registered Facebook friends along with their
 		/// current Facebook profile pictures.
 		/// </summary>
@@ -567,19 +565,21 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
-		/// Remove an associate between a player and a Facebook account previously created
-		/// via the LinkFacebookAccount method.
+		/// Find the ChilliConnectID's of players associated with provided UserName's.
+		/// Returns an array of objects for each UserName that was found providing the
+		/// ChilliConnectID, UserName and DisplayName of the associated player.
 		/// </summary>
 		///
+		/// <param name="userNames">An array of UserNames to look up. Maximum 10.</param>
 		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
 		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
 		/// a container with information on what went wrong.</param>
-		public void UnlinkFacebookAccount(Action<UnlinkFacebookAccountResponse> successCallback, Action<UnlinkFacebookAccountError> errorCallback)
+		public void LookupUserNames(IList<string> userNames, Action<LookupUserNamesRequest, LookupUserNamesResponse> successCallback, Action<LookupUserNamesRequest, LookupUserNamesError> errorCallback)
 		{
-			m_logging.LogVerboseMessage("Sending Unlink Facebook Account request.");
+			m_logging.LogVerboseMessage("Sending Lookup User Names request.");
 			
             var connectAccessToken = m_dataStore.GetString("UserAccessToken");
-			var request = new UnlinkFacebookAccountRequest(connectAccessToken);
+			var request = new LookupUserNamesRequest(userNames, connectAccessToken);
 	
 			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
 			{
@@ -587,11 +587,11 @@ namespace ChilliConnect
 				
 				if (serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode)
 				{
-					NotifyUnlinkFacebookAccountSuccess(serverResponse, successCallback);
+					NotifyLookupUserNamesSuccess(serverResponse, request, successCallback);
 				} 
 				else 
 				{
-					NotifyUnlinkFacebookAccountError(serverResponse, errorCallback);
+					NotifyLookupUserNamesError(serverResponse, request, errorCallback);
 				}
 			});
 		}
@@ -814,27 +814,6 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
-		/// Notifies the user that a Link Facebook Account request was successful.
-		/// </summary>
-		///
-		/// <param name="serverResponse">A container for information on the response from the server. Only 
-		/// successful responses can be passed into this method.</param>
-		/// <param name="request"> The request that was sent to the server.</param>
-		/// <param name="callback">The success callback.</param>
-		private void NotifyLinkFacebookAccountSuccess(ServerResponse serverResponse, LinkFacebookAccountRequest request, Action<LinkFacebookAccountRequest, LinkFacebookAccountResponse> successCallback)
-		{
-			ReleaseAssert.IsTrue(serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode, "Input server request must describe a success.");
-			
-			m_logging.LogVerboseMessage("LinkFacebookAccount request succeeded.");
-	
-			LinkFacebookAccountResponse outputResponse = new LinkFacebookAccountResponse(serverResponse.Body);
-			m_taskScheduler.ScheduleMainThreadTask(() =>
-			{
-				successCallback(request, outputResponse);
-			});
-		}
-		
-		/// <summary>
 		/// Notifies the user that a Link Game Center Account request was successful.
 		/// </summary>
 		///
@@ -869,6 +848,47 @@ namespace ChilliConnect
 			m_logging.LogVerboseMessage("UnlinkGameCenterAccount request succeeded.");
 	
 			UnlinkGameCenterAccountResponse outputResponse = new UnlinkGameCenterAccountResponse(serverResponse.Body);
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				successCallback(outputResponse);
+			});
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Link Facebook Account request was successful.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// successful responses can be passed into this method.</param>
+		/// <param name="request"> The request that was sent to the server.</param>
+		/// <param name="callback">The success callback.</param>
+		private void NotifyLinkFacebookAccountSuccess(ServerResponse serverResponse, LinkFacebookAccountRequest request, Action<LinkFacebookAccountRequest, LinkFacebookAccountResponse> successCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode, "Input server request must describe a success.");
+			
+			m_logging.LogVerboseMessage("LinkFacebookAccount request succeeded.");
+	
+			LinkFacebookAccountResponse outputResponse = new LinkFacebookAccountResponse(serverResponse.Body);
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				successCallback(request, outputResponse);
+			});
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Unlink Facebook Account request was successful.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// successful responses can be passed into this method.</param>
+		/// <param name="callback">The success callback.</param>
+		private void NotifyUnlinkFacebookAccountSuccess(ServerResponse serverResponse, Action<UnlinkFacebookAccountResponse> successCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode, "Input server request must describe a success.");
+			
+			m_logging.LogVerboseMessage("UnlinkFacebookAccount request succeeded.");
+	
+			UnlinkFacebookAccountResponse outputResponse = new UnlinkFacebookAccountResponse(serverResponse.Body);
 			m_taskScheduler.ScheduleMainThreadTask(() =>
 			{
 				successCallback(outputResponse);
@@ -917,27 +937,6 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
-		/// Notifies the user that a Lookup User Names request was successful.
-		/// </summary>
-		///
-		/// <param name="serverResponse">A container for information on the response from the server. Only 
-		/// successful responses can be passed into this method.</param>
-		/// <param name="request"> The request that was sent to the server.</param>
-		/// <param name="callback">The success callback.</param>
-		private void NotifyLookupUserNamesSuccess(ServerResponse serverResponse, LookupUserNamesRequest request, Action<LookupUserNamesRequest, LookupUserNamesResponse> successCallback)
-		{
-			ReleaseAssert.IsTrue(serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode, "Input server request must describe a success.");
-			
-			m_logging.LogVerboseMessage("LookupUserNames request succeeded.");
-	
-			LookupUserNamesResponse outputResponse = new LookupUserNamesResponse(serverResponse.Body);
-			m_taskScheduler.ScheduleMainThreadTask(() =>
-			{
-				successCallback(request, outputResponse);
-			});
-		}
-		
-		/// <summary>
 		/// Notifies the user that a Get Facebook Friends request was successful.
 		/// </summary>
 		///
@@ -958,22 +957,23 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
-		/// Notifies the user that a Unlink Facebook Account request was successful.
+		/// Notifies the user that a Lookup User Names request was successful.
 		/// </summary>
 		///
 		/// <param name="serverResponse">A container for information on the response from the server. Only 
 		/// successful responses can be passed into this method.</param>
+		/// <param name="request"> The request that was sent to the server.</param>
 		/// <param name="callback">The success callback.</param>
-		private void NotifyUnlinkFacebookAccountSuccess(ServerResponse serverResponse, Action<UnlinkFacebookAccountResponse> successCallback)
+		private void NotifyLookupUserNamesSuccess(ServerResponse serverResponse, LookupUserNamesRequest request, Action<LookupUserNamesRequest, LookupUserNamesResponse> successCallback)
 		{
 			ReleaseAssert.IsTrue(serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode, "Input server request must describe a success.");
 			
-			m_logging.LogVerboseMessage("UnlinkFacebookAccount request succeeded.");
+			m_logging.LogVerboseMessage("LookupUserNames request succeeded.");
 	
-			UnlinkFacebookAccountResponse outputResponse = new UnlinkFacebookAccountResponse(serverResponse.Body);
+			LookupUserNamesResponse outputResponse = new LookupUserNamesResponse(serverResponse.Body);
 			m_taskScheduler.ScheduleMainThreadTask(() =>
 			{
-				successCallback(outputResponse);
+				successCallback(request, outputResponse);
 			});
 		}
 		
@@ -1233,38 +1233,6 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
-		/// Notifies the user that a Link Facebook Account request has failed.
-		/// </summary>
-		///
-		/// <param name="serverResponse">A container for information on the response from the server. Only 
-		/// failed responses can be passed into this method.</param>
-		/// <param name="request"> The request that was sent to the server.</param>
-		/// <param name="callback">The error callback.</param>
-		private void NotifyLinkFacebookAccountError(ServerResponse serverResponse, LinkFacebookAccountRequest request, Action<LinkFacebookAccountRequest, LinkFacebookAccountError> errorCallback)
-		{
-			ReleaseAssert.IsTrue(serverResponse.Result != HttpResult.Success || serverResponse.HttpResponseCode != SuccessHttpResponseCode, "Input server request must describe an error.");
-			
-			switch (serverResponse.Result) 
-			{
-				case HttpResult.Success:
-					m_logging.LogVerboseMessage("Link Facebook Account request failed with http response code: " + serverResponse.HttpResponseCode);
-					break;
-				case HttpResult.CouldNotConnect:
-					m_logging.LogVerboseMessage("Link Facebook Account request failed becuase a connection could be established.");
-					break;
-				default:
-					m_logging.LogVerboseMessage("Link Facebook Account request failed for an unknown reason.");
-					throw new ArgumentException("Invalid value for server response result.");
-			}
-			
-			LinkFacebookAccountError error = new LinkFacebookAccountError(serverResponse);	
-			m_taskScheduler.ScheduleMainThreadTask(() =>
-			{
-				errorCallback(request, error);
-			});	
-		}
-		
-		/// <summary>
 		/// Notifies the user that a Link Game Center Account request has failed.
 		/// </summary>
 		///
@@ -1321,6 +1289,69 @@ namespace ChilliConnect
 			}
 			
 			UnlinkGameCenterAccountError error = new UnlinkGameCenterAccountError(serverResponse);	
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				errorCallback(error);
+			});	
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Link Facebook Account request has failed.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// failed responses can be passed into this method.</param>
+		/// <param name="request"> The request that was sent to the server.</param>
+		/// <param name="callback">The error callback.</param>
+		private void NotifyLinkFacebookAccountError(ServerResponse serverResponse, LinkFacebookAccountRequest request, Action<LinkFacebookAccountRequest, LinkFacebookAccountError> errorCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result != HttpResult.Success || serverResponse.HttpResponseCode != SuccessHttpResponseCode, "Input server request must describe an error.");
+			
+			switch (serverResponse.Result) 
+			{
+				case HttpResult.Success:
+					m_logging.LogVerboseMessage("Link Facebook Account request failed with http response code: " + serverResponse.HttpResponseCode);
+					break;
+				case HttpResult.CouldNotConnect:
+					m_logging.LogVerboseMessage("Link Facebook Account request failed becuase a connection could be established.");
+					break;
+				default:
+					m_logging.LogVerboseMessage("Link Facebook Account request failed for an unknown reason.");
+					throw new ArgumentException("Invalid value for server response result.");
+			}
+			
+			LinkFacebookAccountError error = new LinkFacebookAccountError(serverResponse);	
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				errorCallback(request, error);
+			});	
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Unlink Facebook Account request has failed.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// failed responses can be passed into this method.</param>
+		/// <param name="callback">The error callback.</param>
+		private void NotifyUnlinkFacebookAccountError(ServerResponse serverResponse, Action<UnlinkFacebookAccountError> errorCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result != HttpResult.Success || serverResponse.HttpResponseCode != SuccessHttpResponseCode, "Input server request must describe an error.");
+			
+			switch (serverResponse.Result) 
+			{
+				case HttpResult.Success:
+					m_logging.LogVerboseMessage("Unlink Facebook Account request failed with http response code: " + serverResponse.HttpResponseCode);
+					break;
+				case HttpResult.CouldNotConnect:
+					m_logging.LogVerboseMessage("Unlink Facebook Account request failed becuase a connection could be established.");
+					break;
+				default:
+					m_logging.LogVerboseMessage("Unlink Facebook Account request failed for an unknown reason.");
+					throw new ArgumentException("Invalid value for server response result.");
+			}
+			
+			UnlinkFacebookAccountError error = new UnlinkFacebookAccountError(serverResponse);	
 			m_taskScheduler.ScheduleMainThreadTask(() =>
 			{
 				errorCallback(error);
@@ -1391,38 +1422,6 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
-		/// Notifies the user that a Lookup User Names request has failed.
-		/// </summary>
-		///
-		/// <param name="serverResponse">A container for information on the response from the server. Only 
-		/// failed responses can be passed into this method.</param>
-		/// <param name="request"> The request that was sent to the server.</param>
-		/// <param name="callback">The error callback.</param>
-		private void NotifyLookupUserNamesError(ServerResponse serverResponse, LookupUserNamesRequest request, Action<LookupUserNamesRequest, LookupUserNamesError> errorCallback)
-		{
-			ReleaseAssert.IsTrue(serverResponse.Result != HttpResult.Success || serverResponse.HttpResponseCode != SuccessHttpResponseCode, "Input server request must describe an error.");
-			
-			switch (serverResponse.Result) 
-			{
-				case HttpResult.Success:
-					m_logging.LogVerboseMessage("Lookup User Names request failed with http response code: " + serverResponse.HttpResponseCode);
-					break;
-				case HttpResult.CouldNotConnect:
-					m_logging.LogVerboseMessage("Lookup User Names request failed becuase a connection could be established.");
-					break;
-				default:
-					m_logging.LogVerboseMessage("Lookup User Names request failed for an unknown reason.");
-					throw new ArgumentException("Invalid value for server response result.");
-			}
-			
-			LookupUserNamesError error = new LookupUserNamesError(serverResponse);	
-			m_taskScheduler.ScheduleMainThreadTask(() =>
-			{
-				errorCallback(request, error);
-			});	
-		}
-		
-		/// <summary>
 		/// Notifies the user that a Get Facebook Friends request has failed.
 		/// </summary>
 		///
@@ -1454,33 +1453,34 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
-		/// Notifies the user that a Unlink Facebook Account request has failed.
+		/// Notifies the user that a Lookup User Names request has failed.
 		/// </summary>
 		///
 		/// <param name="serverResponse">A container for information on the response from the server. Only 
 		/// failed responses can be passed into this method.</param>
+		/// <param name="request"> The request that was sent to the server.</param>
 		/// <param name="callback">The error callback.</param>
-		private void NotifyUnlinkFacebookAccountError(ServerResponse serverResponse, Action<UnlinkFacebookAccountError> errorCallback)
+		private void NotifyLookupUserNamesError(ServerResponse serverResponse, LookupUserNamesRequest request, Action<LookupUserNamesRequest, LookupUserNamesError> errorCallback)
 		{
 			ReleaseAssert.IsTrue(serverResponse.Result != HttpResult.Success || serverResponse.HttpResponseCode != SuccessHttpResponseCode, "Input server request must describe an error.");
 			
 			switch (serverResponse.Result) 
 			{
 				case HttpResult.Success:
-					m_logging.LogVerboseMessage("Unlink Facebook Account request failed with http response code: " + serverResponse.HttpResponseCode);
+					m_logging.LogVerboseMessage("Lookup User Names request failed with http response code: " + serverResponse.HttpResponseCode);
 					break;
 				case HttpResult.CouldNotConnect:
-					m_logging.LogVerboseMessage("Unlink Facebook Account request failed becuase a connection could be established.");
+					m_logging.LogVerboseMessage("Lookup User Names request failed becuase a connection could be established.");
 					break;
 				default:
-					m_logging.LogVerboseMessage("Unlink Facebook Account request failed for an unknown reason.");
+					m_logging.LogVerboseMessage("Lookup User Names request failed for an unknown reason.");
 					throw new ArgumentException("Invalid value for server response result.");
 			}
 			
-			UnlinkFacebookAccountError error = new UnlinkFacebookAccountError(serverResponse);	
+			LookupUserNamesError error = new LookupUserNamesError(serverResponse);	
 			m_taskScheduler.ScheduleMainThreadTask(() =>
 			{
-				errorCallback(error);
+				errorCallback(request, error);
 			});	
 		}
 	}

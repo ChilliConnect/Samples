@@ -19,7 +19,7 @@ public class SceneController : MonoBehaviour
 	private const string MESSAGE_TIMEOUT = "Match Timeout";
 	private const string MESSAGE_OPPONENT_TURN = "Opponent's Turn";
 
-	private const string GAME_TOKEN = "uKU6L4tB2c4AVusKPRddS2eAXASnWnfh";
+	private const string GAME_TOKEN = "";
 
     private ChilliConnectSdk m_chilliConnect = null;
 	private MatchSystem m_matchSystem = new MatchSystem ();

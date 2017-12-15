@@ -75,7 +75,7 @@ namespace ChilliConnect
             Groups = Mutability.ToImmutable(groups);
             ConnectAccessToken = connectAccessToken;
 			
-			Url = "https://test-connect.chilliconnect.com/1.0/push/groups";
+			Url = "https://connect.chilliconnect.com/1.0/push/groups";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

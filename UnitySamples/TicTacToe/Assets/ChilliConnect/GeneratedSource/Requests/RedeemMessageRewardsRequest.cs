@@ -83,7 +83,7 @@ namespace ChilliConnect
             MarkAsRead = desc.MarkAsRead;
             ConnectAccessToken = connectAccessToken;
 	
-			Url = "https://test-connect.chilliconnect.com/1.0/message/player/redeem";
+			Url = "https://connect.chilliconnect.com/1.0/message/player/redeem";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

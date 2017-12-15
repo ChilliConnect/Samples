@@ -77,7 +77,7 @@ namespace ChilliConnect
             Receipt = receipt;
             ConnectAccessToken = connectAccessToken;
 			
-			Url = "https://test-connect.chilliconnect.com/1.0/iap/validate/apple";
+			Url = "https://connect.chilliconnect.com/1.0/iap/validate/apple";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

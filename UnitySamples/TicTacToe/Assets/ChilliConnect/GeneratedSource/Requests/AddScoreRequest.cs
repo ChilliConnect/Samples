@@ -92,7 +92,7 @@ namespace ChilliConnect
             Data = desc.Data;
             ConnectAccessToken = connectAccessToken;
 	
-			Url = "https://test-connect.chilliconnect.com/1.0/leaderboard/scores/add";
+			Url = "https://connect.chilliconnect.com/1.0/leaderboard/scores/add";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

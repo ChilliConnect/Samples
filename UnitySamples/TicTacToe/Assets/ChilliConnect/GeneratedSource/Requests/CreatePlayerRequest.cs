@@ -137,7 +137,7 @@ namespace ChilliConnect
             }
             GameToken = gameToken;
 	
-			Url = "https://test-connect.chilliconnect.com/1.0/player/create";
+			Url = "https://connect.chilliconnect.com/1.0/player/create";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

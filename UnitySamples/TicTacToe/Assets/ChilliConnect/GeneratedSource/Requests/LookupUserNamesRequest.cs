@@ -75,7 +75,7 @@ namespace ChilliConnect
             UserNames = Mutability.ToImmutable(userNames);
             ConnectAccessToken = connectAccessToken;
 			
-			Url = "https://test-connect.chilliconnect.com/1.0/player/lookup/username";
+			Url = "https://connect.chilliconnect.com/1.0/player/lookup/username";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

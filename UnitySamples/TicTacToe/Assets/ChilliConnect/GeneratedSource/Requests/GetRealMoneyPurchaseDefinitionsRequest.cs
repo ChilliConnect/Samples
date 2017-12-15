@@ -91,7 +91,7 @@ namespace ChilliConnect
             Page = desc.Page;
             ConnectAccessToken = connectAccessToken;
 	
-			Url = "https://test-connect.chilliconnect.com/1.0/economy/definitions/realmoneypurchase";
+			Url = "https://connect.chilliconnect.com/1.0/economy/definitions/realmoneypurchase";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

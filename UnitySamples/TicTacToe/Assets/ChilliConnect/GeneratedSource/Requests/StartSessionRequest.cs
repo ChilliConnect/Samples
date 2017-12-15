@@ -134,7 +134,7 @@ namespace ChilliConnect
             GameToken = gameToken;
 			Date = DateTime.Now;
 	
-			Url = "https://test-metrics.chilliconnect.com/1.0/session/start";
+			Url = "https://metrics.chilliconnect.com/1.0/session/start";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

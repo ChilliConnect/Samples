@@ -121,7 +121,7 @@ namespace ChilliConnect
             GameToken = gameToken;
 			Date = DateTime.Now;
 	
-			Url = "https://test-connect.chilliconnect.com/1.0/player/login/facebook";
+			Url = "https://connect.chilliconnect.com/1.0/player/login/facebook";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

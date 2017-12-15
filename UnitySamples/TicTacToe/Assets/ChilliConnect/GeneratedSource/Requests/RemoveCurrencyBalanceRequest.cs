@@ -92,7 +92,7 @@ namespace ChilliConnect
             WriteLock = desc.WriteLock;
             ConnectAccessToken = connectAccessToken;
 	
-			Url = "https://test-connect.chilliconnect.com/1.0/economy/currency/balance/remove";
+			Url = "https://connect.chilliconnect.com/1.0/economy/currency/balance/remove";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

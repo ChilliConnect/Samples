@@ -100,7 +100,7 @@ namespace ChilliConnect
             WriteLock = desc.WriteLock;
             ConnectAccessToken = connectAccessToken;
 	
-			Url = "https://test-connect.chilliconnect.com/1.0/data/collection/object/update";
+			Url = "https://connect.chilliconnect.com/1.0/data/collection/object/update";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 
