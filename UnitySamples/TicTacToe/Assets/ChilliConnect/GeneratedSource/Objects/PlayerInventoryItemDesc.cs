@@ -72,19 +72,15 @@ namespace ChilliConnect
 		///
 		/// <param name="itemId">The inventory item identifier.</param>
 		/// <param name="key">The inventory item key.</param>
-		/// <param name="name">The inventory item name. Note: this may be empty if the Economy Inventory Item
-		/// definition no longer exists.</param>
 		/// <param name="writeLock">The identifier for the last write for this item in the player's inventory.</param>
-		public PlayerInventoryItemDesc(string itemId, string key, string name, string writeLock)
+		public PlayerInventoryItemDesc(string itemId, string key, string writeLock)
 		{
 			ReleaseAssert.IsNotNull(itemId, "Item Id cannot be null.");
 			ReleaseAssert.IsNotNull(key, "Key cannot be null.");
-			ReleaseAssert.IsNotNull(name, "Name cannot be null.");
 			ReleaseAssert.IsNotNull(writeLock, "Write Lock cannot be null.");
 	
             ItemId = itemId;
             Key = key;
-            Name = name;
             WriteLock = writeLock;
 		}
 	}

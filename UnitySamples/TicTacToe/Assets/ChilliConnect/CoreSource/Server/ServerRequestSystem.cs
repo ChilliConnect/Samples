@@ -70,39 +70,39 @@ namespace SdkCore
         {
             m_taskScheduler.ScheduleBackgroundTask(() => 
             {
-                if (request.HttpRequestMethod == HttpRequestMethod.Post)
+//                if (request.HttpRequestMethod == HttpRequestMethod.Post)
+//                {
+                var bodyString = MiniJSON.Json.Serialize(request.SerialiseBody());
+                ReleaseAssert.IsTrue(bodyString != null, "Invalid body.");
+                var bodyData = Encoding.UTF8.GetBytes(bodyString);
+
+                var httpRequestDesc = new HttpPostRequestDesc(request.Url, bodyData);
+                httpRequestDesc.Headers = request.SerialiseHeaders();
+                httpRequestDesc.ContentType = "application/json";
+
+                var httpRequest = new HttpPostRequest(httpRequestDesc);
+                m_httpSystem.SendRequest(httpRequest, (HttpPostRequest receivedHttpRequest, HttpResponse httpResponse) =>
                 {
-                    var bodyString = MiniJSON.Json.Serialize(request.SerialiseBody());
-                    ReleaseAssert.IsTrue(bodyString != null, "Invalid body.");
-                    var bodyData = Encoding.UTF8.GetBytes(bodyString);
+                    ReleaseAssert.IsTrue(httpRequest == receivedHttpRequest, "Received response for wrong request.");
 
-                    var httpRequestDesc = new HttpPostRequestDesc(request.Url, bodyData);
-                    httpRequestDesc.Headers = request.SerialiseHeaders();
-                    httpRequestDesc.ContentType = "application/json";
-
-                    var httpRequest = new HttpPostRequest(httpRequestDesc);
-                    m_httpSystem.SendRequest(httpRequest, (HttpPostRequest receivedHttpRequest, HttpResponse httpResponse) => 
-                    {
-                        ReleaseAssert.IsTrue(httpRequest == receivedHttpRequest, "Received response for wrong request.");
-
-                        var serverResponse = new ServerResponse(httpResponse);
-                        callback(request, serverResponse);
-                    });
-                }
-                else
-                {
-                    var httpRequestDesc = new HttpGetRequestDesc(request.Url);
-                    httpRequestDesc.Headers = request.SerialiseHeaders();
-                    
-                    var httpRequest = new HttpGetRequest(httpRequestDesc);
-                    m_httpSystem.SendRequest(httpRequest, (HttpGetRequest receivedHttpRequest, HttpResponse httpResponse) => 
-                    {
-                        ReleaseAssert.IsTrue(httpRequest == receivedHttpRequest, "Received response for wrong request.");
-                        
-                        var serverResponse = new ServerResponse(httpResponse);
-                        callback(request, serverResponse);
-                    });
-                }
+                    var serverResponse = new ServerResponse(httpResponse);
+                    callback(request, serverResponse);
+                });
+//                }
+//                else
+//                {
+//                    var httpRequestDesc = new HttpGetRequestDesc(request.Url);
+//                    httpRequestDesc.Headers = request.SerialiseHeaders();
+//
+//                    var httpRequest = new HttpGetRequest(httpRequestDesc);
+//                    m_httpSystem.SendRequest(httpRequest, (HttpGetRequest receivedHttpRequest, HttpResponse httpResponse) =>
+//                    {
+//                        ReleaseAssert.IsTrue(httpRequest == receivedHttpRequest, "Received response for wrong request.");
+//
+//                        var serverResponse = new ServerResponse(httpResponse);
+//                        callback(request, serverResponse);
+//                    });
+//                }
             });
         }
     }

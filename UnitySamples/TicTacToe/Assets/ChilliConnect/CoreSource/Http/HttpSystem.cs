@@ -24,12 +24,15 @@
 //  THE SOFTWARE.
 //
 
-using UnityEngine;
 using System.Collections;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 using System.Text.RegularExpressions;
+using SdkCore.MiniJSON;
+using UnityEngine;
+using UnityEngine.Networking;
 
 namespace SdkCore
 {
@@ -118,72 +121,75 @@ namespace SdkCore
             ReleaseAssert.IsTrue(headers != null, "The headers must not be null when sending a request.");
             ReleaseAssert.IsTrue(callback != null, "The callback must not be null when sending a request.");
 
-            // Unity's WWW class works with the Dictionary concrete class rather than the abstract
-            // IDictionary. Rather than cast a copy is made so we can be sure other dictionary types
-            // will work.
-            Dictionary<string, string> headersConcreteDict = new Dictionary<string, string>(headers);
-
             m_taskScheduler.ScheduleMainThreadTask(() => 
             {
-                var www = new WWW(url, body, headersConcreteDict);
-                m_taskScheduler.StartCoroutine(ProcessRequest(www, callback));
+                // Create the web request
+				var webRequest = new UnityWebRequest(url);
+				webRequest.method = UnityWebRequest.kHttpVerbPOST;
+
+				// Set the headers
+				foreach(var pair in headers)
+				{
+					webRequest.SetRequestHeader(pair.Key, pair.Value);
+				}
+
+				// Handlers
+				webRequest.uploadHandler = new UploadHandlerRaw(body);
+				webRequest.downloadHandler = new DownloadHandlerBuffer();
+
+				m_taskScheduler.StartCoroutine(ProcessRequest(webRequest, callback));
             });
         }
 
         /// <summary>
         /// <para>The coroutine for processing the HTTP request. This will yield until the 
-        /// request has completed then parse the information required by a HTTP response
-        /// from the WWW object.</para>
+        /// request has completed then get the data from the Web Request object.</para>
         /// </summary>
         /// 
         /// <returns>The coroutine enumerator.</returns>
         /// 
-        /// <param name="www">The WWW object.</param>
+        /// <param name="webRequest">The Web Request object.</param>
         /// <param name="callback">The callback providing the response from the server.</param>
-        private IEnumerator ProcessRequest(WWW www, Action<HttpResponse> callback)
+        private IEnumerator ProcessRequest(UnityWebRequest webRequest, Action<HttpResponse> callback)
         {
-            ReleaseAssert.IsTrue(www != null, "The WWW must not be null when sending a request.");
+            ReleaseAssert.IsTrue(webRequest != null, "The webRequest must not be null when sending a request.");
             ReleaseAssert.IsTrue(callback != null, "The callback must not be null when sending a request.");
 
-            yield return www;
-
+            yield return webRequest.Send();
+		
             HttpResponseDesc desc = null;
-            if (string.IsNullOrEmpty(www.error))
+		    int responseCode = (int)webRequest.responseCode;
+		    if(webRequest.isError)
+			{
+				// Print error
+				UnityEngine.Debug.LogErrorFormat("error = {0}", webRequest.error);
+			}
+
+			if(responseCode == 0)
+			{
+				desc = new HttpResponseDesc(HttpResult.CouldNotConnect);
+			}
+			else
+			{
+				desc = new HttpResponseDesc(HttpResult.Success);
+			}
+
+			// Populate the request response
+			if(webRequest.GetResponseHeaders() == null)
+			{
+				desc.Headers = new Dictionary<string, string>();
+			}
+			else
+			{
+				desc.Headers = new Dictionary<string, string>(webRequest.GetResponseHeaders());
+			}
+	
+			desc.HttpResponseCode = responseCode;
+
+            // Fill the response data
+			if (webRequest.downloadedBytes > 0)
             {
-                ReleaseAssert.IsTrue(www.responseHeaders != null, "A successful HTTP response must have a headers object.");
-
-                desc = new HttpResponseDesc(HttpResult.Success);
-                desc.Headers = new Dictionary<string, string>(www.responseHeaders);
-
-                if (www.bytes != null)
-                {
-                    desc.Body = www.bytes;
-                }
-
-                var httpStatus = www.responseHeaders ["STATUS"];
-                ReleaseAssert.IsTrue(!string.IsNullOrEmpty(httpStatus), "A successful HTTP response must have a HTTP status value in the header.");
-
-                desc.HttpResponseCode = ParseHttpStatus(httpStatus);
-            }
-            else
-            {
-                int httpResponseCode = ParseHttpError(www.error);
-                if (httpResponseCode != 0)
-                {
-                    desc = new HttpResponseDesc(HttpResult.Success);
-                    desc.Headers = new Dictionary<string, string>(www.responseHeaders);
-                    
-                    if (www.bytes != null)
-                    {
-                        desc.Body = www.bytes;
-                    }
-
-                    desc.HttpResponseCode = httpResponseCode;
-                }
-                else
-                {
-                    desc = new HttpResponseDesc(HttpResult.CouldNotConnect);
-                }
+				desc.Body = webRequest.downloadHandler.data;
             }
 
             HttpResponse response = new HttpResponse(desc);
@@ -191,57 +197,6 @@ namespace SdkCore
             {
                 callback(response);
             });
-        }
-
-        /// <summary>
-        /// Parses the HTTP response code from the given HTTP STATUS string. The string should
-        /// be in the format 'HTTP/X YYY...' or 'HTTP/X.X YYY...' where YYY is the response 
-        /// code.
-        /// </summary>
-        /// 
-        /// <returns>The response code.</returns>
-        /// 
-        /// <param name="httpStatus">The HTTP status string in the format 'HTTP/X YYY...' 
-        /// or 'HTTP/X.X YYY...'.</param>
-        private int ParseHttpStatus(string httpStatus)
-        {
-            ReleaseAssert.IsTrue(httpStatus != null, "The HTTP status string must not be null when parsing a response code.");
-            
-            var regex = new Regex("[a-zA-Z]*\\/\\d+(\\.\\d)?\\s(?<httpResponseCode>\\d+)\\s");
-            var match = regex.Match(httpStatus);
-            ReleaseAssert.IsTrue(match.Groups.Count == 3, "There must be exactly 3 match groups when using a regex on a HTTP status.");
-            
-            var responseCodeString = match.Groups ["httpResponseCode"].Value;
-            ReleaseAssert.IsTrue(responseCodeString != null, "The response code string cannot be null when using a regex on a HTTP status.");
-            
-            return Int32.Parse(responseCodeString);
-        }
-
-        /// <summary>
-        /// Parses the HTTP response code from the given HTTP error string. The string should
-        /// be in the format 'XXX ...' where XXX is the HTTP response code.
-        /// </summary>
-        /// 
-        /// <returns>The response code parsed from the error, or 0 if there wasn't one.</returns>
-        /// 
-        /// <param name="httpError">The HTTP error string.</param>
-        private int ParseHttpError(string httpError)
-        {
-            ReleaseAssert.IsTrue(httpError != null, "The HTTP error string must not be null when parsing a response code.");
-            
-            var regex = new Regex("(?<httpResponseCode>[0-9][0-9][0-9])\\s");
-            if (regex.IsMatch(httpError))
-            {
-                var match = regex.Match(httpError);
-                ReleaseAssert.IsTrue(match.Groups.Count == 2, "There must be exactly 2 match groups when using a regex on a HTTP error.");
-                
-                var responseCodeString = match.Groups ["httpResponseCode"].Value;
-                ReleaseAssert.IsTrue(responseCodeString != null, "The response code string cannot be null when using a regex on a HTTP error.");
-
-                return Int32.Parse(responseCodeString);
-            }
-
-            return 0;
         }
     }
 }

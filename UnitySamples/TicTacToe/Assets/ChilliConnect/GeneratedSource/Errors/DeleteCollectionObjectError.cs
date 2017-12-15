@@ -64,6 +64,11 @@ namespace ChilliConnect
 			InvalidRequest = 1007,
 	
 			/// <summary>
+			/// Rate Limit Reached. Too many requests. Player has been rate limited.
+			/// </summary>
+			RateLimitReached = 10002,
+	
+			/// <summary>
 			/// Expired Connect Access Token. The Connect Access Token used to authenticate with
 			/// the server has expired and should be renewed.
 			/// </summary>
@@ -98,10 +103,9 @@ namespace ChilliConnect
 			CollectionPermissionDenied = 12007,
 	
 			/// <summary>
-			/// Collection Object Write Conflict. The the WriteLock parameter is out of date.
-			/// There have been writes since the previous WriteLock given in the request. Details
-			/// of the Attempted and Existing data will be available in the response data
-			/// attribute.
+			/// Collection Object Write Conflict. The WriteLock parameter is out of date. There
+			/// have been writes since the previous WriteLock given in the request. Details of
+			/// the Attempted and Existing data will be available in the response data attribute.
 			/// </summary>
 			CollectionObjectWriteConflict = 12008,
 	
@@ -207,6 +211,9 @@ namespace ChilliConnect
 				case 1007:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 422, @"Invalid HTTP response code for error code.");
 					return Error.InvalidRequest;		
+				case 10002:
+					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 429, @"Invalid HTTP response code for error code.");
+					return Error.RateLimitReached;		
 				case 1003:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
 					return Error.ExpiredConnectAccessToken;		
@@ -274,6 +281,8 @@ namespace ChilliConnect
 					return "Invalid Request. One of more of the provided fields were not correctly formatted."
 						+ " The data property of the response body will contain specific error messages for"
 						+ " each field.";
+				case Error.RateLimitReached:
+					return "Rate Limit Reached. Too many requests. Player has been rate limited.";
 				case Error.ExpiredConnectAccessToken:
 					return "Expired Connect Access Token. The Connect Access Token used to authenticate with"
 						+ " the server has expired and should be renewed.";
@@ -291,10 +300,9 @@ namespace ChilliConnect
 					return "Collection Permission Denied. Player has insufficient permission to complete the"
 						+ " request.";
 				case Error.CollectionObjectWriteConflict:
-					return "Collection Object Write Conflict. The the WriteLock parameter is out of date."
-						+ " There have been writes since the previous WriteLock given in the request. Details"
-						+ " of the Attempted and Existing data will be available in the response data"
-						+ " attribute.";
+					return "Collection Object Write Conflict. The WriteLock parameter is out of date. There"
+						+ " have been writes since the previous WriteLock given in the request. Details of"
+						+ " the Attempted and Existing data will be available in the response data attribute.";
 				case Error.MethodDisabled:
 					return "Method Disabled. Public access to this method has been disabled on the"
 						+ " ChilliConnect Dashboard.";

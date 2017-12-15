@@ -132,14 +132,6 @@ namespace ChilliConnect
                         return new GlobalScore((IDictionary<string, object>)element);	
                     });
 				}
-	
-				// An error has occurred.
-				else
-				{
-#if DEBUG
-					throw new ArgumentException("Input Json contains an invalid field.");
-#endif
-				}
 			}
 		}
 	}

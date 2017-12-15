@@ -38,6 +38,11 @@ namespace ChilliConnect
 	public sealed class GetInventoryResponse
 	{
 		/// <summary>
+		/// The Economy Version.
+		/// </summary>
+        public string EconomyVersion { get; private set; }
+	
+		/// <summary>
 		/// A list of Player Inventory Items.
 		/// </summary>
         public ReadOnlyCollection<PlayerInventoryItem> Items { get; private set; }
@@ -50,12 +55,20 @@ namespace ChilliConnect
 		public GetInventoryResponse(IDictionary<string, object> jsonDictionary)
 		{
 			ReleaseAssert.IsNotNull(jsonDictionary, "JSON dictionary cannot be null.");
+			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("EconomyVersion"), "Json is missing required field 'EconomyVersion'");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("Items"), "Json is missing required field 'Items'");
 	
 			foreach (KeyValuePair<string, object> entry in jsonDictionary)
 			{
+				// Economy Version
+				if (entry.Key == "EconomyVersion")
+				{
+                    ReleaseAssert.IsTrue(entry.Value is string, "Invalid serialised type.");
+                    EconomyVersion = (string)entry.Value;
+				}
+		
 				// Items
-				if (entry.Key == "Items")
+				else if (entry.Key == "Items")
 				{
                     ReleaseAssert.IsTrue(entry.Value is IList<object>, "Invalid serialised type.");
                     Items = JsonSerialisation.DeserialiseList((IList<object>)entry.Value, (object element) =>
@@ -63,14 +76,6 @@ namespace ChilliConnect
                         ReleaseAssert.IsTrue(element is IDictionary<string, object>, "Invalid element type.");
                         return new PlayerInventoryItem((IDictionary<string, object>)element);	
                     });
-				}
-	
-				// An error has occurred.
-				else
-				{
-#if DEBUG
-					throw new ArgumentException("Input Json contains an invalid field.");
-#endif
 				}
 			}
 		}

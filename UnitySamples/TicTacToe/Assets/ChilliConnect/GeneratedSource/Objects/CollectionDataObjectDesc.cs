@@ -82,18 +82,15 @@ namespace ChilliConnect
 		/// </summary>
 		///
 		/// <param name="objectId">The ID of the Object.</param>
-		/// <param name="createdBy">The Player that created the Object.</param>
 		/// <param name="dateCreated">The Date the Object was created. Format: ISO8601 e.g. 2016-01-12T11:08:23.</param>
 		/// <param name="value">The Object's data.</param>
-		public CollectionDataObjectDesc(string objectId, Player createdBy, DateTime dateCreated, MultiTypeValue value)
+		public CollectionDataObjectDesc(string objectId, DateTime dateCreated, MultiTypeValue value)
 		{
 			ReleaseAssert.IsNotNull(objectId, "Object Id cannot be null.");
-			ReleaseAssert.IsNotNull(createdBy, "Created By cannot be null.");
 			ReleaseAssert.IsNotNull(dateCreated, "Date Created cannot be null.");
 			ReleaseAssert.IsNotNull(value, "Value cannot be null.");
 	
             ObjectId = objectId;
-            CreatedBy = createdBy;
             DateCreated = dateCreated;
             Value = value;
 		}

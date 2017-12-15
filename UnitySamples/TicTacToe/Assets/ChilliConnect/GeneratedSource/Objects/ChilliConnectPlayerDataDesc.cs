@@ -56,6 +56,11 @@ namespace ChilliConnect
         public MultiTypeValue Value { get; set; }
 	
 		/// <summary>
+		/// True if the Key has Attachment data associated with it.
+		/// </summary>
+        public bool? HasAttachment { get; set; }
+	
+		/// <summary>
 		/// The player's UserName.
 		/// </summary>
         public string UserName { get; set; }
@@ -81,20 +86,17 @@ namespace ChilliConnect
 		///
 		/// <param name="chilliConnectId">The ChilliConnectID of the player of the returned data.</param>
 		/// <param name="key">The requested Custom Data Key.</param>
-		/// <param name="value">The value of the Custom Data Key.</param>
 		/// <param name="dateCreated">The Date the Key was first created. Format: ISO8601 e.g. 2016-01-12T11:08:23.</param>
 		/// <param name="dateModified">The Date the Key was last updated. Format: ISO8601 e.g. 2016-01-12T11:08:23.</param>
-		public ChilliConnectPlayerDataDesc(string chilliConnectId, string key, MultiTypeValue value, DateTime dateCreated, DateTime dateModified)
+		public ChilliConnectPlayerDataDesc(string chilliConnectId, string key, DateTime dateCreated, DateTime dateModified)
 		{
 			ReleaseAssert.IsNotNull(chilliConnectId, "Chilli Connect Id cannot be null.");
 			ReleaseAssert.IsNotNull(key, "Key cannot be null.");
-			ReleaseAssert.IsNotNull(value, "Value cannot be null.");
 			ReleaseAssert.IsNotNull(dateCreated, "Date Created cannot be null.");
 			ReleaseAssert.IsNotNull(dateModified, "Date Modified cannot be null.");
 	
             ChilliConnectId = chilliConnectId;
             Key = key;
-            Value = value;
             DateCreated = dateCreated;
             DateModified = dateModified;
 		}

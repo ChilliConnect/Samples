@@ -70,6 +70,35 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
+		/// Returns details about the Economy for the currently logged in Player.
+		/// </summary>
+		///
+		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
+		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
+		/// a container with information on what went wrong.</param>
+		public void GetEconomyVersion(Action<GetEconomyVersionResponse> successCallback, Action<GetEconomyVersionError> errorCallback)
+		{
+			m_logging.LogVerboseMessage("Sending Get Economy Version request.");
+			
+            var connectAccessToken = m_dataStore.GetString("UserAccessToken");
+			var request = new GetEconomyVersionRequest(connectAccessToken);
+	
+			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
+			{
+				ReleaseAssert.IsTrue(request == sentRequest, "Received request is not the same as the one sent!");
+				
+				if (serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode)
+				{
+					NotifyGetEconomyVersionSuccess(serverResponse, successCallback);
+				} 
+				else 
+				{
+					NotifyGetEconomyVersionError(serverResponse, errorCallback);
+				}
+			});
+		}
+		
+		/// <summary>
 		/// Returns a list of currency balances for the currently logged in player.
 		/// </summary>
 		///
@@ -559,6 +588,36 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
+		/// Get a Economy Definition Package along with details of the contained files and
+		/// types.
+		/// </summary>
+		///
+		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
+		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
+		/// a container with information on what went wrong.</param>
+		public void GetDefinitionsPackage(Action<GetDefinitionsPackageResponse> successCallback, Action<GetDefinitionsPackageError> errorCallback)
+		{
+			m_logging.LogVerboseMessage("Sending Get Definitions Package request.");
+			
+            var connectAccessToken = m_dataStore.GetString("UserAccessToken");
+			var request = new GetDefinitionsPackageRequest(connectAccessToken);
+	
+			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
+			{
+				ReleaseAssert.IsTrue(request == sentRequest, "Received request is not the same as the one sent!");
+				
+				if (serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode)
+				{
+					NotifyGetDefinitionsPackageSuccess(serverResponse, successCallback);
+				} 
+				else 
+				{
+					NotifyGetDefinitionsPackageError(serverResponse, errorCallback);
+				}
+			});
+		}
+		
+		/// <summary>
 		/// Get the Economy definitions for any Currency Conversion items.
 		/// </summary>
 		///
@@ -735,6 +794,26 @@ namespace ChilliConnect
 				{
 					NotifyGetVirtualPurchaseDefinitionsError(serverResponse, request, errorCallback);
 				}
+			});
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Get Economy Version request was successful.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// successful responses can be passed into this method.</param>
+		/// <param name="callback">The success callback.</param>
+		private void NotifyGetEconomyVersionSuccess(ServerResponse serverResponse, Action<GetEconomyVersionResponse> successCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode, "Input server request must describe a success.");
+			
+			m_logging.LogVerboseMessage("GetEconomyVersion request succeeded.");
+	
+			GetEconomyVersionResponse outputResponse = new GetEconomyVersionResponse(serverResponse.Body);
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				successCallback(outputResponse);
 			});
 		}
 		
@@ -1052,6 +1131,26 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
+		/// Notifies the user that a Get Definitions Package request was successful.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// successful responses can be passed into this method.</param>
+		/// <param name="callback">The success callback.</param>
+		private void NotifyGetDefinitionsPackageSuccess(ServerResponse serverResponse, Action<GetDefinitionsPackageResponse> successCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode, "Input server request must describe a success.");
+			
+			m_logging.LogVerboseMessage("GetDefinitionsPackage request succeeded.");
+	
+			GetDefinitionsPackageResponse outputResponse = new GetDefinitionsPackageResponse(serverResponse.Body);
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				successCallback(outputResponse);
+			});
+		}
+		
+		/// <summary>
 		/// Notifies the user that a Get Conversion Definitions request was successful.
 		/// </summary>
 		///
@@ -1175,6 +1274,37 @@ namespace ChilliConnect
 			{
 				successCallback(request, outputResponse);
 			});
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Get Economy Version request has failed.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// failed responses can be passed into this method.</param>
+		/// <param name="callback">The error callback.</param>
+		private void NotifyGetEconomyVersionError(ServerResponse serverResponse, Action<GetEconomyVersionError> errorCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result != HttpResult.Success || serverResponse.HttpResponseCode != SuccessHttpResponseCode, "Input server request must describe an error.");
+			
+			switch (serverResponse.Result) 
+			{
+				case HttpResult.Success:
+					m_logging.LogVerboseMessage("Get Economy Version request failed with http response code: " + serverResponse.HttpResponseCode);
+					break;
+				case HttpResult.CouldNotConnect:
+					m_logging.LogVerboseMessage("Get Economy Version request failed becuase a connection could be established.");
+					break;
+				default:
+					m_logging.LogVerboseMessage("Get Economy Version request failed for an unknown reason.");
+					throw new ArgumentException("Invalid value for server response result.");
+			}
+			
+			GetEconomyVersionError error = new GetEconomyVersionError(serverResponse);	
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				errorCallback(error);
+			});	
 		}
 		
 		/// <summary>
@@ -1653,6 +1783,37 @@ namespace ChilliConnect
 			m_taskScheduler.ScheduleMainThreadTask(() =>
 			{
 				errorCallback(request, error);
+			});	
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Get Definitions Package request has failed.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// failed responses can be passed into this method.</param>
+		/// <param name="callback">The error callback.</param>
+		private void NotifyGetDefinitionsPackageError(ServerResponse serverResponse, Action<GetDefinitionsPackageError> errorCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result != HttpResult.Success || serverResponse.HttpResponseCode != SuccessHttpResponseCode, "Input server request must describe an error.");
+			
+			switch (serverResponse.Result) 
+			{
+				case HttpResult.Success:
+					m_logging.LogVerboseMessage("Get Definitions Package request failed with http response code: " + serverResponse.HttpResponseCode);
+					break;
+				case HttpResult.CouldNotConnect:
+					m_logging.LogVerboseMessage("Get Definitions Package request failed becuase a connection could be established.");
+					break;
+				default:
+					m_logging.LogVerboseMessage("Get Definitions Package request failed for an unknown reason.");
+					throw new ArgumentException("Invalid value for server response result.");
+			}
+			
+			GetDefinitionsPackageError error = new GetDefinitionsPackageError(serverResponse);	
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				errorCallback(error);
 			});	
 		}
 		

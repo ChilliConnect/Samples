@@ -8,22 +8,29 @@ public class MatchSystem
 {
 	private const string MATCH_FILE = "MatchId.txt";
 
+	const string MATCH_TYPE = "TIC_TAC_TOE";
+	const string TURN_TYPE_SEQUENTIAL = "SEQUENTIAL";
+
 	const string MATCHES_COLLECTION = "GAMESTATE";
 	const string QUERY_FIND_MATCH = "Value.MatchState = \"{0}\""; 
     
-	public event System.Action<Match, Match> OnMatchUpdated = delegate {};
+	public event System.Action<GameState, GameState> OnMatchUpdated = delegate {};
 	public event System.Action OnMatchMakingStarted = delegate {};
 	public event System.Action OnMatchMakingFailed = delegate {};
-	public event System.Action<Match> OnMatchMakingSuceeded = delegate {};
-	public event System.Action<Match> OnNewMatchCreated = delegate {};
-	public event System.Action<Match> OnMatchSavedOnServer = delegate {};
+	public event System.Action<GameState> OnMatchMakingSuceeded = delegate {};
+	public event System.Action<GameState> OnNewMatchCreated = delegate {};
+	public event System.Action<GameState> OnMatchSavedOnServer = delegate {};
 
 	private static MatchSystem s_singletonInstance;
 
-	public Match CurrentMatch { get; set; }
+	public GameState CurrentGame { get; set; }
+
+	public int SkillLevel {
+		get;
+		set;
+	}
 
 	private ChilliConnectSdk m_chilliConnect;
-
 	private string m_chilliConnectId;
 
 	public static MatchSystem Get()
@@ -39,7 +46,7 @@ public class MatchSystem
 	public void Initialise(ChilliConnectSdk chilliConnect)
 	{
 		m_chilliConnect = chilliConnect;
-		CurrentMatch = new Match ();
+		CurrentGame = new GameState();
 	}
 
 	public void LoadExistingOrFindNewGame(string chilliConnectId)
@@ -53,7 +60,7 @@ public class MatchSystem
 		}
 		else {
 			UnityEngine.Debug.Log("Found existing game [" +  existingMatchId + "], refreshing from server");
-			CurrentMatch.MatchId = existingMatchId;
+			CurrentGame.MatchId = existingMatchId;
 			RefreshMatchFromServer ();
 		}
 	}
@@ -83,28 +90,42 @@ public class MatchSystem
 
 		OnMatchMakingStarted ();
 
-		QueryCollectionRequestDesc requestDesc = new QueryCollectionRequestDesc(MATCHES_COLLECTION);
-		requestDesc.Query = string.Format(QUERY_FIND_MATCH, Match.MATCHSTATE_WAITING);
+		var joinMatchRequest = new JoinAvailableMatchRequestDesc(MATCH_TYPE);
+		joinMatchRequest.Query = new List<string> () {
+			"Properties.SkillLevel = :skillLevel",
+			"Properties.SkillLevel > :skillLevelLower AND Properties.SkillLevel < :skillLevelUpper",
+		};
 
-		m_chilliConnect.CloudData.QueryCollection(requestDesc, 
-			(request, response ) => StartMatchmakingCallback(response),
+		joinMatchRequest.Params = new Dictionary<string, SdkCore.MultiTypeValue> ();
+		joinMatchRequest.Params ["skillLevel"] = SkillLevel;
+		joinMatchRequest.Params ["skillLevelLower"] = SkillLevel - 5;
+		joinMatchRequest.Params ["skillLevelUpper"] = SkillLevel + 5;
+
+		joinMatchRequest.FallbackToAny = false;
+
+		m_chilliConnect.AsyncMultiplayer.JoinAvailableMatch(joinMatchRequest,
+			(request, response ) => JoinAvailableMatchCallBack(response),
 			(request, error) => Debug.Log(error.ErrorDescription) );
 	}
 
-	private void StartMatchmakingCallback(QueryCollectionResponse response )
+	private void JoinAvailableMatchCallBack(JoinAvailableMatchResponse response )
 	{
-		if (response.Total > 0)
+		if (response.Success)
 		{
-			var matchObject = response.Objects [0];
+			var matchObject = response.Match;
+			if (matchObject.State != GameState.MATCHSTATE_READY) {
+				UnityEngine.Debug.Log("INVALID MATCH STATE:" + matchObject.State);
+			}
 
-			SaveMatchId(matchObject.ObjectId);
+			SaveMatchId(matchObject.MatchId);
 
-			CurrentMatch.MatchId = matchObject.ObjectId;
-			CurrentMatch.Update (matchObject.Value.AsDictionary ());
-			CurrentMatch.OccupyEmptyPlayerPosition (m_chilliConnectId);
+			CurrentGame.MatchId = matchObject.MatchId;
+			CurrentGame.Update(matchObject);
+			CurrentGame.OccupyEmptyPlayerPosition(m_chilliConnectId);
 
-			SaveMatchOnServer();
-			OnMatchMakingSuceeded (CurrentMatch);
+			StartMatch (matchObject.MatchId);
+
+			OnMatchMakingSuceeded (CurrentGame);
 		}
 		else
 		{
@@ -112,73 +133,100 @@ public class MatchSystem
 		}
 	}
 
-	public void CreateNewGame (string selectedSide)
+	private void StartMatch(String matchId)
 	{
-		CurrentMatch.SetNewGame (selectedSide, m_chilliConnectId);
-		AddCollectionObject (CurrentMatch);
-	}
+		var startMatchDesc = new StartMatchRequestDesc (matchId);
+		startMatchDesc.StateData = CurrentGame.AsMultiTypeDictionary ();
 
-	/// Uses AddCollectionObject to add a new game to the existing collection
-	/// 
-	private void AddCollectionObject(Match matchState)
-	{
-		UnityEngine.Debug.Log("Saving new game");
-
-		m_chilliConnect.CloudData.AddCollectionObject( MATCHES_COLLECTION, matchState.AsMultiTypeDictionary(), 
-			(request, response) => AddCollectionObjectCallBack(response),
-			(request, error) => Debug.Log(error.ErrorDescription) );
-	}
-
-	private void AddCollectionObjectCallBack(AddCollectionObjectResponse response)
-	{
-		UnityEngine.Debug.Log("New Game Created On Server");
-
-		var newMatchId = response.ObjectId;
-
-		CurrentMatch.MatchId = newMatchId;
-		SaveMatchId(newMatchId);
-		OnNewMatchCreated(CurrentMatch);
-	}
-
-	public void SaveMatchOnServer()
-	{
-		UnityEngine.Debug.Log("Saving match on server");
-
-		UpdateCollectionObjectRequestDesc desc = new UpdateCollectionObjectRequestDesc(MATCHES_COLLECTION, 
-			CurrentMatch.MatchId, CurrentMatch.AsMultiTypeDictionary());
-
-		m_chilliConnect.CloudData.UpdateCollectionObject(desc, 
-			(request, response) => OnUpdateGameOnServer(),
+		m_chilliConnect.AsyncMultiplayer.StartMatch (startMatchDesc,
+			(request, response) => StartMatchCallBack(response),
 			(request, error) => Debug.Log(error.ErrorDescription) );
 	}
 		
-	private void OnUpdateGameOnServer()
+	private void StartMatchCallBack(StartMatchResponse response)
 	{
-		OnMatchSavedOnServer(CurrentMatch);
+		UnityEngine.Debug.Log("New Game Created On Server");
+
+		var previous = CurrentGame.Copy ();
+		CurrentGame.Update (response.Match);
+
+		OnMatchUpdated (CurrentGame, previous);
+	}
+
+	public void CreateNewGame (string selectedSide)
+	{
+		CurrentGame.SetNewGame (selectedSide, m_chilliConnectId);
+
+		var maxPlayers = 2;
+		var createMatchRequest = new CreateMatchRequestDesc (MATCH_TYPE, TURN_TYPE_SEQUENTIAL, maxPlayers);
+		createMatchRequest.StateData = CurrentGame.AsMultiTypeDictionary ();
+		createMatchRequest.TurnOrderType = "RANDOM";
+		createMatchRequest.AutoStart = false;
+		createMatchRequest.Properties = new Dictionary<string, SdkCore.MultiTypeValue> ();
+		createMatchRequest.Properties ["SkillLevel"] = SkillLevel;
+
+		m_chilliConnect.AsyncMultiplayer.CreateMatch(createMatchRequest,
+			(request, response) => CreateMatchCallBack(response),
+			(request, error) => Debug.Log(error.ErrorDescription) );		
+	}
+
+	private void CreateMatchCallBack(CreateMatchResponse response)
+	{
+		UnityEngine.Debug.Log("New game created");
+
+		var match = response.Match;
+
+		CurrentGame.MatchId = match.MatchId;
+		CurrentGame.MatchState = match.State;
+		SaveMatchId(match.MatchId);
+		OnNewMatchCreated(CurrentGame);
+	}
+
+	public void SubmitTurn()
+	{
+		UnityEngine.Debug.Log("Submitting turn");
+
+		var submitTurnRequest = new SubmitTurnRequestDesc (CurrentGame.MatchId);
+		submitTurnRequest.StateData = CurrentGame.AsMultiTypeDictionary ();
+		if (CurrentGame.MatchState == GameState.MATCHSTATE_COMPLETE) {
+			var outcomeDataBuilder = new SdkCore.MultiTypeDictionaryBuilder ();
+			outcomeDataBuilder.Add ("Winner", m_chilliConnectId);
+			submitTurnRequest.OutcomeData = outcomeDataBuilder.Build ();
+			submitTurnRequest.Completed = true;
+
+			SkillLevel++;
+			var setPlayerDataRequest = new SetPlayerDataRequestDesc ("SkillLevel", SkillLevel);
+			m_chilliConnect.CloudData.SetPlayerData (setPlayerDataRequest, 
+				(request, response) => Debug.Log ("Player Data Updated"),
+				(request, error) => Debug.Log (error.ErrorDescription));
+		}
+
+		m_chilliConnect.AsyncMultiplayer.SubmitTurn(submitTurnRequest,
+			(request, response) => SubmitTurnCallBack(response),
+			(request, error) => Debug.Log(error.ErrorDescription) );
+	}
+		
+	private void SubmitTurnCallBack(SubmitTurnResponse response)
+	{
+		var previous = CurrentGame.Copy ();
+		CurrentGame.Update(response.Match);
+		OnMatchUpdated(CurrentGame, previous);
 	}
 
 	public void RefreshMatchFromServer()
 	{
 		UnityEngine.Debug.Log("Refreshing game: " + Time.time);
 
-		m_chilliConnect.CloudData.GetCollectionObjects(MATCHES_COLLECTION, new List<string>{CurrentMatch.MatchId}, 
-			(request, response) => RefreshGameCallback(response),
+		m_chilliConnect.AsyncMultiplayer.GetMatch (CurrentGame.MatchId,
+			(request, response) => GetMatchCallBack(response),
 			(request, error) => Debug.Log(error.ErrorDescription) );
 	}
-
-	private void RefreshGameCallback(GetCollectionObjectsResponse response)
+		
+	private void GetMatchCallBack(GetMatchResponse response)
 	{
-		if (response.Objects.Count > 0)
-		{
-			var previous = CurrentMatch.Copy ();
-			CurrentMatch.Update(response.Objects[0].Value.AsDictionary());
-			OnMatchUpdated (CurrentMatch, previous);
-		}
-		else
-		{
-			ClearMatchId ();
-			UnityEngine.Debug.Log("Error, match not found");
-		}
+		var previous = CurrentGame.Copy ();
+		CurrentGame.Update (response.Match);
+		OnMatchUpdated (CurrentGame, previous);
 	}
 
 }

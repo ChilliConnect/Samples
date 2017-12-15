@@ -248,6 +248,15 @@ public class GameController : MonoBehaviour {
 		}
 	}
 
+	public void Timeout ()
+	{
+		SetBoardInteractable(false);
+		SetNewGameButton (true);
+		SetGameOverText("Match Timeout");
+		SetPlayerColorsInactive();
+
+	}
+
 	void SetGameOverText (string value)
 	{
 		gameOverPanel.SetActive(true);
