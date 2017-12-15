@@ -18,3 +18,4 @@ UnitySamples/PushNotifications/Temp
 /UnitySamples/TicTacToe/Player.txt
 Objective-CSamples/PlayerMessaging/PlayerMessaging.xcodeproj/project.xcworkspace/xcuserdata
 Objective-CSamples/PlayerMessaging/PlayerMessaging.xcodeproj/xcuserdata
+*.bin
