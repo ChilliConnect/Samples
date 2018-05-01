@@ -33,7 +33,7 @@ using SdkCore;
 namespace ChilliConnect 
 {
 	/// <summary>
-	/// <para>A container used to describe Economy Currency Conversion objects.</para>
+	/// <para>A container used to describe Catalog Currency Conversion objects.</para>
 	///
 	/// <para>This is immutable after construction and is therefore thread safe.</para>
 	/// </summary>
@@ -144,14 +144,6 @@ namespace ChilliConnect
                         ReleaseAssert.IsTrue(element is IDictionary<string, object>, "Invalid element type.");
                         return new ConversionRuleDefinition((IDictionary<string, object>)element);	
                     });
-				}
-	
-				// An error has occurred.
-				else
-				{
-#if DEBUG
-					throw new ArgumentException("Input Json contains an invalid field.");
-#endif
 				}
 			}
 		}

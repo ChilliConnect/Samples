@@ -107,18 +107,16 @@ namespace ChilliConnect
 		/// well as closing the session.
 		/// </summary>
 		///
-		/// <param name="userId">ID that uniquely identifies this player. This ID should not clash with any other
-		/// player and should persist across Sessions.</param>
-		/// <param name="appVersion">The version of your game from which the Session was started.</param>
+		/// <param name="desc">The request description.</param>
 		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
 		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
 		/// a container with information on what went wrong.</param>
-		public void StartSession(string userId, string appVersion, Action<StartSessionRequest> successCallback, Action<StartSessionRequest, StartSessionError> errorCallback)
+		public void StartSession(StartSessionRequestDesc desc, Action<StartSessionRequest> successCallback, Action<StartSessionRequest, StartSessionError> errorCallback)
 		{
 			m_logging.LogVerboseMessage("Sending Start Session request.");
 			
             var gameToken = m_dataStore.GetString("AppToken");
-			var request = new StartSessionRequest(userId, appVersion, gameToken);
+			var request = new StartSessionRequest(desc, gameToken);
 	
 			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
 			{
@@ -131,6 +129,67 @@ namespace ChilliConnect
 				else 
 				{
 					NotifyStartSessionError(serverResponse, request, errorCallback);
+				}
+			});
+		}
+		
+		/// <summary>
+		/// Refreshes the current player session. Depending on ChilliConnect settings, the
+		/// existing session could be refresed, or a new session generated.
+		/// </summary>
+		///
+		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
+		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
+		/// a container with information on what went wrong.</param>
+		public void RefreshSession(Action successCallback, Action<RefreshSessionError> errorCallback)
+		{
+			m_logging.LogVerboseMessage("Sending Refresh Session request.");
+			
+            var metricsAccessToken = m_dataStore.GetString("MetricsAccessToken");
+			var request = new RefreshSessionRequest(metricsAccessToken);
+	
+			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
+			{
+				ReleaseAssert.IsTrue(request == sentRequest, "Received request is not the same as the one sent!");
+				
+				if (serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode)
+				{
+					NotifyRefreshSessionSuccess(serverResponse, successCallback);
+				} 
+				else 
+				{
+					NotifyRefreshSessionError(serverResponse, errorCallback);
+				}
+			});
+		}
+		
+		/// <summary>
+		/// Closes a session previously opened with a call to StartSession. On successful
+		/// close an empty response with a HTTP code of 200 is returned. No request body is
+		/// expected.
+		/// </summary>
+		///
+		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
+		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
+		/// a container with information on what went wrong.</param>
+		public void EndSession(Action successCallback, Action<EndSessionError> errorCallback)
+		{
+			m_logging.LogVerboseMessage("Sending End Session request.");
+			
+            var metricsAccessToken = m_dataStore.GetString("MetricsAccessToken");
+			var request = new EndSessionRequest(metricsAccessToken);
+	
+			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
+			{
+				ReleaseAssert.IsTrue(request == sentRequest, "Received request is not the same as the one sent!");
+				
+				if (serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode)
+				{
+					NotifyEndSessionSuccess(serverResponse, successCallback);
+				} 
+				else 
+				{
+					NotifyEndSessionError(serverResponse, errorCallback);
 				}
 			});
 		}
@@ -237,37 +296,6 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
-		/// Closes a session previously opened with a call to StartSession. On successful
-		/// close an empty response with a HTTP code of 200 is returned. No request body is
-		/// expected.
-		/// </summary>
-		///
-		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
-		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
-		/// a container with information on what went wrong.</param>
-		public void EndSession(Action successCallback, Action<EndSessionError> errorCallback)
-		{
-			m_logging.LogVerboseMessage("Sending End Session request.");
-			
-            var metricsAccessToken = m_dataStore.GetString("MetricsAccessToken");
-			var request = new EndSessionRequest(metricsAccessToken);
-	
-			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
-			{
-				ReleaseAssert.IsTrue(request == sentRequest, "Received request is not the same as the one sent!");
-				
-				if (serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode)
-				{
-					NotifyEndSessionSuccess(serverResponse, successCallback);
-				} 
-				else 
-				{
-					NotifyEndSessionError(serverResponse, errorCallback);
-				}
-			});
-		}
-		
-		/// <summary>
 		/// Notifies the user that a Generate Uuid request was successful.
 		/// </summary>
 		///
@@ -302,12 +330,56 @@ namespace ChilliConnect
 			m_logging.LogVerboseMessage("StartSession request succeeded.");
 	
             var metricsAccessToken = serverResponse.Body["MetricsAccessToken"] as string;
-            ReleaseAssert.IsNotNull(metricsAccessToken, "Data Store property cannot be null.");
-            m_dataStore.Set("MetricsAccessToken", metricsAccessToken);
+            if (metricsAccessToken != null) {
+            	m_dataStore.Set("MetricsAccessToken", metricsAccessToken);
+        	}
         
 			m_taskScheduler.ScheduleMainThreadTask(() =>
 			{
 				successCallback(request);
+			});
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Refresh Session request was successful.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// successful responses can be passed into this method.</param>
+		/// <param name="callback">The success callback.</param>
+		private void NotifyRefreshSessionSuccess(ServerResponse serverResponse, Action successCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode, "Input server request must describe a success.");
+			
+			m_logging.LogVerboseMessage("RefreshSession request succeeded.");
+	
+            var metricsAccessToken = serverResponse.Body["MetricsAccessToken"] as string;
+            if (metricsAccessToken != null) {
+            	m_dataStore.Set("MetricsAccessToken", metricsAccessToken);
+        	}
+        
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				successCallback();
+			});
+		}
+		
+		/// <summary>
+		/// Notifies the user that a End Session request was successful.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// successful responses can be passed into this method.</param>
+		/// <param name="callback">The success callback.</param>
+		private void NotifyEndSessionSuccess(ServerResponse serverResponse, Action successCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode, "Input server request must describe a success.");
+			
+			m_logging.LogVerboseMessage("EndSession request succeeded.");
+	
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				successCallback();
 			});
 		}
 		
@@ -372,25 +444,6 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
-		/// Notifies the user that a End Session request was successful.
-		/// </summary>
-		///
-		/// <param name="serverResponse">A container for information on the response from the server. Only 
-		/// successful responses can be passed into this method.</param>
-		/// <param name="callback">The success callback.</param>
-		private void NotifyEndSessionSuccess(ServerResponse serverResponse, Action successCallback)
-		{
-			ReleaseAssert.IsTrue(serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode, "Input server request must describe a success.");
-			
-			m_logging.LogVerboseMessage("EndSession request succeeded.");
-	
-			m_taskScheduler.ScheduleMainThreadTask(() =>
-			{
-				successCallback();
-			});
-		}
-		
-		/// <summary>
 		/// Notifies the user that a Generate Uuid request has failed.
 		/// </summary>
 		///
@@ -450,6 +503,68 @@ namespace ChilliConnect
 			m_taskScheduler.ScheduleMainThreadTask(() =>
 			{
 				errorCallback(request, error);
+			});	
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Refresh Session request has failed.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// failed responses can be passed into this method.</param>
+		/// <param name="callback">The error callback.</param>
+		private void NotifyRefreshSessionError(ServerResponse serverResponse, Action<RefreshSessionError> errorCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result != HttpResult.Success || serverResponse.HttpResponseCode != SuccessHttpResponseCode, "Input server request must describe an error.");
+			
+			switch (serverResponse.Result) 
+			{
+				case HttpResult.Success:
+					m_logging.LogVerboseMessage("Refresh Session request failed with http response code: " + serverResponse.HttpResponseCode);
+					break;
+				case HttpResult.CouldNotConnect:
+					m_logging.LogVerboseMessage("Refresh Session request failed becuase a connection could be established.");
+					break;
+				default:
+					m_logging.LogVerboseMessage("Refresh Session request failed for an unknown reason.");
+					throw new ArgumentException("Invalid value for server response result.");
+			}
+			
+			RefreshSessionError error = new RefreshSessionError(serverResponse);	
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				errorCallback(error);
+			});	
+		}
+		
+		/// <summary>
+		/// Notifies the user that a End Session request has failed.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// failed responses can be passed into this method.</param>
+		/// <param name="callback">The error callback.</param>
+		private void NotifyEndSessionError(ServerResponse serverResponse, Action<EndSessionError> errorCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result != HttpResult.Success || serverResponse.HttpResponseCode != SuccessHttpResponseCode, "Input server request must describe an error.");
+			
+			switch (serverResponse.Result) 
+			{
+				case HttpResult.Success:
+					m_logging.LogVerboseMessage("End Session request failed with http response code: " + serverResponse.HttpResponseCode);
+					break;
+				case HttpResult.CouldNotConnect:
+					m_logging.LogVerboseMessage("End Session request failed becuase a connection could be established.");
+					break;
+				default:
+					m_logging.LogVerboseMessage("End Session request failed for an unknown reason.");
+					throw new ArgumentException("Invalid value for server response result.");
+			}
+			
+			EndSessionError error = new EndSessionError(serverResponse);	
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				errorCallback(error);
 			});	
 		}
 		
@@ -546,37 +661,6 @@ namespace ChilliConnect
 			m_taskScheduler.ScheduleMainThreadTask(() =>
 			{
 				errorCallback(request, error);
-			});	
-		}
-		
-		/// <summary>
-		/// Notifies the user that a End Session request has failed.
-		/// </summary>
-		///
-		/// <param name="serverResponse">A container for information on the response from the server. Only 
-		/// failed responses can be passed into this method.</param>
-		/// <param name="callback">The error callback.</param>
-		private void NotifyEndSessionError(ServerResponse serverResponse, Action<EndSessionError> errorCallback)
-		{
-			ReleaseAssert.IsTrue(serverResponse.Result != HttpResult.Success || serverResponse.HttpResponseCode != SuccessHttpResponseCode, "Input server request must describe an error.");
-			
-			switch (serverResponse.Result) 
-			{
-				case HttpResult.Success:
-					m_logging.LogVerboseMessage("End Session request failed with http response code: " + serverResponse.HttpResponseCode);
-					break;
-				case HttpResult.CouldNotConnect:
-					m_logging.LogVerboseMessage("End Session request failed becuase a connection could be established.");
-					break;
-				default:
-					m_logging.LogVerboseMessage("End Session request failed for an unknown reason.");
-					throw new ArgumentException("Invalid value for server response result.");
-			}
-			
-			EndSessionError error = new EndSessionError(serverResponse);	
-			m_taskScheduler.ScheduleMainThreadTask(() =>
-			{
-				errorCallback(error);
 			});	
 		}
 	}

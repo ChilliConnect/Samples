@@ -73,6 +73,12 @@ namespace ChilliConnect
 		/// checking don't provide this parameter - data will be written with no checking.
 		/// </summary>
         public string WriteLock { get; private set; }
+	
+		/// <summary>
+		/// The attachment data to be saved to the Custom Data Key. The maximum size is 2mb.
+		/// To remove Attachment Data set to empty string.
+		/// </summary>
+        public string Attachment { get; private set; }
 
 		/// <summary>
 		/// Initialises a new instance of the request with the given description.
@@ -92,6 +98,7 @@ namespace ChilliConnect
             Key = desc.Key;
             Value = desc.Value;
             WriteLock = desc.WriteLock;
+            Attachment = desc.Attachment;
             ConnectAccessToken = connectAccessToken;
 	
 			Url = "https://connect.chilliconnect.com/1.0/data/player/set";
@@ -104,7 +111,7 @@ namespace ChilliConnect
 		/// all server requests. Will return an empty dictionary if there are no headers.
 		/// </summary>
 		///
-		/// <returns>The header hey-value pairs.</returns>
+		/// <returns>The header key-value pairs.</returns>
 		public IDictionary<string, string> SerialiseHeaders()
 		{
 			var dictionary = new Dictionary<string, string>();
@@ -136,6 +143,12 @@ namespace ChilliConnect
             if (WriteLock != null)
 			{
 				dictionary.Add("WriteLock", WriteLock);
+            }
+			
+			// Attachment
+            if (Attachment != null)
+			{
+				dictionary.Add("Attachment", Attachment);
             }
 	
 			return dictionary;

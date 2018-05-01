@@ -33,7 +33,7 @@ using SdkCore;
 namespace ChilliConnect 
 {
 	/// <summary>
-	/// <para>A container used to describe Economy Real Money Purchase objects.</para>
+	/// <para>A container used to describe Catalog Real Money Purchase objects.</para>
 	///
 	/// <para>This is immutable after construction and is therefore thread safe.</para>
 	/// </summary>
@@ -185,14 +185,6 @@ namespace ChilliConnect
 				{
                     ReleaseAssert.IsTrue(entry.Value is IDictionary<string, object>, "Invalid serialised type.");
                     Rewards = new PurchaseExchangeDefinition((IDictionary<string, object>)entry.Value);	
-				}
-	
-				// An error has occurred.
-				else
-				{
-#if DEBUG
-					throw new ArgumentException("Input Json contains an invalid field.");
-#endif
 				}
 			}
 		}

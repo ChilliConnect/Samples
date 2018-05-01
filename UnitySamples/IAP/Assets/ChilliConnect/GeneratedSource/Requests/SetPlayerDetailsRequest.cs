@@ -77,7 +77,7 @@ namespace ChilliConnect
 	
 		/// <summary>
 		/// Password to be assigned to the new player account. If provided must be greater
-		/// than 3 and less than 50 characters in length.
+		/// than 6 and less than 50 characters in length.
 		/// </summary>
         public string Password { get; private set; }
 
@@ -110,7 +110,7 @@ namespace ChilliConnect
 		/// all server requests. Will return an empty dictionary if there are no headers.
 		/// </summary>
 		///
-		/// <returns>The header hey-value pairs.</returns>
+		/// <returns>The header key-value pairs.</returns>
 		public IDictionary<string, string> SerialiseHeaders()
 		{
 			var dictionary = new Dictionary<string, string>();

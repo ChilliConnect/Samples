@@ -38,19 +38,44 @@ namespace ChilliConnect
 	public sealed class GetPlayerDetailsResponse
 	{
 		/// <summary>
-		/// The player's UserName.
+		/// The ChilliConnectID of the account.
+		/// </summary>
+        public string ChilliConnectId { get; private set; }
+	
+		/// <summary>
+		/// The UserName currently associated with the account.
 		/// </summary>
         public string UserName { get; private set; }
 	
 		/// <summary>
-		/// The player's DisplayName.
+		/// The DisplayName currently associated with the account.
 		/// </summary>
         public string DisplayName { get; private set; }
 	
 		/// <summary>
-		/// The player's Email.
+		/// The Email currently associated with the account.
 		/// </summary>
         public string Email { get; private set; }
+	
+		/// <summary>
+		/// The Country currently associated with the account. Format: ISO 3166-1 alpha-2.
+		/// </summary>
+        public string Country { get; private set; }
+	
+		/// <summary>
+		/// List of DeviceModels being used by the player.
+		/// </summary>
+        public ReadOnlyCollection<string> DeviceModel { get; private set; }
+	
+		/// <summary>
+		/// DeviceType being used by the player.
+		/// </summary>
+        public string DeviceType { get; private set; }
+	
+		/// <summary>
+		/// Platform being used by the player.
+		/// </summary>
+        public string Platform { get; private set; }
 
 		/// <summary>
 		/// Initialises the response with the given json dictionary.
@@ -60,11 +85,19 @@ namespace ChilliConnect
 		public GetPlayerDetailsResponse(IDictionary<string, object> jsonDictionary)
 		{
 			ReleaseAssert.IsNotNull(jsonDictionary, "JSON dictionary cannot be null.");
+			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("ChilliConnectID"), "Json is missing required field 'ChilliConnectID'");
 	
 			foreach (KeyValuePair<string, object> entry in jsonDictionary)
 			{
+				// Chilli Connect Id
+				if (entry.Key == "ChilliConnectID")
+				{
+                    ReleaseAssert.IsTrue(entry.Value is string, "Invalid serialised type.");
+                    ChilliConnectId = (string)entry.Value;
+				}
+		
 				// User Name
-				if (entry.Key == "UserName")
+				else if (entry.Key == "UserName")
 				{
 					if (entry.Value != null)
 					{
@@ -92,13 +125,49 @@ namespace ChilliConnect
                         Email = (string)entry.Value;
                     }
 				}
-	
-				// An error has occurred.
-				else
+		
+				// Country
+				else if (entry.Key == "Country")
 				{
-#if DEBUG
-					throw new ArgumentException("Input Json contains an invalid field.");
-#endif
+					if (entry.Value != null)
+					{
+                        ReleaseAssert.IsTrue(entry.Value is string, "Invalid serialised type.");
+                        Country = (string)entry.Value;
+                    }
+				}
+		
+				// Device Model
+				else if (entry.Key == "DeviceModel")
+				{
+					if (entry.Value != null)
+					{
+                        ReleaseAssert.IsTrue(entry.Value is IList<object>, "Invalid serialised type.");
+                        DeviceModel = JsonSerialisation.DeserialiseList((IList<object>)entry.Value, (object element) =>
+                        {
+                            ReleaseAssert.IsTrue(element is string, "Invalid element type.");
+                            return (string)element;
+                        });
+                    }
+				}
+		
+				// Device Type
+				else if (entry.Key == "DeviceType")
+				{
+					if (entry.Value != null)
+					{
+                        ReleaseAssert.IsTrue(entry.Value is string, "Invalid serialised type.");
+                        DeviceType = (string)entry.Value;
+                    }
+				}
+		
+				// Platform
+				else if (entry.Key == "Platform")
+				{
+					if (entry.Value != null)
+					{
+                        ReleaseAssert.IsTrue(entry.Value is string, "Invalid serialised type.");
+                        Platform = (string)entry.Value;
+                    }
 				}
 			}
 		}

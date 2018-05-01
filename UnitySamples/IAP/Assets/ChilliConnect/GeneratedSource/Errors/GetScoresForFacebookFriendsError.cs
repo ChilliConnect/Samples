@@ -64,6 +64,11 @@ namespace ChilliConnect
 			InvalidRequest = 1007,
 	
 			/// <summary>
+			/// Rate Limit Reached. Too many requests. Player has been rate limited.
+			/// </summary>
+			RateLimitReached = 10002,
+	
+			/// <summary>
 			/// Unable To Get Facebook Friends. The player's Facebook friends could not be
 			/// retrieved. This may be because the Facebook AccessToken stoked against the player
 			/// is no longer valid, there was a temporary error communicating with the Facebook
@@ -99,7 +104,14 @@ namespace ChilliConnect
 			/// Temporary Service Error. A temporary error is preventing the request from being
 			/// processed.
 			/// </summary>
-			TemporaryServiceError = 1008
+			TemporaryServiceError = 1008,
+	
+			/// <summary>
+			/// Player Context Not Set. Only applicable to Cloud Code Scripts. Attempted to call
+			/// a method that required a player context, but none was set. Note that the AsPlayer
+			/// method can be used to select a specific player context.
+			/// </summary>
+			PlayerContextNotSet = 6002
 		}
 		
 		private const int SuccessHttpResponseCode = 200;
@@ -197,6 +209,9 @@ namespace ChilliConnect
 				case 1007:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 422, @"Invalid HTTP response code for error code.");
 					return Error.InvalidRequest;		
+				case 10002:
+					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 429, @"Invalid HTTP response code for error code.");
+					return Error.RateLimitReached;		
 				case 2008:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 422, @"Invalid HTTP response code for error code.");
 					return Error.UnableToGetFacebookFriends;		
@@ -215,8 +230,11 @@ namespace ChilliConnect
 				case 1008:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 503, @"Invalid HTTP response code for error code.");
 					return Error.TemporaryServiceError;		
+				case 6002:
+					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
+					return Error.PlayerContextNotSet;		
 				default:
-					throw new ArgumentException("Invalid error code.");
+					return Error.UnexpectedError;
 			}
 		}
         
@@ -254,12 +272,12 @@ namespace ChilliConnect
 			{
 				case Error.CouldNotConnect:
 					return "A connection could not be established.";
-				case Error.UnexpectedError:
-					return "An unexpected server error occurred.";
 				case Error.InvalidRequest:
 					return "Invalid Request. One of more of the provided fields were not correctly formatted."
 						+ " The data property of the response body will contain specific error messages for"
 						+ " each field.";
+				case Error.RateLimitReached:
+					return "Rate Limit Reached. Too many requests. Player has been rate limited.";
 				case Error.UnableToGetFacebookFriends:
 					return "Unable To Get Facebook Friends. The player's Facebook friends could not be"
 						+ " retrieved. This may be because the Facebook AccessToken stoked against the player"
@@ -280,8 +298,13 @@ namespace ChilliConnect
 				case Error.TemporaryServiceError:
 					return "Temporary Service Error. A temporary error is preventing the request from being"
 						+ " processed.";
+				case Error.PlayerContextNotSet:
+					return "Player Context Not Set. Only applicable to Cloud Code Scripts. Attempted to call"
+						+ " a method that required a player context, but none was set. Note that the AsPlayer"
+						+ " method can be used to select a specific player context.";
+				case Error.UnexpectedError:
 				default:
-					throw new ArgumentException("Invalid error code.");
+					return "An unexpected server error occurred.";
 			}
 		}
 	}

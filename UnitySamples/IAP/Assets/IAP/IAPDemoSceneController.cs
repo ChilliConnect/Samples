@@ -32,7 +32,8 @@ public class IAPDemoSceneController : MonoBehaviour
 		if(PlayerPrefs.HasKey("CCId") == true && PlayerPrefs.HasKey("CCSecret") == true)
 		{
 			Debug.Log("Player already exists. Logging in");
-			m_chilliConnect.PlayerAccounts.LogInUsingChilliConnect(PlayerPrefs.GetString("CCId"), PlayerPrefs.GetString("CCSecret"), (loginRequest) => OnLoggedIn(), (loginRequest, error) => Debug.LogError(error.ErrorDescription));
+			var loginRequestDesc = new LogInUsingChilliConnectRequestDesc(PlayerPrefs.GetString("CCId"), PlayerPrefs.GetString("CCSecret"));
+			m_chilliConnect.PlayerAccounts.LogInUsingChilliConnect(loginRequestDesc, (loginRequest, loginResponse) => OnLoggedIn(), (loginRequest, error) => Debug.LogError(error.ErrorDescription));
 		}
 		else
 		{
@@ -59,7 +60,9 @@ public class IAPDemoSceneController : MonoBehaviour
 		PlayerPrefs.SetString("CCId", response.ChilliConnectId);
 		PlayerPrefs.SetString("CCSecret", response.ChilliConnectSecret);
 		PlayerPrefs.Save();
-		m_chilliConnect.PlayerAccounts.LogInUsingChilliConnect(response.ChilliConnectId, response.ChilliConnectSecret, (loginRequest) => OnLoggedIn(), (loginRequest, error) => Debug.LogError(error.ErrorDescription));
+
+		var loginRequestDesc = new LogInUsingChilliConnectRequestDesc(response.ChilliConnectId, response.ChilliConnectSecret);
+		m_chilliConnect.PlayerAccounts.LogInUsingChilliConnect(loginRequestDesc, (loginRequest, loginResponse) => OnLoggedIn(), (loginRequest, error) => Debug.LogError(error.ErrorDescription));
 	}
 
 	/// Called on successful login to ChilliConnect and initialises the systems we

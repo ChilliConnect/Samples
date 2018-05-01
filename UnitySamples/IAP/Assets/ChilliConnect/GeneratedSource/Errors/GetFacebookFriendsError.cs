@@ -63,6 +63,11 @@ namespace ChilliConnect
 			ExpiredConnectAccessToken = 1003,
 	
 			/// <summary>
+			/// Rate Limit Reached. Too many requests. Player has been rate limited.
+			/// </summary>
+			RateLimitReached = 10002,
+	
+			/// <summary>
 			/// Invalid Connect Access Token. The Connect Access Token was not valid and cannot
 			/// be used to authenticate requests.
 			/// </summary>
@@ -72,6 +77,13 @@ namespace ChilliConnect
 			/// Player Not Linked To Facebook. The current player has no linked Facebook account.
 			/// </summary>
 			PlayerNotLinkedToFacebook = 2005,
+	
+			/// <summary>
+			/// Player Context Not Set. Only applicable to Cloud Code Scripts. Attempted to call
+			/// a method that required a player context, but none was set. Note that the AsPlayer
+			/// method can be used to select a specific player context.
+			/// </summary>
+			PlayerContextNotSet = 6002,
 	
 			/// <summary>
 			/// Unable To Get Facebook Friends. The player's Facebook friends could not be
@@ -178,17 +190,23 @@ namespace ChilliConnect
 				case 1003:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
 					return Error.ExpiredConnectAccessToken;		
+				case 10002:
+					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 429, @"Invalid HTTP response code for error code.");
+					return Error.RateLimitReached;		
 				case 1004:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
 					return Error.InvalidConnectAccessToken;		
 				case 2005:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 422, @"Invalid HTTP response code for error code.");
 					return Error.PlayerNotLinkedToFacebook;		
+				case 6002:
+					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
+					return Error.PlayerContextNotSet;		
 				case 2008:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 422, @"Invalid HTTP response code for error code.");
 					return Error.UnableToGetFacebookFriends;		
 				default:
-					throw new ArgumentException("Invalid error code.");
+					return Error.UnexpectedError;
 			}
 		}
         
@@ -226,24 +244,29 @@ namespace ChilliConnect
 			{
 				case Error.CouldNotConnect:
 					return "A connection could not be established.";
-				case Error.UnexpectedError:
-					return "An unexpected server error occurred.";
 				case Error.ExpiredConnectAccessToken:
 					return "Expired Connect Access Token. The Connect Access Token used to authenticate with"
 						+ " the server has expired and should be renewed.";
+				case Error.RateLimitReached:
+					return "Rate Limit Reached. Too many requests. Player has been rate limited.";
 				case Error.InvalidConnectAccessToken:
 					return "Invalid Connect Access Token. The Connect Access Token was not valid and cannot"
 						+ " be used to authenticate requests.";
 				case Error.PlayerNotLinkedToFacebook:
 					return "Player Not Linked To Facebook. The current player has no linked Facebook account.";
+				case Error.PlayerContextNotSet:
+					return "Player Context Not Set. Only applicable to Cloud Code Scripts. Attempted to call"
+						+ " a method that required a player context, but none was set. Note that the AsPlayer"
+						+ " method can be used to select a specific player context.";
 				case Error.UnableToGetFacebookFriends:
 					return "Unable To Get Facebook Friends. The player's Facebook friends could not be"
 						+ " retrieved. This may be because the Facebook AccessToken stoked against the player"
 						+ " is no longer valid, there was a temporary error communicating with the Facebook"
 						+ " API, or the AccessToken provided during Facebook Login did not have the player"
 						+ " friends permission.";
+				case Error.UnexpectedError:
 				default:
-					throw new ArgumentException("Invalid error code.");
+					return "An unexpected server error occurred.";
 			}
 		}
 	}

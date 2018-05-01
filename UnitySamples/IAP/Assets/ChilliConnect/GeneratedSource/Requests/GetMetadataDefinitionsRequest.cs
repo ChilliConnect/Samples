@@ -91,7 +91,7 @@ namespace ChilliConnect
             Page = desc.Page;
             ConnectAccessToken = connectAccessToken;
 	
-			Url = "https://connect.chilliconnect.com/1.0/economy/definitions/metadata";
+			Url = "https://connect.chilliconnect.com/1.0/catalog/definitions/metadata";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 
@@ -101,7 +101,7 @@ namespace ChilliConnect
 		/// all server requests. Will return an empty dictionary if there are no headers.
 		/// </summary>
 		///
-		/// <returns>The header hey-value pairs.</returns>
+		/// <returns>The header key-value pairs.</returns>
 		public IDictionary<string, string> SerialiseHeaders()
 		{
 			var dictionary = new Dictionary<string, string>();
