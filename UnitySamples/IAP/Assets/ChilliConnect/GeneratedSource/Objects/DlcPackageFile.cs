@@ -33,7 +33,7 @@ using SdkCore;
 namespace ChilliConnect 
 {
 	/// <summary>
-	/// <para>A container for information on a DLC package file.</para>
+	/// <para>A container for information about a DLC package file.</para>
 	///
 	/// <para>This is immutable after construction and is therefore thread safe.</para>
 	/// </summary>
@@ -120,14 +120,6 @@ namespace ChilliConnect
 				{
                     ReleaseAssert.IsTrue(entry.Value is string, "Invalid serialised type.");
                     Checksum = (string)entry.Value;
-				}
-	
-				// An error has occurred.
-				else
-				{
-#if DEBUG
-					throw new ArgumentException("Input Json contains an invalid field.");
-#endif
 				}
 			}
 		}

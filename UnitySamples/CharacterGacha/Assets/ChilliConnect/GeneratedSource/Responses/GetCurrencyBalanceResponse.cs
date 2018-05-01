@@ -38,6 +38,11 @@ namespace ChilliConnect
 	public sealed class GetCurrencyBalanceResponse
 	{
 		/// <summary>
+		/// The Catalog Version.
+		/// </summary>
+        public string CatalogVersion { get; private set; }
+	
+		/// <summary>
 		/// An array of Currency balances.
 		/// </summary>
         public ReadOnlyCollection<CurrencyBalance> Balances { get; private set; }
@@ -50,12 +55,20 @@ namespace ChilliConnect
 		public GetCurrencyBalanceResponse(IDictionary<string, object> jsonDictionary)
 		{
 			ReleaseAssert.IsNotNull(jsonDictionary, "JSON dictionary cannot be null.");
+			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("CatalogVersion"), "Json is missing required field 'CatalogVersion'");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("Balances"), "Json is missing required field 'Balances'");
 	
 			foreach (KeyValuePair<string, object> entry in jsonDictionary)
 			{
+				// Catalog Version
+				if (entry.Key == "CatalogVersion")
+				{
+                    ReleaseAssert.IsTrue(entry.Value is string, "Invalid serialised type.");
+                    CatalogVersion = (string)entry.Value;
+				}
+		
 				// Balances
-				if (entry.Key == "Balances")
+				else if (entry.Key == "Balances")
 				{
                     ReleaseAssert.IsTrue(entry.Value is IList<object>, "Invalid serialised type.");
                     Balances = JsonSerialisation.DeserialiseList((IList<object>)entry.Value, (object element) =>

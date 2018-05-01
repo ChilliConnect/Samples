@@ -80,7 +80,7 @@ namespace ChilliConnect
 			}
             ConnectAccessToken = connectAccessToken;
 	
-			Url = "https://connect.chilliconnect.com/1.0/economy/currency/balance/get";
+			Url = "https://connect.chilliconnect.com/2.0/economy/currency/balance/get";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 
@@ -90,7 +90,7 @@ namespace ChilliConnect
 		/// all server requests. Will return an empty dictionary if there are no headers.
 		/// </summary>
 		///
-		/// <returns>The header hey-value pairs.</returns>
+		/// <returns>The header key-value pairs.</returns>
 		public IDictionary<string, string> SerialiseHeaders()
 		{
 			var dictionary = new Dictionary<string, string>();

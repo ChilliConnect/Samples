@@ -17,7 +17,7 @@ public class RecipeListUIController: MonoBehaviour
 
 	private void Awake() 
 	{
-		m_contentParent = transform.FindChild("Content");
+		m_contentParent = transform.Find("Content");
 		GameObject prefab = Resources.Load<GameObject>("RecipeListUIElement");
 		m_pooledParent = new GameObject("RecipeListUIElementPool").transform;
 

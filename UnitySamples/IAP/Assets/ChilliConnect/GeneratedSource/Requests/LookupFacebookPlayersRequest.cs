@@ -56,7 +56,7 @@ namespace ChilliConnect
         public string ConnectAccessToken { get; private set; }
 	
 		/// <summary>
-		/// An array of FacebookIDs to look up.
+		/// An array of FacebookIDs to look up. Maximum 10.
 		/// </summary>
         public ReadOnlyCollection<string> FacebookIds { get; private set; }
 
@@ -64,7 +64,7 @@ namespace ChilliConnect
 		/// Initialises a new instance of the request with the given properties.
 		/// </summary>
 		///
-		/// <param name="facebookIds">An array of FacebookIDs to look up.</param>
+		/// <param name="facebookIds">An array of FacebookIDs to look up. Maximum 10.</param>
 		/// <param name="connectAccessToken">A valid session ConnectAccessToken obtained through one of the login endpoints.</param>
 		public LookupFacebookPlayersRequest(IList<string> facebookIds, string connectAccessToken)
 		{
@@ -85,7 +85,7 @@ namespace ChilliConnect
 		/// all server requests. Will return an empty dictionary if there are no headers.
 		/// </summary>
 		///
-		/// <returns>The header hey-value pairs.</returns>
+		/// <returns>The header key-value pairs.</returns>
 		public IDictionary<string, string> SerialiseHeaders()
 		{
 			var dictionary = new Dictionary<string, string>();

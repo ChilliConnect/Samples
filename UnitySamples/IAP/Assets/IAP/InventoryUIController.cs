@@ -12,9 +12,9 @@ public class InventoryUIController : MonoBehaviour
 	///
 	private void Start () 
 	{
-		m_coinText = transform.FindChild("CoinText").GetComponent<Text>();
+		m_coinText = transform.Find("CoinText").GetComponent<Text>();
 		m_coinText.text = "Coins: Fetching";
-		m_gemText = transform.FindChild("GemText").GetComponent<Text>();
+		m_gemText = transform.Find("GemText").GetComponent<Text>();
 		m_gemText.text = "Gems: Fetching";
 
 		InventorySystem.Get().OnInventoryUpdated += OnInventoryUpdated;

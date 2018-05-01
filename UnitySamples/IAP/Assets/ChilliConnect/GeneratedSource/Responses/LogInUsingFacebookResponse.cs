@@ -43,9 +43,9 @@ namespace ChilliConnect
         public string ChilliConnectId { get; private set; }
 	
 		/// <summary>
-		/// The player's ChilliConnectSecret.
+		/// The Catalog Version.
 		/// </summary>
-        public string ChilliConnectSecret { get; private set; }
+        public string CatalogVersion { get; private set; }
 	
 		/// <summary>
 		/// The player's Facebook account ID.
@@ -66,7 +66,6 @@ namespace ChilliConnect
 		{
 			ReleaseAssert.IsNotNull(jsonDictionary, "JSON dictionary cannot be null.");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("ChilliConnectID"), "Json is missing required field 'ChilliConnectID'");
-			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("ChilliConnectSecret"), "Json is missing required field 'ChilliConnectSecret'");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("FacebookID"), "Json is missing required field 'FacebookID'");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("FacebookName"), "Json is missing required field 'FacebookName'");
 	
@@ -79,11 +78,14 @@ namespace ChilliConnect
                     ChilliConnectId = (string)entry.Value;
 				}
 		
-				// Chilli Connect Secret
-				else if (entry.Key == "ChilliConnectSecret")
+				// Catalog Version
+				else if (entry.Key == "CatalogVersion")
 				{
-                    ReleaseAssert.IsTrue(entry.Value is string, "Invalid serialised type.");
-                    ChilliConnectSecret = (string)entry.Value;
+					if (entry.Value != null)
+					{
+                        ReleaseAssert.IsTrue(entry.Value is string, "Invalid serialised type.");
+                        CatalogVersion = (string)entry.Value;
+                    }
 				}
 		
 				// Facebook Id
@@ -106,12 +108,10 @@ namespace ChilliConnect
 					//Do nothing
 				}
 	
-				// An error has occurred.
-				else
+				// Metrics Access Token
+				else if (entry.Key == "MetricsAccessToken")
 				{
-#if DEBUG
-					throw new ArgumentException("Input Json contains an invalid field.");
-#endif
+					//Do nothing
 				}
 			}
 		}

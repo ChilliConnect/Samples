@@ -79,8 +79,8 @@ public class IAPSystem : IStoreListener
 
 		var desc = new GetRealMoneyPurchaseDefinitionsRequestDesc();
 
-		// Make a request for all "Real money purchase" items that have been registed on the ChilliConnect dashboard.
-		m_chilliConnect.Economy.GetRealMoneyPurchaseDefinitions(desc, OnAvailableItemsFetched, (request, error) => Debug.LogError(error.ErrorDescription));
+		// Make a request for all "Real money purchase" items that have been registered on the ChilliConnect dashboard.
+		m_chilliConnect.Catalog.GetRealMoneyPurchaseDefinitions(desc, OnAvailableItemsFetched, (request, error) => Debug.LogError(error.ErrorDescription));
 	}
 
 	/// Called when the available items have been pulled from ChilliConnect.

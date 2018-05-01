@@ -33,7 +33,7 @@ using SdkCore;
 namespace ChilliConnect 
 {
 	/// <summary>
-	/// <para>A container used to describe Economy Inventory objects.</para>
+	/// <para>A container used to describe Catalog Inventory objects.</para>
 	///
 	/// <para>This is immutable after construction and is therefore thread safe.</para>
 	/// </summary>

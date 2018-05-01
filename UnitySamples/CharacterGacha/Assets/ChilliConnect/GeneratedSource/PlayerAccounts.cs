@@ -70,11 +70,14 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
-		/// Creates a new, anonymous ChilliConnect player account for a specific game.
-		/// UserName, DisplayName, Email and Password details can be provided but are not
-		/// required. Will return a ChilliConnectID and ChilliConnectSecret that uniquely
-		/// identifies the newly created player. These details can be used to login to the
-		/// players account via the LogInUsingChilliConnect method.
+		/// It is no longer recommended to create new players through this endpoint. It is
+		/// better to create new players by using any of the other Login endpoints that have
+		/// a CreatePlayer property. Creates a new, anonymous ChilliConnect player account
+		/// for a specific game. UserName, DisplayName, Email and Password details can be
+		/// provided but are not required. Will return a ChilliConnectID and
+		/// ChilliConnectSecret that uniquely identifies the newly created player. These
+		/// details can be used to login to the players account via the
+		/// LogInUsingChilliConnect method.
 		/// </summary>
 		///
 		/// <param name="desc">The request description.</param>
@@ -113,7 +116,7 @@ namespace ChilliConnect
 		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
 		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
 		/// a container with information on what went wrong.</param>
-		public void LogInUsingChilliConnect(LogInUsingChilliConnectRequestDesc desc, Action<LogInUsingChilliConnectRequest> successCallback, Action<LogInUsingChilliConnectRequest, LogInUsingChilliConnectError> errorCallback)
+		public void LogInUsingChilliConnect(LogInUsingChilliConnectRequestDesc desc, Action<LogInUsingChilliConnectRequest, LogInUsingChilliConnectResponse> successCallback, Action<LogInUsingChilliConnectRequest, LogInUsingChilliConnectError> errorCallback)
 		{
 			m_logging.LogVerboseMessage("Sending Log In Using Chilli Connect request.");
 			
@@ -136,12 +139,9 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
-		/// Login to the sytem using an Email and Password. Returns an ConnectAccessToken
+		/// Login to the system using an Email and Password. Returns an ConnectAccessToken
 		/// that is tied to the player and should be used to authenticate on subsequent
-		/// requests. Also returns the ChilliConnectID and ChilliConnectSecret of the logged
-		/// in player that can be used to generate new ConnectAccessTokens via the
-		/// LogInUsingChilliConnect method without requiring the player to explicitly
-		/// reauthenticate.
+		/// requests. Also returns the ChilliConnectID of the logged in player.
 		/// </summary>
 		///
 		/// <param name="desc">The request description.</param>
@@ -171,12 +171,9 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
-		/// Login to the sytem using a FacebookAccessToken. Returns an ConnectAccessToken
+		/// Login to the system using a FacebookAccessToken. Returns an ConnectAccessToken
 		/// that is tied to the player and should be used to authenticate on subsequent
-		/// requests. Also returns the ChilliConnectID and ChilliConnectSecret of the logged
-		/// in player that can be used to generate new ConnectAccessTokens via the
-		/// LogInUsingChilliConnect method without requiring the player to explicitly
-		/// reauthenticate.
+		/// requests. Also returns the ChilliConnectID of the logged in player.
 		/// </summary>
 		///
 		/// <param name="desc">The request description.</param>
@@ -206,12 +203,105 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
-		/// Login to the sytem using an UserName and Password. Returns an ConnectAccessToken
+		/// Login to the system using a Google Auth Code. Returns an ConnectAccessToken that
+		/// is tied to the player and should be used to authenticate on subsequent requests.
+		/// Also returns the ChilliConnectID of the logged in player.
+		/// </summary>
+		///
+		/// <param name="desc">The request description.</param>
+		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
+		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
+		/// a container with information on what went wrong.</param>
+		public void LogInUsingGoogle(LogInUsingGoogleRequestDesc desc, Action<LogInUsingGoogleRequest, LogInUsingGoogleResponse> successCallback, Action<LogInUsingGoogleRequest, LogInUsingGoogleError> errorCallback)
+		{
+			m_logging.LogVerboseMessage("Sending Log In Using Google request.");
+			
+            var gameToken = m_dataStore.GetString("AppToken");
+			var request = new LogInUsingGoogleRequest(desc, gameToken);
+	
+			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
+			{
+				ReleaseAssert.IsTrue(request == sentRequest, "Received request is not the same as the one sent!");
+				
+				if (serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode)
+				{
+					NotifyLogInUsingGoogleSuccess(serverResponse, request, successCallback);
+				} 
+				else 
+				{
+					NotifyLogInUsingGoogleError(serverResponse, request, errorCallback);
+				}
+			});
+		}
+		
+		/// <summary>
+		/// Login to the system using a GameCenterID. Returns an ConnectAccessToken that is
+		/// tied to the player and should be used to authenticate on subsequent requests.
+		/// Also returns the ChilliConnectID of the logged in player.
+		/// </summary>
+		///
+		/// <param name="desc">The request description.</param>
+		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
+		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
+		/// a container with information on what went wrong.</param>
+		public void LogInUsingGameCenter(LogInUsingGameCenterRequestDesc desc, Action<LogInUsingGameCenterRequest, LogInUsingGameCenterResponse> successCallback, Action<LogInUsingGameCenterRequest, LogInUsingGameCenterError> errorCallback)
+		{
+			m_logging.LogVerboseMessage("Sending Log In Using Game Center request.");
+			
+            var gameToken = m_dataStore.GetString("AppToken");
+			var request = new LogInUsingGameCenterRequest(desc, gameToken);
+	
+			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
+			{
+				ReleaseAssert.IsTrue(request == sentRequest, "Received request is not the same as the one sent!");
+				
+				if (serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode)
+				{
+					NotifyLogInUsingGameCenterSuccess(serverResponse, request, successCallback);
+				} 
+				else 
+				{
+					NotifyLogInUsingGameCenterError(serverResponse, request, errorCallback);
+				}
+			});
+		}
+		
+		/// <summary>
+		/// Login to the system using a Mobile DeviceId and Platform. Returns an
+		/// ConnectAccessToken that is tied to the player and should be used to authenticate
+		/// on subsequent requests. Also returns the ChilliConnectID of the logged in player.
+		/// </summary>
+		///
+		/// <param name="desc">The request description.</param>
+		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
+		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
+		/// a container with information on what went wrong.</param>
+		public void LogInUsingMobileDeviceId(LogInUsingMobileDeviceIdRequestDesc desc, Action<LogInUsingMobileDeviceIdRequest, LogInUsingMobileDeviceIdResponse> successCallback, Action<LogInUsingMobileDeviceIdRequest, LogInUsingMobileDeviceIdError> errorCallback)
+		{
+			m_logging.LogVerboseMessage("Sending Log In Using Mobile Device Id request.");
+			
+            var gameToken = m_dataStore.GetString("AppToken");
+			var request = new LogInUsingMobileDeviceIdRequest(desc, gameToken);
+	
+			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
+			{
+				ReleaseAssert.IsTrue(request == sentRequest, "Received request is not the same as the one sent!");
+				
+				if (serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode)
+				{
+					NotifyLogInUsingMobileDeviceIdSuccess(serverResponse, request, successCallback);
+				} 
+				else 
+				{
+					NotifyLogInUsingMobileDeviceIdError(serverResponse, request, errorCallback);
+				}
+			});
+		}
+		
+		/// <summary>
+		/// Login to the system using an UserName and Password. Returns an ConnectAccessToken
 		/// that is tied to the player and should be used to authenticate on subsequent
-		/// requests. Also returns the ChilliConnectID and ChilliConnectSecret of the logged
-		/// in player that can be used to generate new ConnectAccessTokens via the
-		/// LogInUsingChilliConnect method without requiring the player to explicitly
-		/// reauthenticate.
+		/// requests. Also returns the ChilliConnectID of the logged in player.
 		/// </summary>
 		///
 		/// <param name="desc">The request description.</param>
@@ -300,16 +390,154 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
+		/// Associate a player account with a GameCenterID. Each player can only be
+		/// associated with a single GameCenterID and a GameCenterID can only be associated
+		/// with a single player per game. If the player is already associated with a
+		/// GameCenterID an error will be returned, unless the Replace flag is provided, in
+		/// which case the association will be updated. If the GameCenterID is already
+		/// associated with another player within this game, an error will be returned along
+		/// with the ChilliConnectID for the associated player within the data parameter of
+		/// the response body. If the Update flag is provided, the existing association will
+		/// be removed and GameCenterID associated with the current ChilliConnect account.
+		/// </summary>
+		///
+		/// <param name="desc">The request description.</param>
+		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
+		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
+		/// a container with information on what went wrong.</param>
+		public void LinkGameCenterAccount(LinkGameCenterAccountRequestDesc desc, Action<LinkGameCenterAccountRequest, LinkGameCenterAccountResponse> successCallback, Action<LinkGameCenterAccountRequest, LinkGameCenterAccountError> errorCallback)
+		{
+			m_logging.LogVerboseMessage("Sending Link Game Center Account request.");
+			
+            var connectAccessToken = m_dataStore.GetString("UserAccessToken");
+			var request = new LinkGameCenterAccountRequest(desc, connectAccessToken);
+	
+			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
+			{
+				ReleaseAssert.IsTrue(request == sentRequest, "Received request is not the same as the one sent!");
+				
+				if (serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode)
+				{
+					NotifyLinkGameCenterAccountSuccess(serverResponse, request, successCallback);
+				} 
+				else 
+				{
+					NotifyLinkGameCenterAccountError(serverResponse, request, errorCallback);
+				}
+			});
+		}
+		
+		/// <summary>
+		/// Remove an associate between a player and a GameCenter account previously created
+		/// via the LinkGameCenterAccount method.
+		/// </summary>
+		///
+		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
+		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
+		/// a container with information on what went wrong.</param>
+		public void UnlinkGameCenterAccount(Action<UnlinkGameCenterAccountResponse> successCallback, Action<UnlinkGameCenterAccountError> errorCallback)
+		{
+			m_logging.LogVerboseMessage("Sending Unlink Game Center Account request.");
+			
+            var connectAccessToken = m_dataStore.GetString("UserAccessToken");
+			var request = new UnlinkGameCenterAccountRequest(connectAccessToken);
+	
+			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
+			{
+				ReleaseAssert.IsTrue(request == sentRequest, "Received request is not the same as the one sent!");
+				
+				if (serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode)
+				{
+					NotifyUnlinkGameCenterAccountSuccess(serverResponse, successCallback);
+				} 
+				else 
+				{
+					NotifyUnlinkGameCenterAccountError(serverResponse, errorCallback);
+				}
+			});
+		}
+		
+		/// <summary>
+		/// Associate a unique Mobile DeviceId with a player account. Each player can have
+		/// multiple devices of the same platform linked with their account, so long as the
+		/// combination of DeviceID and Platform are unique. If the player is already
+		/// associated with a DeviceID and Platform, an error will be returned. If the
+		/// DeviceID and Platform are already associated with another player within this
+		/// game, an error will be returned along with the ChilliConnectID for the associated
+		/// player within the data parameter of the response body. If the Update flag is
+		/// provided, the existing association will be removed and the DeviceID and Platform
+		/// will be associated with the current ChilliConnect account.
+		/// </summary>
+		///
+		/// <param name="desc">The request description.</param>
+		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
+		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
+		/// a container with information on what went wrong.</param>
+		public void LinkMobileDeviceId(LinkMobileDeviceIdRequestDesc desc, Action<LinkMobileDeviceIdRequest, LinkMobileDeviceIdResponse> successCallback, Action<LinkMobileDeviceIdRequest, LinkMobileDeviceIdError> errorCallback)
+		{
+			m_logging.LogVerboseMessage("Sending Link Mobile Device Id request.");
+			
+            var connectAccessToken = m_dataStore.GetString("UserAccessToken");
+			var request = new LinkMobileDeviceIdRequest(desc, connectAccessToken);
+	
+			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
+			{
+				ReleaseAssert.IsTrue(request == sentRequest, "Received request is not the same as the one sent!");
+				
+				if (serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode)
+				{
+					NotifyLinkMobileDeviceIdSuccess(serverResponse, request, successCallback);
+				} 
+				else 
+				{
+					NotifyLinkMobileDeviceIdError(serverResponse, request, errorCallback);
+				}
+			});
+		}
+		
+		/// <summary>
+		/// Remove an association between a player and a DeviceId previously created via the
+		/// LinkMobileDeviceId method.
+		/// </summary>
+		///
+		/// <param name="deviceId">DeviceId generated on the Players current device.</param>
+		/// <param name="platform">Platform of the Players current Device. Must only be ANDROID, IOS, or KINDLE.</param>
+		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
+		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
+		/// a container with information on what went wrong.</param>
+		public void UnlinkMobileDeviceId(string deviceId, string platform, Action<UnlinkMobileDeviceIdRequest, UnlinkMobileDeviceIdResponse> successCallback, Action<UnlinkMobileDeviceIdRequest, UnlinkMobileDeviceIdError> errorCallback)
+		{
+			m_logging.LogVerboseMessage("Sending Unlink Mobile Device Id request.");
+			
+            var connectAccessToken = m_dataStore.GetString("UserAccessToken");
+			var request = new UnlinkMobileDeviceIdRequest(deviceId, platform, connectAccessToken);
+	
+			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
+			{
+				ReleaseAssert.IsTrue(request == sentRequest, "Received request is not the same as the one sent!");
+				
+				if (serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode)
+				{
+					NotifyUnlinkMobileDeviceIdSuccess(serverResponse, request, successCallback);
+				} 
+				else 
+				{
+					NotifyUnlinkMobileDeviceIdError(serverResponse, request, errorCallback);
+				}
+			});
+		}
+		
+		/// <summary>
 		/// Associate a player account with a Facebook account. Each player can only be
 		/// associated with a single Facebook account and a Facebook account can only be
 		/// associated with a single player per game. If the player is already associated
 		/// with a Facebook account an error will be returned, unless the Replace flag is
 		/// provided, in which case the association will be updated. If the Facebook account
 		/// is already associated with another player within this game, an error will be
-		/// returned along with the ChilliConnectID and ChilliConnectSecret for the
-		/// associated player within the data parameter of the response body. If the Update
-		/// flag is provided, the existing association will be removed and Facebook account
-		/// associated with the current ChilliConnect account.
+		/// returned along with the FacebookID and FacebookName for the associated player
+		/// within the data parameter of the response body. If the Update flag is provided,
+		/// the existing association will be removed and Facebook account associated with the
+		/// current ChilliConnect account.
 		/// </summary>
 		///
 		/// <param name="desc">The request description.</param>
@@ -334,6 +562,105 @@ namespace ChilliConnect
 				else 
 				{
 					NotifyLinkFacebookAccountError(serverResponse, request, errorCallback);
+				}
+			});
+		}
+		
+		/// <summary>
+		/// Remove an associate between a player and a Facebook account previously created
+		/// via the LinkFacebookAccount method.
+		/// </summary>
+		///
+		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
+		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
+		/// a container with information on what went wrong.</param>
+		public void UnlinkFacebookAccount(Action<UnlinkFacebookAccountResponse> successCallback, Action<UnlinkFacebookAccountError> errorCallback)
+		{
+			m_logging.LogVerboseMessage("Sending Unlink Facebook Account request.");
+			
+            var connectAccessToken = m_dataStore.GetString("UserAccessToken");
+			var request = new UnlinkFacebookAccountRequest(connectAccessToken);
+	
+			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
+			{
+				ReleaseAssert.IsTrue(request == sentRequest, "Received request is not the same as the one sent!");
+				
+				if (serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode)
+				{
+					NotifyUnlinkFacebookAccountSuccess(serverResponse, successCallback);
+				} 
+				else 
+				{
+					NotifyUnlinkFacebookAccountError(serverResponse, errorCallback);
+				}
+			});
+		}
+		
+		/// <summary>
+		/// Associate a player account with a Google account. Each player can only be
+		/// associated with a single Google account and a Google account can only be
+		/// associated with a single player per game. If the player is already associated
+		/// with a Google account an error will be returned, unless the Replace flag is
+		/// provided, in which case the association will be updated. If the Google account is
+		/// already associated with another player within this game, an error will be
+		/// returned along with the ChilliConnectID for the associated player within the data
+		/// parameter of the response body. If the Update flag is provided, the existing
+		/// association will be removed and Google account associated with the current
+		/// ChilliConnect account.
+		/// </summary>
+		///
+		/// <param name="desc">The request description.</param>
+		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
+		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
+		/// a container with information on what went wrong.</param>
+		public void LinkGoogleAccount(LinkGoogleAccountRequestDesc desc, Action<LinkGoogleAccountRequest, LinkGoogleAccountResponse> successCallback, Action<LinkGoogleAccountRequest, LinkGoogleAccountError> errorCallback)
+		{
+			m_logging.LogVerboseMessage("Sending Link Google Account request.");
+			
+            var connectAccessToken = m_dataStore.GetString("UserAccessToken");
+			var request = new LinkGoogleAccountRequest(desc, connectAccessToken);
+	
+			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
+			{
+				ReleaseAssert.IsTrue(request == sentRequest, "Received request is not the same as the one sent!");
+				
+				if (serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode)
+				{
+					NotifyLinkGoogleAccountSuccess(serverResponse, request, successCallback);
+				} 
+				else 
+				{
+					NotifyLinkGoogleAccountError(serverResponse, request, errorCallback);
+				}
+			});
+		}
+		
+		/// <summary>
+		/// Remove an associate between a player and a Google account previously created via
+		/// the LinkGoogleAccount method.
+		/// </summary>
+		///
+		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
+		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
+		/// a container with information on what went wrong.</param>
+		public void UnlinkGoogleAccount(Action<UnlinkGoogleAccountResponse> successCallback, Action<UnlinkGoogleAccountError> errorCallback)
+		{
+			m_logging.LogVerboseMessage("Sending Unlink Google Account request.");
+			
+            var connectAccessToken = m_dataStore.GetString("UserAccessToken");
+			var request = new UnlinkGoogleAccountRequest(connectAccessToken);
+	
+			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
+			{
+				ReleaseAssert.IsTrue(request == sentRequest, "Received request is not the same as the one sent!");
+				
+				if (serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode)
+				{
+					NotifyUnlinkGoogleAccountSuccess(serverResponse, successCallback);
+				} 
+				else 
+				{
+					NotifyUnlinkGoogleAccountError(serverResponse, errorCallback);
 				}
 			});
 		}
@@ -401,38 +728,6 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
-		/// Find the ChilliConnectID's of players associated with provided UserName's.
-		/// Returns an array of objects for each UserName that was found providing the
-		/// ChilliConnectID, UserName and DisplayName of the associated player.
-		/// </summary>
-		///
-		/// <param name="userNames">An array of UserNames to look up. Maximum 10.</param>
-		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
-		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
-		/// a container with information on what went wrong.</param>
-		public void LookupUserNames(IList<string> userNames, Action<LookupUserNamesRequest, LookupUserNamesResponse> successCallback, Action<LookupUserNamesRequest, LookupUserNamesError> errorCallback)
-		{
-			m_logging.LogVerboseMessage("Sending Lookup User Names request.");
-			
-            var connectAccessToken = m_dataStore.GetString("UserAccessToken");
-			var request = new LookupUserNamesRequest(userNames, connectAccessToken);
-	
-			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
-			{
-				ReleaseAssert.IsTrue(request == sentRequest, "Received request is not the same as the one sent!");
-				
-				if (serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode)
-				{
-					NotifyLookupUserNamesSuccess(serverResponse, request, successCallback);
-				} 
-				else 
-				{
-					NotifyLookupUserNamesError(serverResponse, request, errorCallback);
-				}
-			});
-		}
-		
-		/// <summary>
 		/// Get back a players ChilliConnect registered Facebook friends along with their
 		/// current Facebook profile pictures.
 		/// </summary>
@@ -463,19 +758,21 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
-		/// Remove an associate between a player and a Facebook account previously created
-		/// via the LinkFacebookAccount method.
+		/// Find the ChilliConnectID's of players associated with provided UserName's.
+		/// Returns an array of objects for each UserName that was found providing the
+		/// ChilliConnectID, UserName and DisplayName of the associated player.
 		/// </summary>
 		///
+		/// <param name="userNames">An array of UserNames to look up. Maximum 10.</param>
 		/// <param name="successCallback">The delegate which is called if the request was successful.</param>
 		/// <param name="errorCallback">The delegate which is called if the request was unsuccessful. Provides 
 		/// a container with information on what went wrong.</param>
-		public void UnlinkFacebookAccount(Action<UnlinkFacebookAccountResponse> successCallback, Action<UnlinkFacebookAccountError> errorCallback)
+		public void LookupUserNames(IList<string> userNames, Action<LookupUserNamesRequest, LookupUserNamesResponse> successCallback, Action<LookupUserNamesRequest, LookupUserNamesError> errorCallback)
 		{
-			m_logging.LogVerboseMessage("Sending Unlink Facebook Account request.");
+			m_logging.LogVerboseMessage("Sending Lookup User Names request.");
 			
             var connectAccessToken = m_dataStore.GetString("UserAccessToken");
-			var request = new UnlinkFacebookAccountRequest(connectAccessToken);
+			var request = new LookupUserNamesRequest(userNames, connectAccessToken);
 	
 			m_serverRequestSystem.SendImmediateRequest(request, (IImmediateServerRequest sentRequest, ServerResponse serverResponse) =>
 			{
@@ -483,11 +780,11 @@ namespace ChilliConnect
 				
 				if (serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode)
 				{
-					NotifyUnlinkFacebookAccountSuccess(serverResponse, successCallback);
+					NotifyLookupUserNamesSuccess(serverResponse, request, successCallback);
 				} 
 				else 
 				{
-					NotifyUnlinkFacebookAccountError(serverResponse, errorCallback);
+					NotifyLookupUserNamesError(serverResponse, request, errorCallback);
 				}
 			});
 		}
@@ -521,19 +818,26 @@ namespace ChilliConnect
 		/// successful responses can be passed into this method.</param>
 		/// <param name="request"> The request that was sent to the server.</param>
 		/// <param name="callback">The success callback.</param>
-		private void NotifyLogInUsingChilliConnectSuccess(ServerResponse serverResponse, LogInUsingChilliConnectRequest request, Action<LogInUsingChilliConnectRequest> successCallback)
+		private void NotifyLogInUsingChilliConnectSuccess(ServerResponse serverResponse, LogInUsingChilliConnectRequest request, Action<LogInUsingChilliConnectRequest, LogInUsingChilliConnectResponse> successCallback)
 		{
 			ReleaseAssert.IsTrue(serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode, "Input server request must describe a success.");
 			
 			m_logging.LogVerboseMessage("LogInUsingChilliConnect request succeeded.");
 	
             var connectAccessToken = serverResponse.Body["ConnectAccessToken"] as string;
-            ReleaseAssert.IsNotNull(connectAccessToken, "Data Store property cannot be null.");
-            m_dataStore.Set("UserAccessToken", connectAccessToken);
+            if (connectAccessToken != null) {
+            	m_dataStore.Set("UserAccessToken", connectAccessToken);
+        	}
         
+            var metricsAccessToken = serverResponse.Body["MetricsAccessToken"] as string;
+            if (metricsAccessToken != null) {
+            	m_dataStore.Set("MetricsAccessToken", metricsAccessToken);
+        	}
+        
+			LogInUsingChilliConnectResponse outputResponse = new LogInUsingChilliConnectResponse(serverResponse.Body);
 			m_taskScheduler.ScheduleMainThreadTask(() =>
 			{
-				successCallback(request);
+				successCallback(request, outputResponse);
 			});
 		}
 		
@@ -552,8 +856,14 @@ namespace ChilliConnect
 			m_logging.LogVerboseMessage("LogInUsingEmail request succeeded.");
 	
             var connectAccessToken = serverResponse.Body["ConnectAccessToken"] as string;
-            ReleaseAssert.IsNotNull(connectAccessToken, "Data Store property cannot be null.");
-            m_dataStore.Set("UserAccessToken", connectAccessToken);
+            if (connectAccessToken != null) {
+            	m_dataStore.Set("UserAccessToken", connectAccessToken);
+        	}
+        
+            var metricsAccessToken = serverResponse.Body["MetricsAccessToken"] as string;
+            if (metricsAccessToken != null) {
+            	m_dataStore.Set("MetricsAccessToken", metricsAccessToken);
+        	}
         
 			LogInUsingEmailResponse outputResponse = new LogInUsingEmailResponse(serverResponse.Body);
 			m_taskScheduler.ScheduleMainThreadTask(() =>
@@ -577,10 +887,109 @@ namespace ChilliConnect
 			m_logging.LogVerboseMessage("LogInUsingFacebook request succeeded.");
 	
             var connectAccessToken = serverResponse.Body["ConnectAccessToken"] as string;
-            ReleaseAssert.IsNotNull(connectAccessToken, "Data Store property cannot be null.");
-            m_dataStore.Set("UserAccessToken", connectAccessToken);
+            if (connectAccessToken != null) {
+            	m_dataStore.Set("UserAccessToken", connectAccessToken);
+        	}
+        
+            var metricsAccessToken = serverResponse.Body["MetricsAccessToken"] as string;
+            if (metricsAccessToken != null) {
+            	m_dataStore.Set("MetricsAccessToken", metricsAccessToken);
+        	}
         
 			LogInUsingFacebookResponse outputResponse = new LogInUsingFacebookResponse(serverResponse.Body);
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				successCallback(request, outputResponse);
+			});
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Log In Using Google request was successful.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// successful responses can be passed into this method.</param>
+		/// <param name="request"> The request that was sent to the server.</param>
+		/// <param name="callback">The success callback.</param>
+		private void NotifyLogInUsingGoogleSuccess(ServerResponse serverResponse, LogInUsingGoogleRequest request, Action<LogInUsingGoogleRequest, LogInUsingGoogleResponse> successCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode, "Input server request must describe a success.");
+			
+			m_logging.LogVerboseMessage("LogInUsingGoogle request succeeded.");
+	
+            var connectAccessToken = serverResponse.Body["ConnectAccessToken"] as string;
+            if (connectAccessToken != null) {
+            	m_dataStore.Set("UserAccessToken", connectAccessToken);
+        	}
+        
+            var metricsAccessToken = serverResponse.Body["MetricsAccessToken"] as string;
+            if (metricsAccessToken != null) {
+            	m_dataStore.Set("MetricsAccessToken", metricsAccessToken);
+        	}
+        
+			LogInUsingGoogleResponse outputResponse = new LogInUsingGoogleResponse(serverResponse.Body);
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				successCallback(request, outputResponse);
+			});
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Log In Using Game Center request was successful.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// successful responses can be passed into this method.</param>
+		/// <param name="request"> The request that was sent to the server.</param>
+		/// <param name="callback">The success callback.</param>
+		private void NotifyLogInUsingGameCenterSuccess(ServerResponse serverResponse, LogInUsingGameCenterRequest request, Action<LogInUsingGameCenterRequest, LogInUsingGameCenterResponse> successCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode, "Input server request must describe a success.");
+			
+			m_logging.LogVerboseMessage("LogInUsingGameCenter request succeeded.");
+	
+            var connectAccessToken = serverResponse.Body["ConnectAccessToken"] as string;
+            if (connectAccessToken != null) {
+            	m_dataStore.Set("UserAccessToken", connectAccessToken);
+        	}
+        
+            var metricsAccessToken = serverResponse.Body["MetricsAccessToken"] as string;
+            if (metricsAccessToken != null) {
+            	m_dataStore.Set("MetricsAccessToken", metricsAccessToken);
+        	}
+        
+			LogInUsingGameCenterResponse outputResponse = new LogInUsingGameCenterResponse(serverResponse.Body);
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				successCallback(request, outputResponse);
+			});
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Log In Using Mobile Device Id request was successful.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// successful responses can be passed into this method.</param>
+		/// <param name="request"> The request that was sent to the server.</param>
+		/// <param name="callback">The success callback.</param>
+		private void NotifyLogInUsingMobileDeviceIdSuccess(ServerResponse serverResponse, LogInUsingMobileDeviceIdRequest request, Action<LogInUsingMobileDeviceIdRequest, LogInUsingMobileDeviceIdResponse> successCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode, "Input server request must describe a success.");
+			
+			m_logging.LogVerboseMessage("LogInUsingMobileDeviceId request succeeded.");
+	
+            var connectAccessToken = serverResponse.Body["ConnectAccessToken"] as string;
+            if (connectAccessToken != null) {
+            	m_dataStore.Set("UserAccessToken", connectAccessToken);
+        	}
+        
+            var metricsAccessToken = serverResponse.Body["MetricsAccessToken"] as string;
+            if (metricsAccessToken != null) {
+            	m_dataStore.Set("MetricsAccessToken", metricsAccessToken);
+        	}
+        
+			LogInUsingMobileDeviceIdResponse outputResponse = new LogInUsingMobileDeviceIdResponse(serverResponse.Body);
 			m_taskScheduler.ScheduleMainThreadTask(() =>
 			{
 				successCallback(request, outputResponse);
@@ -602,8 +1011,14 @@ namespace ChilliConnect
 			m_logging.LogVerboseMessage("LogInUsingUserName request succeeded.");
 	
             var connectAccessToken = serverResponse.Body["ConnectAccessToken"] as string;
-            ReleaseAssert.IsNotNull(connectAccessToken, "Data Store property cannot be null.");
-            m_dataStore.Set("UserAccessToken", connectAccessToken);
+            if (connectAccessToken != null) {
+            	m_dataStore.Set("UserAccessToken", connectAccessToken);
+        	}
+        
+            var metricsAccessToken = serverResponse.Body["MetricsAccessToken"] as string;
+            if (metricsAccessToken != null) {
+            	m_dataStore.Set("MetricsAccessToken", metricsAccessToken);
+        	}
         
 			LogInUsingUserNameResponse outputResponse = new LogInUsingUserNameResponse(serverResponse.Body);
 			m_taskScheduler.ScheduleMainThreadTask(() =>
@@ -654,6 +1069,89 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
+		/// Notifies the user that a Link Game Center Account request was successful.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// successful responses can be passed into this method.</param>
+		/// <param name="request"> The request that was sent to the server.</param>
+		/// <param name="callback">The success callback.</param>
+		private void NotifyLinkGameCenterAccountSuccess(ServerResponse serverResponse, LinkGameCenterAccountRequest request, Action<LinkGameCenterAccountRequest, LinkGameCenterAccountResponse> successCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode, "Input server request must describe a success.");
+			
+			m_logging.LogVerboseMessage("LinkGameCenterAccount request succeeded.");
+	
+			LinkGameCenterAccountResponse outputResponse = new LinkGameCenterAccountResponse(serverResponse.Body);
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				successCallback(request, outputResponse);
+			});
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Unlink Game Center Account request was successful.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// successful responses can be passed into this method.</param>
+		/// <param name="callback">The success callback.</param>
+		private void NotifyUnlinkGameCenterAccountSuccess(ServerResponse serverResponse, Action<UnlinkGameCenterAccountResponse> successCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode, "Input server request must describe a success.");
+			
+			m_logging.LogVerboseMessage("UnlinkGameCenterAccount request succeeded.");
+	
+			UnlinkGameCenterAccountResponse outputResponse = new UnlinkGameCenterAccountResponse(serverResponse.Body);
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				successCallback(outputResponse);
+			});
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Link Mobile Device Id request was successful.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// successful responses can be passed into this method.</param>
+		/// <param name="request"> The request that was sent to the server.</param>
+		/// <param name="callback">The success callback.</param>
+		private void NotifyLinkMobileDeviceIdSuccess(ServerResponse serverResponse, LinkMobileDeviceIdRequest request, Action<LinkMobileDeviceIdRequest, LinkMobileDeviceIdResponse> successCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode, "Input server request must describe a success.");
+			
+			m_logging.LogVerboseMessage("LinkMobileDeviceId request succeeded.");
+	
+			LinkMobileDeviceIdResponse outputResponse = new LinkMobileDeviceIdResponse(serverResponse.Body);
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				successCallback(request, outputResponse);
+			});
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Unlink Mobile Device Id request was successful.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// successful responses can be passed into this method.</param>
+		/// <param name="request"> The request that was sent to the server.</param>
+		/// <param name="callback">The success callback.</param>
+		private void NotifyUnlinkMobileDeviceIdSuccess(ServerResponse serverResponse, UnlinkMobileDeviceIdRequest request, Action<UnlinkMobileDeviceIdRequest, UnlinkMobileDeviceIdResponse> successCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode, "Input server request must describe a success.");
+			
+			m_logging.LogVerboseMessage("UnlinkMobileDeviceId request succeeded.");
+	
+			UnlinkMobileDeviceIdResponse outputResponse = new UnlinkMobileDeviceIdResponse(serverResponse.Body);
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				successCallback(request, outputResponse);
+			});
+		}
+		
+		/// <summary>
 		/// Notifies the user that a Link Facebook Account request was successful.
 		/// </summary>
 		///
@@ -671,6 +1169,67 @@ namespace ChilliConnect
 			m_taskScheduler.ScheduleMainThreadTask(() =>
 			{
 				successCallback(request, outputResponse);
+			});
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Unlink Facebook Account request was successful.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// successful responses can be passed into this method.</param>
+		/// <param name="callback">The success callback.</param>
+		private void NotifyUnlinkFacebookAccountSuccess(ServerResponse serverResponse, Action<UnlinkFacebookAccountResponse> successCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode, "Input server request must describe a success.");
+			
+			m_logging.LogVerboseMessage("UnlinkFacebookAccount request succeeded.");
+	
+			UnlinkFacebookAccountResponse outputResponse = new UnlinkFacebookAccountResponse(serverResponse.Body);
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				successCallback(outputResponse);
+			});
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Link Google Account request was successful.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// successful responses can be passed into this method.</param>
+		/// <param name="request"> The request that was sent to the server.</param>
+		/// <param name="callback">The success callback.</param>
+		private void NotifyLinkGoogleAccountSuccess(ServerResponse serverResponse, LinkGoogleAccountRequest request, Action<LinkGoogleAccountRequest, LinkGoogleAccountResponse> successCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode, "Input server request must describe a success.");
+			
+			m_logging.LogVerboseMessage("LinkGoogleAccount request succeeded.");
+	
+			LinkGoogleAccountResponse outputResponse = new LinkGoogleAccountResponse(serverResponse.Body);
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				successCallback(request, outputResponse);
+			});
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Unlink Google Account request was successful.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// successful responses can be passed into this method.</param>
+		/// <param name="callback">The success callback.</param>
+		private void NotifyUnlinkGoogleAccountSuccess(ServerResponse serverResponse, Action<UnlinkGoogleAccountResponse> successCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode, "Input server request must describe a success.");
+			
+			m_logging.LogVerboseMessage("UnlinkGoogleAccount request succeeded.");
+	
+			UnlinkGoogleAccountResponse outputResponse = new UnlinkGoogleAccountResponse(serverResponse.Body);
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				successCallback(outputResponse);
 			});
 		}
 		
@@ -716,27 +1275,6 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
-		/// Notifies the user that a Lookup User Names request was successful.
-		/// </summary>
-		///
-		/// <param name="serverResponse">A container for information on the response from the server. Only 
-		/// successful responses can be passed into this method.</param>
-		/// <param name="request"> The request that was sent to the server.</param>
-		/// <param name="callback">The success callback.</param>
-		private void NotifyLookupUserNamesSuccess(ServerResponse serverResponse, LookupUserNamesRequest request, Action<LookupUserNamesRequest, LookupUserNamesResponse> successCallback)
-		{
-			ReleaseAssert.IsTrue(serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode, "Input server request must describe a success.");
-			
-			m_logging.LogVerboseMessage("LookupUserNames request succeeded.");
-	
-			LookupUserNamesResponse outputResponse = new LookupUserNamesResponse(serverResponse.Body);
-			m_taskScheduler.ScheduleMainThreadTask(() =>
-			{
-				successCallback(request, outputResponse);
-			});
-		}
-		
-		/// <summary>
 		/// Notifies the user that a Get Facebook Friends request was successful.
 		/// </summary>
 		///
@@ -757,22 +1295,23 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
-		/// Notifies the user that a Unlink Facebook Account request was successful.
+		/// Notifies the user that a Lookup User Names request was successful.
 		/// </summary>
 		///
 		/// <param name="serverResponse">A container for information on the response from the server. Only 
 		/// successful responses can be passed into this method.</param>
+		/// <param name="request"> The request that was sent to the server.</param>
 		/// <param name="callback">The success callback.</param>
-		private void NotifyUnlinkFacebookAccountSuccess(ServerResponse serverResponse, Action<UnlinkFacebookAccountResponse> successCallback)
+		private void NotifyLookupUserNamesSuccess(ServerResponse serverResponse, LookupUserNamesRequest request, Action<LookupUserNamesRequest, LookupUserNamesResponse> successCallback)
 		{
 			ReleaseAssert.IsTrue(serverResponse.Result == HttpResult.Success && serverResponse.HttpResponseCode == SuccessHttpResponseCode, "Input server request must describe a success.");
 			
-			m_logging.LogVerboseMessage("UnlinkFacebookAccount request succeeded.");
+			m_logging.LogVerboseMessage("LookupUserNames request succeeded.");
 	
-			UnlinkFacebookAccountResponse outputResponse = new UnlinkFacebookAccountResponse(serverResponse.Body);
+			LookupUserNamesResponse outputResponse = new LookupUserNamesResponse(serverResponse.Body);
 			m_taskScheduler.ScheduleMainThreadTask(() =>
 			{
-				successCallback(outputResponse);
+				successCallback(request, outputResponse);
 			});
 		}
 		
@@ -905,6 +1444,102 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
+		/// Notifies the user that a Log In Using Google request has failed.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// failed responses can be passed into this method.</param>
+		/// <param name="request"> The request that was sent to the server.</param>
+		/// <param name="callback">The error callback.</param>
+		private void NotifyLogInUsingGoogleError(ServerResponse serverResponse, LogInUsingGoogleRequest request, Action<LogInUsingGoogleRequest, LogInUsingGoogleError> errorCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result != HttpResult.Success || serverResponse.HttpResponseCode != SuccessHttpResponseCode, "Input server request must describe an error.");
+			
+			switch (serverResponse.Result) 
+			{
+				case HttpResult.Success:
+					m_logging.LogVerboseMessage("Log In Using Google request failed with http response code: " + serverResponse.HttpResponseCode);
+					break;
+				case HttpResult.CouldNotConnect:
+					m_logging.LogVerboseMessage("Log In Using Google request failed becuase a connection could be established.");
+					break;
+				default:
+					m_logging.LogVerboseMessage("Log In Using Google request failed for an unknown reason.");
+					throw new ArgumentException("Invalid value for server response result.");
+			}
+			
+			LogInUsingGoogleError error = new LogInUsingGoogleError(serverResponse);	
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				errorCallback(request, error);
+			});	
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Log In Using Game Center request has failed.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// failed responses can be passed into this method.</param>
+		/// <param name="request"> The request that was sent to the server.</param>
+		/// <param name="callback">The error callback.</param>
+		private void NotifyLogInUsingGameCenterError(ServerResponse serverResponse, LogInUsingGameCenterRequest request, Action<LogInUsingGameCenterRequest, LogInUsingGameCenterError> errorCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result != HttpResult.Success || serverResponse.HttpResponseCode != SuccessHttpResponseCode, "Input server request must describe an error.");
+			
+			switch (serverResponse.Result) 
+			{
+				case HttpResult.Success:
+					m_logging.LogVerboseMessage("Log In Using Game Center request failed with http response code: " + serverResponse.HttpResponseCode);
+					break;
+				case HttpResult.CouldNotConnect:
+					m_logging.LogVerboseMessage("Log In Using Game Center request failed becuase a connection could be established.");
+					break;
+				default:
+					m_logging.LogVerboseMessage("Log In Using Game Center request failed for an unknown reason.");
+					throw new ArgumentException("Invalid value for server response result.");
+			}
+			
+			LogInUsingGameCenterError error = new LogInUsingGameCenterError(serverResponse);	
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				errorCallback(request, error);
+			});	
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Log In Using Mobile Device Id request has failed.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// failed responses can be passed into this method.</param>
+		/// <param name="request"> The request that was sent to the server.</param>
+		/// <param name="callback">The error callback.</param>
+		private void NotifyLogInUsingMobileDeviceIdError(ServerResponse serverResponse, LogInUsingMobileDeviceIdRequest request, Action<LogInUsingMobileDeviceIdRequest, LogInUsingMobileDeviceIdError> errorCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result != HttpResult.Success || serverResponse.HttpResponseCode != SuccessHttpResponseCode, "Input server request must describe an error.");
+			
+			switch (serverResponse.Result) 
+			{
+				case HttpResult.Success:
+					m_logging.LogVerboseMessage("Log In Using Mobile Device Id request failed with http response code: " + serverResponse.HttpResponseCode);
+					break;
+				case HttpResult.CouldNotConnect:
+					m_logging.LogVerboseMessage("Log In Using Mobile Device Id request failed becuase a connection could be established.");
+					break;
+				default:
+					m_logging.LogVerboseMessage("Log In Using Mobile Device Id request failed for an unknown reason.");
+					throw new ArgumentException("Invalid value for server response result.");
+			}
+			
+			LogInUsingMobileDeviceIdError error = new LogInUsingMobileDeviceIdError(serverResponse);	
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				errorCallback(request, error);
+			});	
+		}
+		
+		/// <summary>
 		/// Notifies the user that a Log In Using User Name request has failed.
 		/// </summary>
 		///
@@ -1000,6 +1635,133 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
+		/// Notifies the user that a Link Game Center Account request has failed.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// failed responses can be passed into this method.</param>
+		/// <param name="request"> The request that was sent to the server.</param>
+		/// <param name="callback">The error callback.</param>
+		private void NotifyLinkGameCenterAccountError(ServerResponse serverResponse, LinkGameCenterAccountRequest request, Action<LinkGameCenterAccountRequest, LinkGameCenterAccountError> errorCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result != HttpResult.Success || serverResponse.HttpResponseCode != SuccessHttpResponseCode, "Input server request must describe an error.");
+			
+			switch (serverResponse.Result) 
+			{
+				case HttpResult.Success:
+					m_logging.LogVerboseMessage("Link Game Center Account request failed with http response code: " + serverResponse.HttpResponseCode);
+					break;
+				case HttpResult.CouldNotConnect:
+					m_logging.LogVerboseMessage("Link Game Center Account request failed becuase a connection could be established.");
+					break;
+				default:
+					m_logging.LogVerboseMessage("Link Game Center Account request failed for an unknown reason.");
+					throw new ArgumentException("Invalid value for server response result.");
+			}
+			
+			LinkGameCenterAccountError error = new LinkGameCenterAccountError(serverResponse);	
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				errorCallback(request, error);
+			});	
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Unlink Game Center Account request has failed.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// failed responses can be passed into this method.</param>
+		/// <param name="callback">The error callback.</param>
+		private void NotifyUnlinkGameCenterAccountError(ServerResponse serverResponse, Action<UnlinkGameCenterAccountError> errorCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result != HttpResult.Success || serverResponse.HttpResponseCode != SuccessHttpResponseCode, "Input server request must describe an error.");
+			
+			switch (serverResponse.Result) 
+			{
+				case HttpResult.Success:
+					m_logging.LogVerboseMessage("Unlink Game Center Account request failed with http response code: " + serverResponse.HttpResponseCode);
+					break;
+				case HttpResult.CouldNotConnect:
+					m_logging.LogVerboseMessage("Unlink Game Center Account request failed becuase a connection could be established.");
+					break;
+				default:
+					m_logging.LogVerboseMessage("Unlink Game Center Account request failed for an unknown reason.");
+					throw new ArgumentException("Invalid value for server response result.");
+			}
+			
+			UnlinkGameCenterAccountError error = new UnlinkGameCenterAccountError(serverResponse);	
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				errorCallback(error);
+			});	
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Link Mobile Device Id request has failed.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// failed responses can be passed into this method.</param>
+		/// <param name="request"> The request that was sent to the server.</param>
+		/// <param name="callback">The error callback.</param>
+		private void NotifyLinkMobileDeviceIdError(ServerResponse serverResponse, LinkMobileDeviceIdRequest request, Action<LinkMobileDeviceIdRequest, LinkMobileDeviceIdError> errorCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result != HttpResult.Success || serverResponse.HttpResponseCode != SuccessHttpResponseCode, "Input server request must describe an error.");
+			
+			switch (serverResponse.Result) 
+			{
+				case HttpResult.Success:
+					m_logging.LogVerboseMessage("Link Mobile Device Id request failed with http response code: " + serverResponse.HttpResponseCode);
+					break;
+				case HttpResult.CouldNotConnect:
+					m_logging.LogVerboseMessage("Link Mobile Device Id request failed becuase a connection could be established.");
+					break;
+				default:
+					m_logging.LogVerboseMessage("Link Mobile Device Id request failed for an unknown reason.");
+					throw new ArgumentException("Invalid value for server response result.");
+			}
+			
+			LinkMobileDeviceIdError error = new LinkMobileDeviceIdError(serverResponse);	
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				errorCallback(request, error);
+			});	
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Unlink Mobile Device Id request has failed.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// failed responses can be passed into this method.</param>
+		/// <param name="request"> The request that was sent to the server.</param>
+		/// <param name="callback">The error callback.</param>
+		private void NotifyUnlinkMobileDeviceIdError(ServerResponse serverResponse, UnlinkMobileDeviceIdRequest request, Action<UnlinkMobileDeviceIdRequest, UnlinkMobileDeviceIdError> errorCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result != HttpResult.Success || serverResponse.HttpResponseCode != SuccessHttpResponseCode, "Input server request must describe an error.");
+			
+			switch (serverResponse.Result) 
+			{
+				case HttpResult.Success:
+					m_logging.LogVerboseMessage("Unlink Mobile Device Id request failed with http response code: " + serverResponse.HttpResponseCode);
+					break;
+				case HttpResult.CouldNotConnect:
+					m_logging.LogVerboseMessage("Unlink Mobile Device Id request failed becuase a connection could be established.");
+					break;
+				default:
+					m_logging.LogVerboseMessage("Unlink Mobile Device Id request failed for an unknown reason.");
+					throw new ArgumentException("Invalid value for server response result.");
+			}
+			
+			UnlinkMobileDeviceIdError error = new UnlinkMobileDeviceIdError(serverResponse);	
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				errorCallback(request, error);
+			});	
+		}
+		
+		/// <summary>
 		/// Notifies the user that a Link Facebook Account request has failed.
 		/// </summary>
 		///
@@ -1028,6 +1790,100 @@ namespace ChilliConnect
 			m_taskScheduler.ScheduleMainThreadTask(() =>
 			{
 				errorCallback(request, error);
+			});	
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Unlink Facebook Account request has failed.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// failed responses can be passed into this method.</param>
+		/// <param name="callback">The error callback.</param>
+		private void NotifyUnlinkFacebookAccountError(ServerResponse serverResponse, Action<UnlinkFacebookAccountError> errorCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result != HttpResult.Success || serverResponse.HttpResponseCode != SuccessHttpResponseCode, "Input server request must describe an error.");
+			
+			switch (serverResponse.Result) 
+			{
+				case HttpResult.Success:
+					m_logging.LogVerboseMessage("Unlink Facebook Account request failed with http response code: " + serverResponse.HttpResponseCode);
+					break;
+				case HttpResult.CouldNotConnect:
+					m_logging.LogVerboseMessage("Unlink Facebook Account request failed becuase a connection could be established.");
+					break;
+				default:
+					m_logging.LogVerboseMessage("Unlink Facebook Account request failed for an unknown reason.");
+					throw new ArgumentException("Invalid value for server response result.");
+			}
+			
+			UnlinkFacebookAccountError error = new UnlinkFacebookAccountError(serverResponse);	
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				errorCallback(error);
+			});	
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Link Google Account request has failed.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// failed responses can be passed into this method.</param>
+		/// <param name="request"> The request that was sent to the server.</param>
+		/// <param name="callback">The error callback.</param>
+		private void NotifyLinkGoogleAccountError(ServerResponse serverResponse, LinkGoogleAccountRequest request, Action<LinkGoogleAccountRequest, LinkGoogleAccountError> errorCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result != HttpResult.Success || serverResponse.HttpResponseCode != SuccessHttpResponseCode, "Input server request must describe an error.");
+			
+			switch (serverResponse.Result) 
+			{
+				case HttpResult.Success:
+					m_logging.LogVerboseMessage("Link Google Account request failed with http response code: " + serverResponse.HttpResponseCode);
+					break;
+				case HttpResult.CouldNotConnect:
+					m_logging.LogVerboseMessage("Link Google Account request failed becuase a connection could be established.");
+					break;
+				default:
+					m_logging.LogVerboseMessage("Link Google Account request failed for an unknown reason.");
+					throw new ArgumentException("Invalid value for server response result.");
+			}
+			
+			LinkGoogleAccountError error = new LinkGoogleAccountError(serverResponse);	
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				errorCallback(request, error);
+			});	
+		}
+		
+		/// <summary>
+		/// Notifies the user that a Unlink Google Account request has failed.
+		/// </summary>
+		///
+		/// <param name="serverResponse">A container for information on the response from the server. Only 
+		/// failed responses can be passed into this method.</param>
+		/// <param name="callback">The error callback.</param>
+		private void NotifyUnlinkGoogleAccountError(ServerResponse serverResponse, Action<UnlinkGoogleAccountError> errorCallback)
+		{
+			ReleaseAssert.IsTrue(serverResponse.Result != HttpResult.Success || serverResponse.HttpResponseCode != SuccessHttpResponseCode, "Input server request must describe an error.");
+			
+			switch (serverResponse.Result) 
+			{
+				case HttpResult.Success:
+					m_logging.LogVerboseMessage("Unlink Google Account request failed with http response code: " + serverResponse.HttpResponseCode);
+					break;
+				case HttpResult.CouldNotConnect:
+					m_logging.LogVerboseMessage("Unlink Google Account request failed becuase a connection could be established.");
+					break;
+				default:
+					m_logging.LogVerboseMessage("Unlink Google Account request failed for an unknown reason.");
+					throw new ArgumentException("Invalid value for server response result.");
+			}
+			
+			UnlinkGoogleAccountError error = new UnlinkGoogleAccountError(serverResponse);	
+			m_taskScheduler.ScheduleMainThreadTask(() =>
+			{
+				errorCallback(error);
 			});	
 		}
 		
@@ -1095,38 +1951,6 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
-		/// Notifies the user that a Lookup User Names request has failed.
-		/// </summary>
-		///
-		/// <param name="serverResponse">A container for information on the response from the server. Only 
-		/// failed responses can be passed into this method.</param>
-		/// <param name="request"> The request that was sent to the server.</param>
-		/// <param name="callback">The error callback.</param>
-		private void NotifyLookupUserNamesError(ServerResponse serverResponse, LookupUserNamesRequest request, Action<LookupUserNamesRequest, LookupUserNamesError> errorCallback)
-		{
-			ReleaseAssert.IsTrue(serverResponse.Result != HttpResult.Success || serverResponse.HttpResponseCode != SuccessHttpResponseCode, "Input server request must describe an error.");
-			
-			switch (serverResponse.Result) 
-			{
-				case HttpResult.Success:
-					m_logging.LogVerboseMessage("Lookup User Names request failed with http response code: " + serverResponse.HttpResponseCode);
-					break;
-				case HttpResult.CouldNotConnect:
-					m_logging.LogVerboseMessage("Lookup User Names request failed becuase a connection could be established.");
-					break;
-				default:
-					m_logging.LogVerboseMessage("Lookup User Names request failed for an unknown reason.");
-					throw new ArgumentException("Invalid value for server response result.");
-			}
-			
-			LookupUserNamesError error = new LookupUserNamesError(serverResponse);	
-			m_taskScheduler.ScheduleMainThreadTask(() =>
-			{
-				errorCallback(request, error);
-			});	
-		}
-		
-		/// <summary>
 		/// Notifies the user that a Get Facebook Friends request has failed.
 		/// </summary>
 		///
@@ -1158,33 +1982,34 @@ namespace ChilliConnect
 		}
 		
 		/// <summary>
-		/// Notifies the user that a Unlink Facebook Account request has failed.
+		/// Notifies the user that a Lookup User Names request has failed.
 		/// </summary>
 		///
 		/// <param name="serverResponse">A container for information on the response from the server. Only 
 		/// failed responses can be passed into this method.</param>
+		/// <param name="request"> The request that was sent to the server.</param>
 		/// <param name="callback">The error callback.</param>
-		private void NotifyUnlinkFacebookAccountError(ServerResponse serverResponse, Action<UnlinkFacebookAccountError> errorCallback)
+		private void NotifyLookupUserNamesError(ServerResponse serverResponse, LookupUserNamesRequest request, Action<LookupUserNamesRequest, LookupUserNamesError> errorCallback)
 		{
 			ReleaseAssert.IsTrue(serverResponse.Result != HttpResult.Success || serverResponse.HttpResponseCode != SuccessHttpResponseCode, "Input server request must describe an error.");
 			
 			switch (serverResponse.Result) 
 			{
 				case HttpResult.Success:
-					m_logging.LogVerboseMessage("Unlink Facebook Account request failed with http response code: " + serverResponse.HttpResponseCode);
+					m_logging.LogVerboseMessage("Lookup User Names request failed with http response code: " + serverResponse.HttpResponseCode);
 					break;
 				case HttpResult.CouldNotConnect:
-					m_logging.LogVerboseMessage("Unlink Facebook Account request failed becuase a connection could be established.");
+					m_logging.LogVerboseMessage("Lookup User Names request failed becuase a connection could be established.");
 					break;
 				default:
-					m_logging.LogVerboseMessage("Unlink Facebook Account request failed for an unknown reason.");
+					m_logging.LogVerboseMessage("Lookup User Names request failed for an unknown reason.");
 					throw new ArgumentException("Invalid value for server response result.");
 			}
 			
-			UnlinkFacebookAccountError error = new UnlinkFacebookAccountError(serverResponse);	
+			LookupUserNamesError error = new LookupUserNamesError(serverResponse);	
 			m_taskScheduler.ScheduleMainThreadTask(() =>
 			{
-				errorCallback(error);
+				errorCallback(request, error);
 			});	
 		}
 	}

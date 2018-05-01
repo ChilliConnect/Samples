@@ -65,6 +65,12 @@ namespace ChilliConnect
 		/// is 7kb.
 		/// </summary>
         public MultiTypeValue InstanceData { get; private set; }
+	
+		/// <summary>
+		/// The ID to use as the ItemID for the new item. If not given an ID will be
+		/// automatically generated. An ID must be unique for a player.
+		/// </summary>
+        public string ItemId { get; private set; }
 
 		/// <summary>
 		/// Initialises a new instance of the request with the given description.
@@ -82,6 +88,7 @@ namespace ChilliConnect
 	
             Key = desc.Key;
             InstanceData = desc.InstanceData;
+            ItemId = desc.ItemId;
             ConnectAccessToken = connectAccessToken;
 	
 			Url = "https://connect.chilliconnect.com/1.0/economy/inventory/add";
@@ -94,7 +101,7 @@ namespace ChilliConnect
 		/// all server requests. Will return an empty dictionary if there are no headers.
 		/// </summary>
 		///
-		/// <returns>The header hey-value pairs.</returns>
+		/// <returns>The header key-value pairs.</returns>
 		public IDictionary<string, string> SerialiseHeaders()
 		{
 			var dictionary = new Dictionary<string, string>();
@@ -123,6 +130,12 @@ namespace ChilliConnect
             if (InstanceData != null)
 			{
                 dictionary.Add("InstanceData", InstanceData.Serialise());
+            }
+			
+			// Item Id
+            if (ItemId != null)
+			{
+				dictionary.Add("ItemID", ItemId);
             }
 	
 			return dictionary;

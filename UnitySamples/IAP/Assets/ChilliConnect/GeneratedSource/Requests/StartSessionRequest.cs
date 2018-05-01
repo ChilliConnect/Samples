@@ -62,36 +62,78 @@ namespace ChilliConnect
         public string UserId { get; private set; }
 	
 		/// <summary>
-		/// Date that indicates the local, device time that the session started. Format:
-		/// ISO8601 e.g. 2016-01-12T11:08:23.
+		/// The local device time that the session started. Format: ISO8601 e.g.
+		/// 2016-01-12T11:08:23.
 		/// </summary>
         public DateTime Date { get; private set; }
 	
 		/// <summary>
-		/// The version of your game from which the Session was started.
+		/// The client version of your game.
 		/// </summary>
         public string AppVersion { get; private set; }
+	
+		/// <summary>
+		/// Country of the player. Must be two letter country code ISO 3166-1 alpha-2. E.g.
+		/// GB. If not provided, will be automatically populated.
+		/// </summary>
+        public string Country { get; private set; }
+	
+		/// <summary>
+		/// Type of device being used by the player. Accepted values: PHONE, TABLET, BROWSER,
+		/// DESKTOP, OTHER.
+		/// </summary>
+        public string DeviceType { get; private set; }
+	
+		/// <summary>
+		/// Platform of the device being used by the player. Accepted values: ANDROID, IOS,
+		/// KINDLE, WINDOWS, MACOS, LINUX, OTHER.
+		/// </summary>
+        public string Platform { get; private set; }
+	
+		/// <summary>
+		/// The player's currently assigned AB Test Key.
+		/// </summary>
+        public string TestKey { get; private set; }
+	
+		/// <summary>
+		/// The player's currently assigned AB Test Group Key. Only accepted with TestKey.
+		/// </summary>
+        public string TestGroupKey { get; private set; }
 
 		/// <summary>
-		/// Initialises a new instance of the request with the given properties.
+		/// Initialises a new instance of the request with the given description.
 		/// </summary>
 		///
-		/// <param name="userId">ID that uniquely identifies this player. This ID should not clash with any other
-		/// player and should persist across Sessions.</param>
-		/// <param name="appVersion">The version of your game from which the Session was started.</param>
+		/// <param name="desc">The description.</param>
 		/// <param name="gameToken">The GameToken.</param>
-		public StartSessionRequest(string userId, string appVersion, string gameToken)
+		public StartSessionRequest(StartSessionRequestDesc desc, string gameToken)
 		{
-			ReleaseAssert.IsNotNull(userId, "User Id cannot be null.");
-			ReleaseAssert.IsNotNull(appVersion, "App Version cannot be null.");
+			ReleaseAssert.IsNotNull(desc, "A description object cannot be null.");
+			
+			ReleaseAssert.IsNotNull(desc.UserId, "UserId cannot be null.");
 	
 			ReleaseAssert.IsNotNull(gameToken, "Game Token cannot be null.");
 	
-            UserId = userId;
-            AppVersion = appVersion;
+            UserId = desc.UserId;
+            AppVersion = desc.AppVersion;
+            Country = desc.Country;
+            if (desc.DeviceType == null)
+			{
+                DeviceType = DeviceTypeDefaultProvider.GetDefault();
+            } else {
+            	DeviceType = desc.DeviceType;
+            }
+            if (desc.Platform == null)
+			{
+                Platform = PlatformDefaultProvider.GetDefault();
+            } else {
+            	Platform = desc.Platform;
+            }
+            TestKey = desc.TestKey;
+            TestGroupKey = desc.TestGroupKey;
             GameToken = gameToken;
 			Date = DateTime.Now;
-			
+	
 			Url = "https://metrics.chilliconnect.com/1.0/session/start";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
@@ -102,7 +144,7 @@ namespace ChilliConnect
 		/// all server requests. Will return an empty dictionary if there are no headers.
 		/// </summary>
 		///
-		/// <returns>The header hey-value pairs.</returns>
+		/// <returns>The header key-value pairs.</returns>
 		public IDictionary<string, string> SerialiseHeaders()
 		{
 			var dictionary = new Dictionary<string, string>();
@@ -131,7 +173,40 @@ namespace ChilliConnect
             dictionary.Add("Date", JsonSerialisation.Serialise(Date));
 			
 			// App Version
-			dictionary.Add("AppVersion", AppVersion);
+            if (AppVersion != null)
+			{
+				dictionary.Add("AppVersion", AppVersion);
+            }
+			
+			// Country
+            if (Country != null)
+			{
+				dictionary.Add("Country", Country);
+            }
+			
+			// Device Type
+            if (DeviceType != null)
+			{
+				dictionary.Add("DeviceType", DeviceType);
+            }
+			
+			// Platform
+            if (Platform != null)
+			{
+				dictionary.Add("Platform", Platform);
+            }
+			
+			// Test Key
+            if (TestKey != null)
+			{
+				dictionary.Add("TestKey", TestKey);
+            }
+			
+			// Test Group Key
+            if (TestGroupKey != null)
+			{
+				dictionary.Add("TestGroupKey", TestGroupKey);
+            }
 	
 			return dictionary;
 		}

@@ -62,16 +62,15 @@ public class EconomySystem
 	/// TestGroup is populated before the login event happens and defaults to 
 	/// a static defined on the  AccountSystem
 	///
-	public void GetRecipeMetaData(string testGroup)
+	public void GetRecipeMetaData()
 	{			
 		var tags = new List<string>();
 		tags.Add ( RECIPE_TAG );
-		tags.Add ( testGroup );
 
 		var getMetadataDefinitionsRequestDesc = new GetMetadataDefinitionsRequestDesc ();
 		getMetadataDefinitionsRequestDesc.Tags = tags;
 
-		m_chilliConnect.Economy.GetMetadataDefinitions (getMetadataDefinitionsRequestDesc,
+		m_chilliConnect.Catalog.GetMetadataDefinitions (getMetadataDefinitionsRequestDesc,
 			(request, response) => RenderRecipeList(response), 
 			(request, error) => Debug.LogError (error.ErrorDescription));
 	}

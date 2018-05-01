@@ -126,14 +126,6 @@ namespace ChilliConnect
                         return (string)element;
                     });
 				}
-	
-				// An error has occurred.
-				else
-				{
-#if DEBUG
-					throw new ArgumentException("Input Json contains an invalid field.");
-#endif
-				}
 			}
 		}
 

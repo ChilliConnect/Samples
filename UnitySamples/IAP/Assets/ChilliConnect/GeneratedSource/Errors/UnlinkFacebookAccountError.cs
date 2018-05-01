@@ -63,6 +63,11 @@ namespace ChilliConnect
 			ExpiredConnectAccessToken = 1003,
 	
 			/// <summary>
+			/// Rate Limit Reached. Too many requests. Player has been rate limited.
+			/// </summary>
+			RateLimitReached = 10002,
+	
+			/// <summary>
 			/// Temporary Service Error. A temporary error is preventing the request from being
 			/// processed.
 			/// </summary>
@@ -181,6 +186,9 @@ namespace ChilliConnect
 				case 1003:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
 					return Error.ExpiredConnectAccessToken;		
+				case 10002:
+					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 429, @"Invalid HTTP response code for error code.");
+					return Error.RateLimitReached;		
 				case 1008:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 503, @"Invalid HTTP response code for error code.");
 					return Error.TemporaryServiceError;		
@@ -194,7 +202,7 @@ namespace ChilliConnect
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 403, @"Invalid HTTP response code for error code.");
 					return Error.MethodDisabled;		
 				default:
-					throw new ArgumentException("Invalid error code.");
+					return Error.UnexpectedError;
 			}
 		}
         
@@ -232,11 +240,11 @@ namespace ChilliConnect
 			{
 				case Error.CouldNotConnect:
 					return "A connection could not be established.";
-				case Error.UnexpectedError:
-					return "An unexpected server error occurred.";
 				case Error.ExpiredConnectAccessToken:
 					return "Expired Connect Access Token. The Connect Access Token used to authenticate with"
 						+ " the server has expired and should be renewed.";
+				case Error.RateLimitReached:
+					return "Rate Limit Reached. Too many requests. Player has been rate limited.";
 				case Error.TemporaryServiceError:
 					return "Temporary Service Error. A temporary error is preventing the request from being"
 						+ " processed.";
@@ -248,8 +256,9 @@ namespace ChilliConnect
 				case Error.MethodDisabled:
 					return "Method Disabled. Public access to this method has been disabled on the"
 						+ " ChilliConnect Dashboard.";
+				case Error.UnexpectedError:
 				default:
-					throw new ArgumentException("Invalid error code.");
+					return "An unexpected server error occurred.";
 			}
 		}
 	}

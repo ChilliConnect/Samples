@@ -64,6 +64,11 @@ namespace ChilliConnect
 			InvalidRequest = 1007,
 	
 			/// <summary>
+			/// Rate Limit Reached. Too many requests. Player has been rate limited.
+			/// </summary>
+			RateLimitReached = 10002,
+	
+			/// <summary>
 			/// Expired Connect Access Token. The Connect Access Token used to authenticate with
 			/// the server has expired and should be renewed.
 			/// </summary>
@@ -79,7 +84,19 @@ namespace ChilliConnect
 			/// Temporary Service Error. A temporary error is preventing the request from being
 			/// processed.
 			/// </summary>
-			TemporaryServiceError = 1008
+			TemporaryServiceError = 1008,
+	
+			/// <summary>
+			/// Player Context Not Set. Only applicable to Cloud Code Scripts. Attempted to call
+			/// a method that required a player context, but none was set. Note that the AsPlayer
+			/// method can be used to select a specific player context.
+			/// </summary>
+			PlayerContextNotSet = 6002,
+	
+			/// <summary>
+			/// Catalog Not Published. The game has no published Catalog.
+			/// </summary>
+			CatalogNotPublished = 10105
 		}
 		
 		private const int SuccessHttpResponseCode = 200;
@@ -177,6 +194,9 @@ namespace ChilliConnect
 				case 1007:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 422, @"Invalid HTTP response code for error code.");
 					return Error.InvalidRequest;		
+				case 10002:
+					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 429, @"Invalid HTTP response code for error code.");
+					return Error.RateLimitReached;		
 				case 1003:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
 					return Error.ExpiredConnectAccessToken;		
@@ -186,6 +206,12 @@ namespace ChilliConnect
 				case 1008:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 503, @"Invalid HTTP response code for error code.");
 					return Error.TemporaryServiceError;		
+				case 6002:
+					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
+					return Error.PlayerContextNotSet;		
+				case 10105:
+					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
+					return Error.CatalogNotPublished;		
 				default:
 					return Error.UnexpectedError;
 			}
@@ -229,6 +255,8 @@ namespace ChilliConnect
 					return "Invalid Request. One of more of the provided fields were not correctly formatted."
 						+ " The data property of the response body will contain specific error messages for"
 						+ " each field.";
+				case Error.RateLimitReached:
+					return "Rate Limit Reached. Too many requests. Player has been rate limited.";
 				case Error.ExpiredConnectAccessToken:
 					return "Expired Connect Access Token. The Connect Access Token used to authenticate with"
 						+ " the server has expired and should be renewed.";
@@ -238,6 +266,12 @@ namespace ChilliConnect
 				case Error.TemporaryServiceError:
 					return "Temporary Service Error. A temporary error is preventing the request from being"
 						+ " processed.";
+				case Error.PlayerContextNotSet:
+					return "Player Context Not Set. Only applicable to Cloud Code Scripts. Attempted to call"
+						+ " a method that required a player context, but none was set. Note that the AsPlayer"
+						+ " method can be used to select a specific player context.";
+				case Error.CatalogNotPublished:
+					return "Catalog Not Published. The game has no published Catalog.";
 				case Error.UnexpectedError:
 				default:
 					return "An unexpected server error occurred.";

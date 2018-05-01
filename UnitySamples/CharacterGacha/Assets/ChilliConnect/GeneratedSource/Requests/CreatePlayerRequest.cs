@@ -77,7 +77,7 @@ namespace ChilliConnect
 	
 		/// <summary>
 		/// Password to be assigned to the new player account. If provided must be greater
-		/// than 3 and less than 50 characters in length.
+		/// than 6 and less than 50 characters in length.
 		/// </summary>
         public string Password { get; private set; }
 	
@@ -99,9 +99,8 @@ namespace ChilliConnect
         public string DeviceType { get; private set; }
 	
 		/// <summary>
-		/// Platform of the device being used by the player. A string containing one of the
-		/// accepted values will be mapped to the accepted value. Accepted values: ANDROID,
-		/// IOS, KINDLE, WINDOWS, MACOS, LINUX, OTHER.
+		/// Platform of the device being used by the player. Accepted values: ANDROID, IOS,
+		/// KINDLE, WINDOWS, MACOS, LINUX, OTHER.
 		/// </summary>
         public string Platform { get; private set; }
 
@@ -124,8 +123,18 @@ namespace ChilliConnect
             Password = desc.Password;
             Country = desc.Country;
             DeviceModel = desc.DeviceModel;
-            DeviceType = desc.DeviceType;
-            Platform = desc.Platform;
+            if (desc.DeviceType == null)
+			{
+                DeviceType = DeviceTypeDefaultProvider.GetDefault();
+            } else {
+            	DeviceType = desc.DeviceType;
+            }
+            if (desc.Platform == null)
+			{
+                Platform = PlatformDefaultProvider.GetDefault();
+            } else {
+            	Platform = desc.Platform;
+            }
             GameToken = gameToken;
 	
 			Url = "https://connect.chilliconnect.com/1.0/player/create";

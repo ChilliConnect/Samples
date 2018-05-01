@@ -56,7 +56,7 @@ namespace ChilliConnect
         public string MetricsAccessToken { get; private set; }
 	
 		/// <summary>
-		/// Date that indicates the local, device time that the IAP was purchased. Format:
+		/// Date that indicates the local device time that the IAP was purchased. Format:
 		/// ISO8601 e.g. 2016-01-12T11:08:23.
 		/// </summary>
         public DateTime Date { get; private set; }
@@ -126,7 +126,7 @@ namespace ChilliConnect
 		/// all server requests. Will return an empty dictionary if there are no headers.
 		/// </summary>
 		///
-		/// <returns>The header hey-value pairs.</returns>
+		/// <returns>The header key-value pairs.</returns>
 		public IDictionary<string, string> SerialiseHeaders()
 		{
 			var dictionary = new Dictionary<string, string>();

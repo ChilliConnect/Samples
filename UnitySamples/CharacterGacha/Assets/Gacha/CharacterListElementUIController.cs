@@ -19,10 +19,10 @@ public class CharacterListElementUIController : MonoBehaviour
 	/// 
 	private void Awake()
 	{
-		m_characterId = transform.FindChild("CharacterID").GetComponent<Text>();
-		m_charcterLevel = transform.FindChild("CharacterLevel").GetComponent<Text>();
-		m_characterAtk = transform.FindChild("CharacterAtk").GetComponent<Text>();
-		m_characterDef = transform.FindChild("CharacterDef").GetComponent<Text>();
+		m_characterId = transform.Find("CharacterID").GetComponent<Text>();
+		m_charcterLevel = transform.Find("CharacterLevel").GetComponent<Text>();
+		m_characterAtk = transform.Find("CharacterAtk").GetComponent<Text>();
+		m_characterDef = transform.Find("CharacterDef").GetComponent<Text>();
 		m_background = GetComponent<Image>();
 	}
 

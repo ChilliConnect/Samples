@@ -61,6 +61,12 @@ namespace ChilliConnect
         public string FacebookAccessToken { get; private set; }
 	
 		/// <summary>
+		/// Flag which will tell ChilliConnect to create a player if there is not one
+		/// associated with this Facebook Account.
+		/// </summary>
+        public bool? CreatePlayer { get; private set; }
+	
+		/// <summary>
 		/// Model of device being used by the player. E.g. SamsungABC123.
 		/// </summary>
         public string DeviceModel { get; private set; }
@@ -77,6 +83,17 @@ namespace ChilliConnect
 		/// IOS, KINDLE, WINDOWS, MACOS, LINUX, OTHER.
 		/// </summary>
         public string Platform { get; private set; }
+	
+		/// <summary>
+		/// The local device time that the session started. Format: ISO8601 e.g.
+		/// 2016-01-12T11:08:23.
+		/// </summary>
+        public DateTime Date { get; private set; }
+	
+		/// <summary>
+		/// The client version of your game.
+		/// </summary>
+        public string AppVersion { get; private set; }
 
 		/// <summary>
 		/// Initialises a new instance of the request with the given description.
@@ -93,12 +110,25 @@ namespace ChilliConnect
 			ReleaseAssert.IsNotNull(gameToken, "Game Token cannot be null.");
 	
             FacebookAccessToken = desc.FacebookAccessToken;
+            CreatePlayer = desc.CreatePlayer;
             DeviceModel = desc.DeviceModel;
-            DeviceType = desc.DeviceType;
-            Platform = desc.Platform;
+            if (desc.DeviceType == null)
+			{
+                DeviceType = DeviceTypeDefaultProvider.GetDefault();
+            } else {
+            	DeviceType = desc.DeviceType;
+            }
+            if (desc.Platform == null)
+			{
+                Platform = PlatformDefaultProvider.GetDefault();
+            } else {
+            	Platform = desc.Platform;
+            }
+            AppVersion = desc.AppVersion;
             GameToken = gameToken;
+			Date = DateTime.Now;
 	
-			Url = "https://connect.chilliconnect.com/1.0/player/login/facebook";
+			Url = "https://connect.chilliconnect.com/2.0/player/login/facebook";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 
@@ -133,6 +163,12 @@ namespace ChilliConnect
 			// Facebook Access Token
 			dictionary.Add("FacebookAccessToken", FacebookAccessToken);
 			
+			// Create Player
+            if (CreatePlayer != null)
+			{
+				dictionary.Add("CreatePlayer", CreatePlayer);
+            }
+			
 			// Device Model
             if (DeviceModel != null)
 			{
@@ -149,6 +185,15 @@ namespace ChilliConnect
             if (Platform != null)
 			{
 				dictionary.Add("Platform", Platform);
+            }
+			
+			// Date
+            dictionary.Add("Date", JsonSerialisation.Serialise(Date));
+			
+			// App Version
+            if (AppVersion != null)
+			{
+				dictionary.Add("AppVersion", AppVersion);
             }
 	
 			return dictionary;

@@ -50,6 +50,12 @@ namespace ChilliConnect
 		/// is 7kb.
 		/// </summary>
         public MultiTypeValue InstanceData { get; set; }
+	
+		/// <summary>
+		/// The ID to use as the ItemID for the new item. If not given an ID will be
+		/// automatically generated. An ID must be unique for a player.
+		/// </summary>
+        public string ItemId { get; set; }
 
 		/// <summary>
 		/// Initialises a new instance of the description with the given required properties.

@@ -50,7 +50,7 @@ namespace ChilliConnect
         public string Key { get; private set; }
 	
 		/// <summary>
-		/// The inventory item name. Note: this may be empty if the Economy Inventory Item
+		/// The inventory item name. Note: this may be empty if the Catalog Inventory Item
 		/// definition no longer exists.
 		/// </summary>
         public string Name { get; private set; }
@@ -76,7 +76,6 @@ namespace ChilliConnect
 			
 			ReleaseAssert.IsNotNull(desc.ItemId, "ItemId cannot be null.");
 			ReleaseAssert.IsNotNull(desc.Key, "Key cannot be null.");
-			ReleaseAssert.IsNotNull(desc.Name, "Name cannot be null.");
 			ReleaseAssert.IsNotNull(desc.WriteLock, "WriteLock cannot be null.");
 	
             ItemId = desc.ItemId;
@@ -96,7 +95,6 @@ namespace ChilliConnect
 			ReleaseAssert.IsNotNull(jsonDictionary, "JSON dictionary cannot be null.");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("ItemID"), "Json is missing required field 'ItemID'");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("Key"), "Json is missing required field 'Key'");
-			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("Name"), "Json is missing required field 'Name'");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("WriteLock"), "Json is missing required field 'WriteLock'");
 	
 			foreach (KeyValuePair<string, object> entry in jsonDictionary)
@@ -118,8 +116,11 @@ namespace ChilliConnect
 				// Name
 				else if (entry.Key == "Name")
 				{
-                    ReleaseAssert.IsTrue(entry.Value is string, "Invalid serialised type.");
-                    Name = (string)entry.Value;
+					if (entry.Value != null)
+					{
+                        ReleaseAssert.IsTrue(entry.Value is string, "Invalid serialised type.");
+                        Name = (string)entry.Value;
+                    }
 				}
 		
 				// Instance Data
@@ -137,14 +138,6 @@ namespace ChilliConnect
 				{
                     ReleaseAssert.IsTrue(entry.Value is string, "Invalid serialised type.");
                     WriteLock = (string)entry.Value;
-				}
-	
-				// An error has occurred.
-				else
-				{
-#if DEBUG
-					throw new ArgumentException("Input Json contains an invalid field.");
-#endif
 				}
 			}
 		}
@@ -166,7 +159,10 @@ namespace ChilliConnect
 			dictionary.Add("Key", Key);
 			
 			// Name
-			dictionary.Add("Name", Name);
+            if (Name != null)
+			{
+				dictionary.Add("Name", Name);
+            }
 			
 			// Instance Data
             if (InstanceData != null)

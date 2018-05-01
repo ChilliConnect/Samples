@@ -64,26 +64,71 @@ namespace ChilliConnect
 		/// The player's Password.
 		/// </summary>
         public string Password { get; private set; }
+	
+		/// <summary>
+		/// Model of device being used by the player. E.g. SamsungABC123.
+		/// </summary>
+        public string DeviceModel { get; private set; }
+	
+		/// <summary>
+		/// Type of device being used by the player. Accepted values: PHONE, TABLET, BROWSER,
+		/// DESKTOP, OTHER.
+		/// </summary>
+        public string DeviceType { get; private set; }
+	
+		/// <summary>
+		/// Platform of the device being used by the player. A string containing one of the
+		/// accepted values will be mapped to the accepted value. Accepted values: ANDROID,
+		/// IOS, KINDLE, WINDOWS, MACOS, LINUX, OTHER.
+		/// </summary>
+        public string Platform { get; private set; }
+	
+		/// <summary>
+		/// The local device time that the session started. Format: ISO8601 e.g.
+		/// 2016-01-12T11:08:23.
+		/// </summary>
+        public DateTime Date { get; private set; }
+	
+		/// <summary>
+		/// The client version of your game.
+		/// </summary>
+        public string AppVersion { get; private set; }
 
 		/// <summary>
-		/// Initialises a new instance of the request with the given properties.
+		/// Initialises a new instance of the request with the given description.
 		/// </summary>
 		///
-		/// <param name="userName">The player's Username.</param>
-		/// <param name="password">The player's Password.</param>
+		/// <param name="desc">The description.</param>
 		/// <param name="gameToken">The Game to log in to.</param>
-		public LogInUsingUserNameRequest(string userName, string password, string gameToken)
+		public LogInUsingUserNameRequest(LogInUsingUserNameRequestDesc desc, string gameToken)
 		{
-			ReleaseAssert.IsNotNull(userName, "User Name cannot be null.");
-			ReleaseAssert.IsNotNull(password, "Password cannot be null.");
+			ReleaseAssert.IsNotNull(desc, "A description object cannot be null.");
+			
+			ReleaseAssert.IsNotNull(desc.UserName, "UserName cannot be null.");
+			ReleaseAssert.IsNotNull(desc.Password, "Password cannot be null.");
 	
 			ReleaseAssert.IsNotNull(gameToken, "Game Token cannot be null.");
 	
-            UserName = userName;
-            Password = password;
+            UserName = desc.UserName;
+            Password = desc.Password;
+            DeviceModel = desc.DeviceModel;
+            if (desc.DeviceType == null)
+			{
+                DeviceType = DeviceTypeDefaultProvider.GetDefault();
+            } else {
+            	DeviceType = desc.DeviceType;
+            }
+            if (desc.Platform == null)
+			{
+                Platform = PlatformDefaultProvider.GetDefault();
+            } else {
+            	Platform = desc.Platform;
+            }
+            AppVersion = desc.AppVersion;
             GameToken = gameToken;
-			
-			Url = "https://connect.chilliconnect.com/1.0/player/login/username";
+			Date = DateTime.Now;
+	
+			Url = "https://connect.chilliconnect.com/2.0/player/login/username";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 
@@ -93,7 +138,7 @@ namespace ChilliConnect
 		/// all server requests. Will return an empty dictionary if there are no headers.
 		/// </summary>
 		///
-		/// <returns>The header hey-value pairs.</returns>
+		/// <returns>The header key-value pairs.</returns>
 		public IDictionary<string, string> SerialiseHeaders()
 		{
 			var dictionary = new Dictionary<string, string>();
@@ -120,6 +165,33 @@ namespace ChilliConnect
 			
 			// Password
 			dictionary.Add("Password", Password);
+			
+			// Device Model
+            if (DeviceModel != null)
+			{
+				dictionary.Add("DeviceModel", DeviceModel);
+            }
+			
+			// Device Type
+            if (DeviceType != null)
+			{
+				dictionary.Add("DeviceType", DeviceType);
+            }
+			
+			// Platform
+            if (Platform != null)
+			{
+				dictionary.Add("Platform", Platform);
+            }
+			
+			// Date
+            dictionary.Add("Date", JsonSerialisation.Serialise(Date));
+			
+			// App Version
+            if (AppVersion != null)
+			{
+				dictionary.Add("AppVersion", AppVersion);
+            }
 	
 			return dictionary;
 		}

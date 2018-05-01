@@ -19,13 +19,13 @@ public class RecipeListElementUIController : MonoBehaviour
 	/// 
 	private void Awake()
 	{
-		var createButton = transform.FindChild ("CreateCharacterButton").GetComponent<Button> ();
+		var createButton = transform.Find ("CreateCharacterButton").GetComponent<Button> ();
 		createButton.onClick.AddListener (OnCreateButtonClicked);
 
 		m_createButton = createButton.gameObject;
-		m_recipeName = transform.FindChild("RecipeName").GetComponent<Text>();
-		m_recipeKey = transform.FindChild("RecipeKey").GetComponent<Text>();
-		m_recipeCost = transform.FindChild("RecipeCost").GetComponent<Text>();
+		m_recipeName = transform.Find("RecipeName").GetComponent<Text>();
+		m_recipeKey = transform.Find("RecipeKey").GetComponent<Text>();
+		m_recipeCost = transform.Find("RecipeCost").GetComponent<Text>();
 		m_background = GetComponent<Image>();
 	}
 

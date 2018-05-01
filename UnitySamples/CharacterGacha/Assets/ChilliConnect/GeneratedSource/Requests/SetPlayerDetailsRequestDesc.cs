@@ -62,7 +62,7 @@ namespace ChilliConnect
 	
 		/// <summary>
 		/// Password to be assigned to the new player account. If provided must be greater
-		/// than 3 and less than 50 characters in length.
+		/// than 6 and less than 50 characters in length.
 		/// </summary>
         public string Password { get; set; }
 

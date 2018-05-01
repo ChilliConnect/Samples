@@ -64,6 +64,11 @@ namespace ChilliConnect
 			InvalidRequest = 1007,
 	
 			/// <summary>
+			/// Rate Limit Reached. Too many requests. Player has been rate limited.
+			/// </summary>
+			RateLimitReached = 10002,
+	
+			/// <summary>
 			/// Expired Connect Access Token. The Connect Access Token used to authenticate with
 			/// the server has expired and should be renewed.
 			/// </summary>
@@ -73,7 +78,12 @@ namespace ChilliConnect
 			/// Invalid Connect Access Token. The Connect Access Token was not valid and cannot
 			/// be used to authenticate requests.
 			/// </summary>
-			InvalidConnectAccessToken = 1004
+			InvalidConnectAccessToken = 1004,
+	
+			/// <summary>
+			/// Catalog Not Published. The game has no published Catalog.
+			/// </summary>
+			CatalogNotPublished = 10105
 		}
 		
 		private const int SuccessHttpResponseCode = 200;
@@ -171,14 +181,20 @@ namespace ChilliConnect
 				case 1007:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 422, @"Invalid HTTP response code for error code.");
 					return Error.InvalidRequest;		
+				case 10002:
+					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 429, @"Invalid HTTP response code for error code.");
+					return Error.RateLimitReached;		
 				case 1003:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
 					return Error.ExpiredConnectAccessToken;		
 				case 1004:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
 					return Error.InvalidConnectAccessToken;		
+				case 10105:
+					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
+					return Error.CatalogNotPublished;		
 				default:
-					throw new ArgumentException("Invalid error code.");
+					return Error.UnexpectedError;
 			}
 		}
         
@@ -216,20 +232,23 @@ namespace ChilliConnect
 			{
 				case Error.CouldNotConnect:
 					return "A connection could not be established.";
-				case Error.UnexpectedError:
-					return "An unexpected server error occurred.";
 				case Error.InvalidRequest:
 					return "Invalid Request. One of more of the provided fields were not correctly formatted."
 						+ " The data property of the response body will contain specific error messages for"
 						+ " each field.";
+				case Error.RateLimitReached:
+					return "Rate Limit Reached. Too many requests. Player has been rate limited.";
 				case Error.ExpiredConnectAccessToken:
 					return "Expired Connect Access Token. The Connect Access Token used to authenticate with"
 						+ " the server has expired and should be renewed.";
 				case Error.InvalidConnectAccessToken:
 					return "Invalid Connect Access Token. The Connect Access Token was not valid and cannot"
 						+ " be used to authenticate requests.";
+				case Error.CatalogNotPublished:
+					return "Catalog Not Published. The game has no published Catalog.";
+				case Error.UnexpectedError:
 				default:
-					throw new ArgumentException("Invalid error code.");
+					return "An unexpected server error occurred.";
 			}
 		}
 	}

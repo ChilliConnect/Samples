@@ -57,6 +57,11 @@ namespace ChilliConnect
         public MultiTypeValue Value { get; private set; }
 	
 		/// <summary>
+		/// True if the Key has Attachment data associated with it.
+		/// </summary>
+        public bool? HasAttachment { get; private set; }
+	
+		/// <summary>
 		/// The player's UserName.
 		/// </summary>
         public string UserName { get; private set; }
@@ -100,6 +105,7 @@ namespace ChilliConnect
             ChilliConnectId = desc.ChilliConnectId;
             Key = desc.Key;
             Value = desc.Value;
+            HasAttachment = desc.HasAttachment;
             UserName = desc.UserName;
             DisplayName = desc.DisplayName;
             FacebookName = desc.FacebookName;
@@ -145,6 +151,16 @@ namespace ChilliConnect
                     Value = new MultiTypeValue((object)entry.Value);	
 				}
 		
+				// Has Attachment
+				else if (entry.Key == "HasAttachment")
+				{
+					if (entry.Value != null)
+					{
+                        ReleaseAssert.IsTrue(entry.Value is bool, "Invalid serialised type.");
+                        HasAttachment = (bool)entry.Value;
+                    }
+				}
+		
 				// User Name
 				else if (entry.Key == "UserName")
 				{
@@ -185,14 +201,6 @@ namespace ChilliConnect
                     ReleaseAssert.IsTrue(entry.Value is string, "Invalid serialised type.");
                     DateModified = JsonSerialisation.DeserialiseDate((string)entry.Value);
 				}
-	
-				// An error has occurred.
-				else
-				{
-#if DEBUG
-					throw new ArgumentException("Input Json contains an invalid field.");
-#endif
-				}
 			}
 		}
 
@@ -214,6 +222,12 @@ namespace ChilliConnect
 			
 			// Value
             dictionary.Add("Value", Value.Serialise());
+			
+			// Has Attachment
+            if (HasAttachment != null)
+			{
+				dictionary.Add("HasAttachment", HasAttachment);
+            }
 			
 			// User Name
             if (UserName != null)

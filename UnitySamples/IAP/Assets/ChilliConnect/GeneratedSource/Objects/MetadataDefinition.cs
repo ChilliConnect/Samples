@@ -33,7 +33,7 @@ using SdkCore;
 namespace ChilliConnect 
 {
 	/// <summary>
-	/// <para>A container used to describe Economy Metadata objects.</para>
+	/// <para>A container used to describe Catalog Metadata objects.</para>
 	///
 	/// <para>This is immutable after construction and is therefore thread safe.</para>
 	/// </summary>
@@ -125,14 +125,6 @@ namespace ChilliConnect
                         ReleaseAssert.IsTrue(entry.Value is object, "Invalid serialised type.");
                         CustomData = new MultiTypeValue((object)entry.Value);	
                     }
-				}
-	
-				// An error has occurred.
-				else
-				{
-#if DEBUG
-					throw new ArgumentException("Input Json contains an invalid field.");
-#endif
 				}
 			}
 		}

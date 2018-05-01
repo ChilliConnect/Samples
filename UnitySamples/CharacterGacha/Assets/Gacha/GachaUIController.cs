@@ -23,16 +23,16 @@ public class GachaUIController : MonoBehaviour
 	/// 
 	private void Awake()
 	{
-		m_loginLabel = transform.FindChild ("LoginLabel").GetComponent<Text> ();
-		m_balanceAmount = transform.FindChild ("BalanceLabel").GetComponent<Text> ();
+		m_loginLabel = transform.Find ("LoginLabel").GetComponent<Text> ();
+		m_balanceAmount = transform.Find ("BalanceLabel").GetComponent<Text> ();
 
-		m_recipeListPanel = transform.FindChild("RecipeList").gameObject;
+		m_recipeListPanel = transform.Find("RecipeList").gameObject;
 		m_recipeListUIController= m_recipeListPanel.GetComponent<RecipeListUIController>();
 
-		m_characterListPanel = transform.FindChild("CharacterList").gameObject;
+		m_characterListPanel = transform.Find("CharacterList").gameObject;
 		m_characterListUIController = m_characterListPanel.GetComponent<CharacterListUIController>();
 
-		var createNewPlayerButton = transform.FindChild("CreateNewPlayerButton").GetComponent<Button>();
+		var createNewPlayerButton = transform.Find("CreateNewPlayerButton").GetComponent<Button>();
 		createNewPlayerButton.onClick.AddListener (OnCreateNewPlayerClicked);
 	}
 
@@ -55,7 +55,7 @@ public class GachaUIController : MonoBehaviour
 	/// 
 	private void OnPlayerLoggedIn( string chilliConnectId ) {
 		EconomySystem.Get ().GetPlayerCoinBalance();
-		EconomySystem.Get ().GetRecipeMetaData(AccountSystem.Get().TestGroup);
+		EconomySystem.Get ().GetRecipeMetaData();
 		EconomySystem.Get ().GetPlayersCharacterList();
 
 		m_loginLabel.text = "Logged in as " + chilliConnectId;
