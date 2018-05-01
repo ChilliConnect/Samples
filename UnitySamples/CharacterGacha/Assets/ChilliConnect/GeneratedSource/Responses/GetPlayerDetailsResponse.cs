@@ -68,12 +68,12 @@ namespace ChilliConnect
         public ReadOnlyCollection<string> DeviceModel { get; private set; }
 	
 		/// <summary>
-		/// List of DeviceTypes being used by the player.
+		/// DeviceType being used by the player.
 		/// </summary>
         public string DeviceType { get; private set; }
 	
 		/// <summary>
-		/// List of Platforms being used by the player.
+		/// Platform being used by the player.
 		/// </summary>
         public string Platform { get; private set; }
 

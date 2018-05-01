@@ -45,7 +45,7 @@ namespace ChilliConnect
         public string Key { get; private set; }
 	
 		/// <summary>
-		/// The amount of the inventory item.
+		/// The amount of the inventory item. The maximum is 10.
 		/// </summary>
         public int Amount { get; private set; }
 
@@ -54,7 +54,7 @@ namespace ChilliConnect
 		/// </summary>
 		///
 		/// <param name="key">The Key of the inventory item.</param>
-		/// <param name="amount">The amount of the inventory item.</param>
+		/// <param name="amount">The amount of the inventory item. The maximum is 10.</param>
 		public MessageSendInventory(string key, int amount)
 		{
 			ReleaseAssert.IsNotNull(key, "Key cannot be null.");

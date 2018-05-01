@@ -70,11 +70,15 @@ namespace ChilliConnect
 		/// </summary>
 		///
 		/// <param name="key">The Custom Data Key to set value of. Maximum length is 50 characters.</param>
-		public SetPlayerDataRequestDesc(string key)
+		/// <param name="value">The value the Custom Data Key should be set to. When serialised the maximum size
+		/// is 7kb.</param>
+		public SetPlayerDataRequestDesc(string key, MultiTypeValue value)
 		{
 			ReleaseAssert.IsNotNull(key, "Key cannot be null.");
+			ReleaseAssert.IsNotNull(value, "Value cannot be null.");
 	
             Key = key;
+            Value = value;
 		}
 	}
 }

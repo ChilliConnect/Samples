@@ -86,7 +86,6 @@ namespace ChilliConnect
 			ReleaseAssert.IsNotNull(desc, "A description object cannot be null.");
 			
 			ReleaseAssert.IsNotNull(desc.ObjectId, "ObjectId cannot be null.");
-			ReleaseAssert.IsNotNull(desc.CreatedBy, "CreatedBy cannot be null.");
 			ReleaseAssert.IsNotNull(desc.DateCreated, "DateCreated cannot be null.");
 			ReleaseAssert.IsNotNull(desc.Value, "Value cannot be null.");
 	
@@ -108,7 +107,6 @@ namespace ChilliConnect
 		{
 			ReleaseAssert.IsNotNull(jsonDictionary, "JSON dictionary cannot be null.");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("ObjectID"), "Json is missing required field 'ObjectID'");
-			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("CreatedBy"), "Json is missing required field 'CreatedBy'");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("DateCreated"), "Json is missing required field 'DateCreated'");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("Value"), "Json is missing required field 'Value'");
 	
@@ -124,8 +122,11 @@ namespace ChilliConnect
 				// Created By
 				else if (entry.Key == "CreatedBy")
 				{
-                    ReleaseAssert.IsTrue(entry.Value is IDictionary<string, object>, "Invalid serialised type.");
-                    CreatedBy = new Player((IDictionary<string, object>)entry.Value);	
+					if (entry.Value != null)
+					{
+                        ReleaseAssert.IsTrue(entry.Value is IDictionary<string, object>, "Invalid serialised type.");
+                        CreatedBy = new Player((IDictionary<string, object>)entry.Value);	
+                    }
 				}
 		
 				// Date Created
@@ -188,7 +189,10 @@ namespace ChilliConnect
 			dictionary.Add("ObjectID", ObjectId);
 			
 			// Created By
-            dictionary.Add("CreatedBy", CreatedBy.Serialise());
+            if (CreatedBy != null)
+			{
+                dictionary.Add("CreatedBy", CreatedBy.Serialise());
+            }
 			
 			// Date Created
             dictionary.Add("DateCreated", JsonSerialisation.Serialise(DateCreated));

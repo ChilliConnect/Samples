@@ -70,7 +70,7 @@ public class EconomySystem
 		var getMetadataDefinitionsRequestDesc = new GetMetadataDefinitionsRequestDesc ();
 		getMetadataDefinitionsRequestDesc.Tags = tags;
 
-		m_chilliConnect.Economy.GetMetadataDefinitions (getMetadataDefinitionsRequestDesc,
+		m_chilliConnect.Catalog.GetMetadataDefinitions (getMetadataDefinitionsRequestDesc,
 			(request, response) => RenderRecipeList(response), 
 			(request, error) => Debug.LogError (error.ErrorDescription));
 	}

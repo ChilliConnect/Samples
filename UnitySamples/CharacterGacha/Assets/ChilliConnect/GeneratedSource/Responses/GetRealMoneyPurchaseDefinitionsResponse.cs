@@ -38,6 +38,11 @@ namespace ChilliConnect
 	public sealed class GetRealMoneyPurchaseDefinitionsResponse
 	{
 		/// <summary>
+		/// The Catalog Version.
+		/// </summary>
+        public string CatalogVersion { get; private set; }
+	
+		/// <summary>
 		/// List of Real Money Purchase definitions.
 		/// </summary>
         public ReadOnlyCollection<RealMoneyPurchaseDefinition> Items { get; private set; }
@@ -65,6 +70,7 @@ namespace ChilliConnect
 		public GetRealMoneyPurchaseDefinitionsResponse(IDictionary<string, object> jsonDictionary)
 		{
 			ReleaseAssert.IsNotNull(jsonDictionary, "JSON dictionary cannot be null.");
+			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("CatalogVersion"), "Json is missing required field 'CatalogVersion'");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("Items"), "Json is missing required field 'Items'");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("Total"), "Json is missing required field 'Total'");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("Page"), "Json is missing required field 'Page'");
@@ -72,8 +78,15 @@ namespace ChilliConnect
 	
 			foreach (KeyValuePair<string, object> entry in jsonDictionary)
 			{
+				// Catalog Version
+				if (entry.Key == "CatalogVersion")
+				{
+                    ReleaseAssert.IsTrue(entry.Value is string, "Invalid serialised type.");
+                    CatalogVersion = (string)entry.Value;
+				}
+		
 				// Items
-				if (entry.Key == "Items")
+				else if (entry.Key == "Items")
 				{
                     ReleaseAssert.IsTrue(entry.Value is IList<object>, "Invalid serialised type.");
                     Items = JsonSerialisation.DeserialiseList((IList<object>)entry.Value, (object element) =>

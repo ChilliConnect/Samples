@@ -91,7 +91,7 @@ namespace ChilliConnect
             Page = desc.Page;
             ConnectAccessToken = connectAccessToken;
 	
-			Url = "https://connect.chilliconnect.com/1.0/economy/definitions/virtualpurchase";
+			Url = "https://connect.chilliconnect.com/1.0/catalog/definitions/virtualpurchase";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

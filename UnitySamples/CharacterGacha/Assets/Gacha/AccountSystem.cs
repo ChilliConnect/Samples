@@ -89,7 +89,7 @@ public class AccountSystem
 		var loginUsingChilliConnectRequestDesc = new LogInUsingChilliConnectRequestDesc (chilliConnectId, chilliConnectSecret);
 
 		m_chilliConnect.PlayerAccounts.LogInUsingChilliConnect(loginUsingChilliConnectRequestDesc, 
-			(loginRequest) => OnChilliConnectLoggedIn( chilliConnectId, chilliConnectSecret), 
+			(loginRequest, loginResponse) => OnChilliConnectLoggedIn( chilliConnectId, chilliConnectSecret), 
 			(loginRequest, error) => Debug.LogError(error.ErrorDescription));
 	}
 }

@@ -63,6 +63,11 @@ namespace ChilliConnect
 			ExpiredConnectAccessToken = 1003,
 	
 			/// <summary>
+			/// Rate Limit Reached. Too many requests. Player has been rate limited.
+			/// </summary>
+			RateLimitReached = 10002,
+	
+			/// <summary>
 			/// Invalid Connect Access Token. The Connect Access Token was not valid and cannot
 			/// be used to authenticate requests.
 			/// </summary>
@@ -72,7 +77,12 @@ namespace ChilliConnect
 			/// Temporary Service Error. A temporary error is preventing the request from being
 			/// processed.
 			/// </summary>
-			TemporaryServiceError = 1008
+			TemporaryServiceError = 1008,
+	
+			/// <summary>
+			/// Catalog Not Published. The game has no published Catalog.
+			/// </summary>
+			CatalogNotPublished = 10105
 		}
 		
 		private const int SuccessHttpResponseCode = 200;
@@ -170,12 +180,18 @@ namespace ChilliConnect
 				case 1003:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
 					return Error.ExpiredConnectAccessToken;		
+				case 10002:
+					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 429, @"Invalid HTTP response code for error code.");
+					return Error.RateLimitReached;		
 				case 1004:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
 					return Error.InvalidConnectAccessToken;		
 				case 1008:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 503, @"Invalid HTTP response code for error code.");
 					return Error.TemporaryServiceError;		
+				case 10105:
+					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
+					return Error.CatalogNotPublished;		
 				default:
 					return Error.UnexpectedError;
 			}
@@ -218,12 +234,16 @@ namespace ChilliConnect
 				case Error.ExpiredConnectAccessToken:
 					return "Expired Connect Access Token. The Connect Access Token used to authenticate with"
 						+ " the server has expired and should be renewed.";
+				case Error.RateLimitReached:
+					return "Rate Limit Reached. Too many requests. Player has been rate limited.";
 				case Error.InvalidConnectAccessToken:
 					return "Invalid Connect Access Token. The Connect Access Token was not valid and cannot"
 						+ " be used to authenticate requests.";
 				case Error.TemporaryServiceError:
 					return "Temporary Service Error. A temporary error is preventing the request from being"
 						+ " processed.";
+				case Error.CatalogNotPublished:
+					return "Catalog Not Published. The game has no published Catalog.";
 				case Error.UnexpectedError:
 				default:
 					return "An unexpected server error occurred.";

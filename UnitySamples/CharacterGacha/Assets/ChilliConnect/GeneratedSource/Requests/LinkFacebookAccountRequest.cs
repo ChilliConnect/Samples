@@ -92,7 +92,7 @@ namespace ChilliConnect
             Update = desc.Update;
             ConnectAccessToken = connectAccessToken;
 	
-			Url = "https://connect.chilliconnect.com/1.0/player/link/facebook";
+			Url = "https://connect.chilliconnect.com/2.0/player/link/facebook";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

@@ -82,17 +82,16 @@ namespace ChilliConnect
 		public InAppPurchase InAppPurchase { get; private set; }
 	
 		/// <summary>
-		/// Bring back a list of requested DLC packages along with their contained files.
-		/// When a request provides multiple Tags, only packages that have all Tags will be
-		/// returned.
-		/// </summary>
-		public Dlc Dlc { get; private set; }
-	
-		/// <summary>
 		/// The ChillConnect Metrics module. This provides the means to log metrics events
 		/// with the server.
 		/// </summary>
 		public Metrics Metrics { get; private set; }
+	
+		/// <summary>
+		/// The ChillConnect Catalog Management module. Provides the means to retrieve
+		/// catalog definitions.
+		/// </summary>
+		public Catalog Catalog { get; private set; }
 	
 		/// <summary>
 		/// The ChillConnect Economy Management module. Provides the means to retrieve and
@@ -110,6 +109,16 @@ namespace ChilliConnect
 		/// The ChilliConnect LiveOps module.
 		/// </summary>
 		public LiveOps LiveOps { get; private set; }
+	
+		/// <summary>
+		/// The ChilliConnect Multiplayer module.
+		/// </summary>
+		public Multiplayer Multiplayer { get; private set; }
+	
+		/// <summary>
+		/// The ChilliConnect Async Multiplayer module.
+		/// </summary>
+		public AsyncMultiplayer AsyncMultiplayer { get; private set; }
 
 		/// <summary>
 		/// Initialises a new instance with the given App Token. Must be called on the
@@ -136,11 +145,13 @@ namespace ChilliConnect
 			CloudCode = new CloudCode(logging, taskScheduler, serverRequestSystem, dataStore);
 			PushNotifications = new PushNotifications(logging, taskScheduler, serverRequestSystem, dataStore);
 			InAppPurchase = new InAppPurchase(logging, taskScheduler, serverRequestSystem, dataStore);
-			Dlc = new Dlc(logging, taskScheduler, serverRequestSystem, dataStore);
 			Metrics = new Metrics(logging, taskScheduler, serverRequestSystem, dataStore);
+			Catalog = new Catalog(logging, taskScheduler, serverRequestSystem, dataStore);
 			Economy = new Economy(logging, taskScheduler, serverRequestSystem, dataStore);
 			Messaging = new Messaging(logging, taskScheduler, serverRequestSystem, dataStore);
 			LiveOps = new LiveOps(logging, taskScheduler, serverRequestSystem, dataStore);
+			Multiplayer = new Multiplayer(logging, taskScheduler, serverRequestSystem, dataStore);
+			AsyncMultiplayer = new AsyncMultiplayer(logging, taskScheduler, serverRequestSystem, dataStore);
 		}
 		
 		/// <summary>

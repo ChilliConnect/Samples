@@ -46,6 +46,12 @@ namespace ChilliConnect
         public string FacebookAccessToken { get; set; }
 	
 		/// <summary>
+		/// Flag which will tell ChilliConnect to create a player if there is not one
+		/// associated with this Facebook Account.
+		/// </summary>
+        public bool? CreatePlayer { get; set; }
+	
+		/// <summary>
 		/// Model of device being used by the player. E.g. SamsungABC123.
 		/// </summary>
         public string DeviceModel { get; set; }
@@ -62,6 +68,11 @@ namespace ChilliConnect
 		/// IOS, KINDLE, WINDOWS, MACOS, LINUX, OTHER.
 		/// </summary>
         public string Platform { get; set; }
+	
+		/// <summary>
+		/// The client version of your game.
+		/// </summary>
+        public string AppVersion { get; set; }
 
 		/// <summary>
 		/// Initialises a new instance of the description with the given required properties.

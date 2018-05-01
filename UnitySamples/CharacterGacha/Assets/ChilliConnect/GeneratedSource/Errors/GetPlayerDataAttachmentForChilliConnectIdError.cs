@@ -62,6 +62,11 @@ namespace ChilliConnect
 			AttachmentDataNotFound = 7003,
 	
 			/// <summary>
+			/// Rate Limit Reached. Too many requests. Player has been rate limited.
+			/// </summary>
+			RateLimitReached = 10002,
+	
+			/// <summary>
 			/// Player Not Found. The player specified was not found.
 			/// </summary>
 			PlayerNotFound = 1009,
@@ -187,6 +192,9 @@ namespace ChilliConnect
 				case 7003:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
 					return Error.AttachmentDataNotFound;		
+				case 10002:
+					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 429, @"Invalid HTTP response code for error code.");
+					return Error.RateLimitReached;		
 				case 1009:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
 					return Error.PlayerNotFound;		
@@ -243,6 +251,8 @@ namespace ChilliConnect
 					return "A connection could not be established.";
 				case Error.AttachmentDataNotFound:
 					return "Attachment Data Not Found.";
+				case Error.RateLimitReached:
+					return "Rate Limit Reached. Too many requests. Player has been rate limited.";
 				case Error.PlayerNotFound:
 					return "Player Not Found. The player specified was not found.";
 				case Error.InvalidRequest:

@@ -64,6 +64,11 @@ namespace ChilliConnect
 			InvalidRequest = 1007,
 	
 			/// <summary>
+			/// Trial Expired. Trial Period Expired
+			/// </summary>
+			TrialExpired = 1013,
+	
+			/// <summary>
 			/// Temporary Service Error. A temporary error is preventing the request from being
 			/// processed.
 			/// </summary>
@@ -180,6 +185,9 @@ namespace ChilliConnect
 				case 1007:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 422, @"Invalid HTTP response code for error code.");
 					return Error.InvalidRequest;		
+				case 1013:
+					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
+					return Error.TrialExpired;		
 				case 1008:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 503, @"Invalid HTTP response code for error code.");
 					return Error.TemporaryServiceError;		
@@ -235,6 +243,8 @@ namespace ChilliConnect
 					return "Invalid Request. One of more of the provided fields were not correctly formatted."
 						+ " The data property of the response body will contain specific error messages for"
 						+ " each field.";
+				case Error.TrialExpired:
+					return "Trial Expired. Trial Period Expired";
 				case Error.TemporaryServiceError:
 					return "Temporary Service Error. A temporary error is preventing the request from being"
 						+ " processed.";

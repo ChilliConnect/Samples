@@ -49,7 +49,12 @@ namespace SdkCore
             string objectName = "_SdkCore-" + random.Next(0, Int32.MaxValue);
 
             var gameObject = new GameObject(objectName);
-            gameObject.AddComponent<TaskScheduler>();
+            
+#if UNITY_WEBGL
+			gameObject.AddComponent<TaskSchedulerWebGL>();
+#else
+			gameObject.AddComponent<TaskSchedulerThreaded>();
+#endif
 
             UnityEngine.Object.DontDestroyOnLoad(gameObject);
 

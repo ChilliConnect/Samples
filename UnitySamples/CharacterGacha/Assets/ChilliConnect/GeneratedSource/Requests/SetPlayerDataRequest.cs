@@ -91,6 +91,7 @@ namespace ChilliConnect
 			ReleaseAssert.IsNotNull(desc, "A description object cannot be null.");
 			
 			ReleaseAssert.IsNotNull(desc.Key, "Key cannot be null.");
+			ReleaseAssert.IsNotNull(desc.Value, "Value cannot be null.");
 	
 			ReleaseAssert.IsNotNull(connectAccessToken, "Connect Access Token cannot be null.");
 	
@@ -136,10 +137,7 @@ namespace ChilliConnect
 			dictionary.Add("Key", Key);
 			
 			// Value
-            if (Value != null)
-			{
-                dictionary.Add("Value", Value.Serialise());
-            }
+            dictionary.Add("Value", Value.Serialise());
 			
 			// Write Lock
             if (WriteLock != null)

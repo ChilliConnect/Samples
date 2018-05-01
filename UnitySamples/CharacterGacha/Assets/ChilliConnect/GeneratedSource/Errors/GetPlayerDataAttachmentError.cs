@@ -62,6 +62,11 @@ namespace ChilliConnect
 			AttachmentDataNotFound = 7003,
 	
 			/// <summary>
+			/// Rate Limit Reached. Too many requests. Player has been rate limited.
+			/// </summary>
+			RateLimitReached = 10002,
+	
+			/// <summary>
 			/// Invalid Request. One of more of the provided fields were not correctly formatted.
 			/// The data property of the response body will contain specific error messages for
 			/// each field.
@@ -182,6 +187,9 @@ namespace ChilliConnect
 				case 7003:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 401, @"Invalid HTTP response code for error code.");
 					return Error.AttachmentDataNotFound;		
+				case 10002:
+					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 429, @"Invalid HTTP response code for error code.");
+					return Error.RateLimitReached;		
 				case 1007:
 					ReleaseAssert.IsTrue(serverResponse.HttpResponseCode == 422, @"Invalid HTTP response code for error code.");
 					return Error.InvalidRequest;		
@@ -235,6 +243,8 @@ namespace ChilliConnect
 					return "A connection could not be established.";
 				case Error.AttachmentDataNotFound:
 					return "Attachment Data Not Found.";
+				case Error.RateLimitReached:
+					return "Rate Limit Reached. Too many requests. Player has been rate limited.";
 				case Error.InvalidRequest:
 					return "Invalid Request. One of more of the provided fields were not correctly formatted."
 						+ " The data property of the response body will contain specific error messages for"

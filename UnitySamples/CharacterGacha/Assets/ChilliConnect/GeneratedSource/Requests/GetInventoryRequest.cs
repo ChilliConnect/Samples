@@ -66,7 +66,7 @@ namespace ChilliConnect
 	
             ConnectAccessToken = connectAccessToken;
 			
-			Url = "https://connect.chilliconnect.com/1.0/economy/inventory/get";
+			Url = "https://connect.chilliconnect.com/2.0/economy/inventory/get";
 			HttpRequestMethod = HttpRequestMethod.Post;
 		}
 

@@ -38,6 +38,11 @@ namespace ChilliConnect
 	public sealed class GetInventoryForKeysResponse
 	{
 		/// <summary>
+		/// The Catalog Version.
+		/// </summary>
+        public string CatalogVersion { get; private set; }
+	
+		/// <summary>
 		/// A list of Player Inventory Items.
 		/// </summary>
         public ReadOnlyCollection<PlayerInventoryItem> Items { get; private set; }
@@ -50,12 +55,20 @@ namespace ChilliConnect
 		public GetInventoryForKeysResponse(IDictionary<string, object> jsonDictionary)
 		{
 			ReleaseAssert.IsNotNull(jsonDictionary, "JSON dictionary cannot be null.");
+			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("CatalogVersion"), "Json is missing required field 'CatalogVersion'");
 			ReleaseAssert.IsTrue(jsonDictionary.ContainsKey("Items"), "Json is missing required field 'Items'");
 	
 			foreach (KeyValuePair<string, object> entry in jsonDictionary)
 			{
+				// Catalog Version
+				if (entry.Key == "CatalogVersion")
+				{
+                    ReleaseAssert.IsTrue(entry.Value is string, "Invalid serialised type.");
+                    CatalogVersion = (string)entry.Value;
+				}
+		
 				// Items
-				if (entry.Key == "Items")
+				else if (entry.Key == "Items")
 				{
                     ReleaseAssert.IsTrue(entry.Value is IList<object>, "Invalid serialised type.");
                     Items = JsonSerialisation.DeserialiseList((IList<object>)entry.Value, (object element) =>

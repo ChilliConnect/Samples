@@ -67,6 +67,11 @@ namespace ChilliConnect
 		/// IOS, KINDLE, WINDOWS, MACOS, LINUX, OTHER.
 		/// </summary>
         public string Platform { get; set; }
+	
+		/// <summary>
+		/// The client version of your game.
+		/// </summary>
+        public string AppVersion { get; set; }
 
 		/// <summary>
 		/// Initialises a new instance of the description with the given required properties.
