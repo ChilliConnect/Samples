@@ -17,7 +17,7 @@ public class CharacterListUIController: MonoBehaviour
 
 	private void Awake() 
 	{
-		m_contentParent = transform.FindChild("Content");
+		m_contentParent = transform.Find("Content");
 		GameObject prefab = Resources.Load<GameObject>("CharacterListUIElement");
 		m_pooledParent = new GameObject("CharacterListUIElementPool").transform;
 
