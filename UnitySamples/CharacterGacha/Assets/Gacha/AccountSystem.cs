@@ -15,10 +15,6 @@ public class AccountSystem
 
 	private string m_chilliConnectId;
 
-	private const string DEFAULT_TEST_GROUP = "Default";
-
-	public string TestGroup { get; set; }
-
 	public static AccountSystem Get()
 	{
 		return s_singletonInstance;
@@ -49,7 +45,7 @@ public class AccountSystem
 	}
 
 	/// Creates a new ChilliConnect player account, replacing the currently 
-	/// persisted credentials. This effectivley logs out the existing player
+	/// persisted credentials. This effectively logs out the existing player
 	/// 
 	public void CreateNewAccount()
 	{
@@ -57,23 +53,20 @@ public class AccountSystem
 		m_chilliConnect.PlayerAccounts.CreatePlayer(requestDesc, (request, response) => OnChilliConnectAccountCreated(response), (request, createError) => Debug.LogError(createError.ErrorDescription));
 	}
 
-	/// Handler for succesfull log in, will set chilliConnectId to private member variable then
+	/// Handler for successfull log in, will set chilliConnectId to private member variable then
 	/// call the function responsible for login and TestGroup setting
 	/// 
 	private void OnChilliConnectLoggedIn(string chilliConnectId, string chilliConnectSecret)
 	{
-		m_chilliConnect.LiveOps.GetActiveTest( 
-			(response) => OnActiveTestReturned(response), 
-			(error) => Debug.LogError(error.ErrorDescription));
-
 		m_chilliConnectId = chilliConnectId;
+		OnPlayerLoggedIn (m_chilliConnectId);
 	}
 
-	/// Handler for succesfull player account creation. Will persist the new 
+	/// Handler for successfull player account creation. Will persist the new 
 	/// players ChilliConnectID and ChilliConnectSecret and login the player
 	/// 
 	/// @param response
-	/// 	The CreatePlayerReponse from the ChilliConnect SDK
+	/// 	The CreatePlayerResponse from the ChilliConnect SDK
 	/// 
 	private void OnChilliConnectAccountCreated(CreatePlayerResponse response)
 	{
@@ -81,21 +74,6 @@ public class AccountSystem
 		PlayerPrefs.SetString("CCSecret", response.ChilliConnectSecret);
 	
 		Login (response.ChilliConnectId, response.ChilliConnectSecret);
-	}
-
-	/// Handler for setting the TestGroup name and will notify listeners a new player has been logged in
-    /// 
-	private void OnActiveTestReturned(GetActiveTestResponse response)
-	{
-		var testGroup = response.TestGroup;
-
-		if (testGroup != null) {
-			TestGroup = testGroup.Name;
-		} else {
-			TestGroup = DEFAULT_TEST_GROUP;
-		}
-			
-		OnPlayerLoggedIn (m_chilliConnectId);
 	}
 
 	/// Logs in the player identified

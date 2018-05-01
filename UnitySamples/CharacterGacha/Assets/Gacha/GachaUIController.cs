@@ -55,7 +55,7 @@ public class GachaUIController : MonoBehaviour
 	/// 
 	private void OnPlayerLoggedIn( string chilliConnectId ) {
 		EconomySystem.Get ().GetPlayerCoinBalance();
-		EconomySystem.Get ().GetRecipeMetaData(AccountSystem.Get().TestGroup);
+		EconomySystem.Get ().GetRecipeMetaData();
 		EconomySystem.Get ().GetPlayersCharacterList();
 
 		m_loginLabel.text = "Logged in as " + chilliConnectId;
