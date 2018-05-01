@@ -56,8 +56,8 @@ public class CatalogueUIController : MonoBehaviour
 			uiElement.transform.SetParent(transform);
 			uiElement.transform.localScale = Vector3.one;
 			uiElement.name = capturedItem.ProductId;
-			uiElement.transform.FindChild("Name").GetComponent<Text>().text = capturedItem.Name;
-			uiElement.transform.FindChild("Cost").GetComponent<Text>().text = capturedItem.LocalisedPrice;
+			uiElement.transform.Find("Name").GetComponent<Text>().text = capturedItem.Name;
+			uiElement.transform.Find("Cost").GetComponent<Text>().text = capturedItem.LocalisedPrice;
 			uiElement.GetComponent<Button>().onClick.AddListener(() => OnCatalogueItemSelected(capturedItem));
 		}
 
