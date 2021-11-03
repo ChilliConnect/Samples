@@ -110,7 +110,8 @@ public class IAPSystem : IStoreListener
 			m_availableItems.Add(new Item(GetPlatformProductId(item), item.Key));
 		}
 
-		builder.Configure<IGooglePlayConfiguration>().SetPublicKey("ADD YOUR GOOGLE PUBLIC KEY");
+		// No need
+		//builder.Configure<IGooglePlayConfiguration>().SetPublicKey("ADD YOUR GOOGLE PUBLIC KEY");
 			
 		// Expect a response either in OnInitialized or OnInitializeFailed.
 		UnityPurchasing.Initialize(this, builder);
@@ -199,13 +200,15 @@ public class IAPSystem : IStoreListener
 
 		if(Application.platform == RuntimePlatform.IPhonePlayer)
 		{
-			m_chilliConnect.Economy.RedeemAppleIap(rmpKey, ParseAppleReceipt(args.purchasedProduct.receipt), (request, response) => OnPurchaseRedeemed(args.purchasedProduct, response.Status, response.Rewards), (request, error) => OnPurchaseRedeemFailedApple(args.purchasedProduct, error));
+			var redeemAppleIapDesc = new RedeemAppleIapRequestDesc(rmpKey, ParseAppleReceipt(args.purchasedProduct.receipt));
+			m_chilliConnect.Economy.RedeemAppleIap(redeemAppleIapDesc, (request, response) => OnPurchaseRedeemed(args.purchasedProduct, response.Status, response.Rewards), (request, error) => OnPurchaseRedeemFailedApple(args.purchasedProduct, error));
 		}
 		else if(Application.platform == RuntimePlatform.Android)
 		{
 			string purchaseData, dataSignature;
 			ParseGooglePlayReceipt(args.purchasedProduct.receipt, out purchaseData, out dataSignature);
-			m_chilliConnect.Economy.RedeemGoogleIap(rmpKey, purchaseData, dataSignature, (request, response) => OnPurchaseRedeemed(args.purchasedProduct, response.Status, response.Rewards), (request, error) => OnPurchaseRedeemFailedGoogle(args.purchasedProduct, error));
+			var redeemGoogleIapDesc = new RedeemGoogleIapRequestDesc(rmpKey, purchaseData, dataSignature);
+			m_chilliConnect.Economy.RedeemGoogleIap(redeemGoogleIapDesc, (request, response) => OnPurchaseRedeemed(args.purchasedProduct, response.Status, response.Rewards), (request, error) => OnPurchaseRedeemFailedGoogle(args.purchasedProduct, error));
 		}
 		else
 		{
